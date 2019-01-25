@@ -39,7 +39,7 @@ def extract_features(sig, label, cfg, segment=True, window_size=5):
     feat_val = np.array(feat_val)
     d = {str(lab): feat_val[:,idx] for idx, lab in enumerate(labels)}
     df = pd.DataFrame(data=d)
-    df.to_csv('TSFEL/tsfel/utils/Features.csv', sep=',', encoding='utf-8', index_label="Sample")
+    df.to_csv('tsfel/tsfel/utils/Features.csv', sep=',', encoding='utf-8', index_label="Sample")
     print("*** Feature extraction finished ***")
 
     return df

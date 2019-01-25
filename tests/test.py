@@ -22,7 +22,7 @@ wave = np.sin(2 * np.pi * f * x / Fs)
 np.random.seed(seed=10)
 noiseWave = wave + np.random.normal(0,0.1,1000)
 offsetWave = wave + 2
-from TSFEL import*
+from tsfel import*
 
 #### STATISTICAL FEATURES ####
 def test_hist():
