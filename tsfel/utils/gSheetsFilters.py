@@ -2,8 +2,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import ast
-from TSFEL.tsfel.utils.read_json import compute_dictionary
-from TSFEL.tsfel.utils.eval import compute_complexity
+from tsfel.tsfel.utils.read_json import compute_dictionary
+from tsfel.tsfel.utils.eval import compute_complexity
 
 def filter_features(dic, filters):
     features_all = list(np.concatenate([list(dic[dk].keys()) for dk in sorted(dic.keys())]))
@@ -28,7 +28,7 @@ def filter_features(dic, filters):
     return features_filtered
 
 def extract_sheet(gSheetName):
-    FEATURES_JSON = 'TSFEL/tsfel/utils/features.json'
+    FEATURES_JSON = 'tsfel/tsfel/utils/features.json'
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
     DICTIONARY = compute_dictionary(FEATURES_JSON, DEFAULT)
     scope = ['https://spreadsheets.google.com/feeds',
@@ -38,7 +38,6 @@ def extract_sheet(gSheetName):
     confManager = client.open(gSheetName)
     sheet = confManager.sheet1
     metadata = confManager.fetch_sheet_metadata()
-    list_of_features = []
     list_of_features = sheet.col_values(2)[4:]
     filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
     list_filt_features = filter_features(DICTIONARY,filters)
@@ -84,14 +83,22 @@ def extract_sheet(gSheetName):
 
     for i in range(len_stat):
         if use_or_not[i] == 'TRUE':
+            DICTIONARY['Statistical'][list_of_features[i]]['use'] = 'yes'
             if list_of_features[i] == 'Histogram':
                 val = sheet.cell(i + 5, 5).value
-                DICTIONARY['Statistical'][list_of_features[i]]['free parameters'] = {'nbins': [ast.literal_eval(val)['nbins']], "r": [ast.literal_eval(val)['r']]}
-            DICTIONARY['Statistical'][list_of_features[i]]['use'] = 'yes'
+                DICTIONARY['Statistical'][list_of_features[i]]['free parameters'] = {
+                    'nbins': [ast.literal_eval(val)['nbins']], "r": [ast.literal_eval(val)['r']]}
+        else:
+            DICTIONARY['Statistical'][list_of_features[i]]['use']='no'
+
+
 
     for i in range(len_temp):
         if use_or_not[i+len_stat] == 'TRUE':
             DICTIONARY['Temporal'][list_of_features[i+len_stat]]['use'] = 'yes'
+        else:
+            DICTIONARY['Temporal'][list_of_features[i+len_stat]]['use']='no'
+
 
     for i in range(len_spec):
         if use_or_not[i+len_stat+len_temp] == 'TRUE':
@@ -101,7 +108,9 @@ def extract_sheet(gSheetName):
             else:
                 DICTIONARY['Spectral'][list_of_features[i+len_stat+len_temp]]['parameters'] = str(ast.literal_eval(val)['fs'])
                 DICTIONARY['Spectral'][list_of_features[i+len_stat+len_temp]]['use'] = 'yes'
-    
+        else:
+            DICTIONARY['Spectral'][list_of_features[i+len_stat+len_temp]]['use']='no'
+
     return DICTIONARY
 
 #extract_sheet()
