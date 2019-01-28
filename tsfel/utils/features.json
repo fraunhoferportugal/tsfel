@@ -1,7 +1,7 @@
 {
     "Spectral": {
         "Curve distance": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the curve distance of a dataset.",
             "free parameters": "",
             "function": "curve_distance",
@@ -14,7 +14,7 @@
             "use": "yes"
         },
         "Fundamental frequency": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "cost": "100",
             "description": "Computes the fundamental frequency along the specified axis.For an harmonic signal,the fundamental frequency is the frequency so thats its integer multiple best explain the content of the signal spectrum.",
             "free parameters": "",
@@ -28,7 +28,7 @@
             "use": "yes"
         },
         "Linear regression": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the linear regression of a data set.",
             "free parameters": "",
             "function": "linear_regression",
@@ -40,7 +40,7 @@
             "use": "yes"
         },
         "Max power spectrum": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Compute power spectrum density along the specified axes and return the maximum value.",
             "free parameters": "",
             "function": "max_power_spectrum",
@@ -53,7 +53,7 @@
             "use": "yes"
         },
         "Maximum frequency": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Compute the one-dimensional discrete Fourier Transform and with cumsum function find 95% of max frequency.",
             "free parameters": "",
             "function": "max_frequency",
@@ -66,7 +66,7 @@
             "use": "yes"
         },
         "Median frequency": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Compute the one-dimensional discrete Fourier Transform and with cumsum function find 50% of max frequency.",
             "free parameters": "",
             "function": "median_frequency",
@@ -79,7 +79,7 @@
             "use": "yes"
         },
         "Spectral centroid": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral centroid of a data set.",
             "free parameters": "",
             "function": "spectral_centroid",
@@ -92,7 +92,7 @@
             "use": "yes"
         },
         "Spectral decrease": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral decrease of a data set.",
             "free parameters": "",
             "function": "spectral_decrease",
@@ -105,7 +105,7 @@
             "use": "yes"
         },
         "Spectral kurtosis": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral kurtosis of a data set.",
             "free parameters": "",
             "function": "spectral_kurtosis",
@@ -118,7 +118,7 @@
             "use": "yes"
         },
         "Spectral maximum peaks": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Returns the number of maximum peaks of a data set.",
             "free parameters": "",
             "function": "spectral_maxpeaks",
@@ -131,7 +131,7 @@
             "use": "yes"
         },
         "Spectral roll-off": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral roll-off of a dataset.",
             "free parameters": "",
             "function": "spectral_roll_off",
@@ -144,7 +144,7 @@
             "use": "yes"
         },
         "Spectral roll-on": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral roll-on of a dataset.",
             "free parameters": "",
             "function": "spectral_roll_on",
@@ -157,7 +157,7 @@
             "use": "yes"
         },
         "Spectral skewness": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral skewness of a data set.",
             "free parameters": "",
             "function": "spectral_skewness",
@@ -170,7 +170,7 @@
             "use": "yes"
         },
         "Spectral slope": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral slope of a data set.",
             "free parameters": "",
             "function": "spectral_slope",
@@ -183,7 +183,7 @@
             "use": "yes"
         },
         "Spectral spread": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral spread of a data set.",
             "free parameters": "",
             "function": "spectral_spread",
@@ -196,7 +196,7 @@
             "use": "yes"
         },
         "Spectral variation": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the spectral variation of a data set.",
             "free parameters": "",
             "function": "spect_variation",
@@ -209,7 +209,7 @@
             "use": "yes"
         },
         "Total energy": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the total energy of a data set.",
             "free parameters": "",
             "function": "total_energy",
@@ -297,7 +297,7 @@
             "use": "yes"
         },
         "Mean absolute deviation": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the mean absolute deviation for the provided sequence of values, a more robust estimation than the variance.",
             "free parameters": "",
             "function": "calc_meanad",
@@ -310,7 +310,7 @@
             "use": "yes"
         },
         "Median": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the median along the specified axis.",
             "free parameters": "",
             "function": "median",
@@ -323,7 +323,7 @@
             "use": "yes"
         },
         "Median absolute deviation": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the median absolute deviation for the provided sequence of values, a more robust estimation than the variance.",
             "free parameters": "",
             "function": "calc_medad",
@@ -362,7 +362,7 @@
             "use": "yes"
         },
         "Skewness": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the skewness of a data set.",
             "free parameters": "",
             "function": "skew",
@@ -403,7 +403,7 @@
     },
     "Temporal": {
         "Autocorrelation": {
-            "Complexity": "Unknown",
+            "Complexity": "Constant",
             "description": "Cross correlation of 1dimensional sequence.",
             "free parameters": "",
             "function": "autocorr",
@@ -429,7 +429,7 @@
             "use": "yes"
         },
         "Maximum peaks": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Returns the number of maximum peaks of a data set.",
             "free parameters": "",
             "function": "maxpeaks",
@@ -442,7 +442,7 @@
             "use": "yes"
         },
         "Mean absolute diff": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the mean of the absolute differences between two consequent values.",
             "free parameters": "",
             "function": "calc_meanadiff",
@@ -455,7 +455,7 @@
             "use": "yes"
         },
         "Mean diff": {
-            "Complexity": "Unknown",
+            "Complexity": "Constant",
             "description": "Computes the mean of the differences between two consequent values.",
             "free parameters": "",
             "function": "calc_meandiff",
@@ -468,7 +468,7 @@
             "use": "yes"
         },
         "Median absolute diff": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the median of the absolute differences between two consequent values.",
             "free parameters": "",
             "function": "calc_medadiff",
@@ -481,7 +481,7 @@
             "use": "yes"
         },
         "Median diff": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the median of the differences between two consequent values.",
             "free parameters": "",
             "function": "calc_meddiff",
@@ -494,7 +494,7 @@
             "use": "yes"
         },
         "Minimum peaks": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Returns the number of minimum peaks of a data set.",
             "free parameters": "",
             "function": "minpeaks",
@@ -507,7 +507,7 @@
             "use": "yes"
         },
         "Signal distance": {
-            "Complexity": "Unknown",
+            "Complexity": "Linear",
             "description": "Computes the length of the signal.",
             "free parameters": "",
             "function": "distance",
@@ -520,7 +520,7 @@
             "use": "yes"
         },
         "Sum absolute diff": {
-            "Complexity": "Unknown",
+            "Complexity": "Log",
             "description": "Computes the sum of the absolute differences between two consequent values.",
             "free parameters": "",
             "function": "calc_sadiff",
