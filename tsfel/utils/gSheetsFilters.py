@@ -2,8 +2,9 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import ast
-from tsfel.tsfel.utils.read_json import compute_dictionary
-from tsfel.tsfel.utils.eval import compute_complexity
+from tsfel.utils.read_json import compute_dictionary
+from tsfel.utils.eval import compute_complexity
+
 
 def filter_features(dic, filters):
     features_all = list(np.concatenate([list(dic[dk].keys()) for dk in sorted(dic.keys())]))
@@ -26,6 +27,7 @@ def filter_features(dic, filters):
     features_filtered = [cc for cc in features_filtered if cc in cost_shown]
 
     return features_filtered
+
 
 def extract_sheet(gSheetName):
     FEATURES_JSON = 'tsfel/tsfel/utils/features.json'

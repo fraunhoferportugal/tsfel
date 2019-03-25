@@ -1,10 +1,10 @@
-
 import numpy as np
 from scipy.optimize import curve_fit
-from tsfel.tsfel.utils.read_json import compute_dictionary
-from tsfel.tsfel.utils.read_json import one_extract
+from tsfel.utils.read_json import compute_dictionary
+from tsfel.utils.read_json import one_extract
 import time
 import json
+
 ###########################################
 # curves
 def n_Squared(x, No):

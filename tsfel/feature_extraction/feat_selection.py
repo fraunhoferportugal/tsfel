@@ -2,6 +2,7 @@ import numpy as np
 import pandas_profiling
 from sklearn.metrics import accuracy_score
 
+
 def FSE(X_train, X_test, y_train, y_test, features_descrition, classifier):
     """ Performs a forward feature selection.
     Parameters

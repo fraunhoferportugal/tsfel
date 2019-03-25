@@ -113,3 +113,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/
+data/inputs/
+data/outputs/

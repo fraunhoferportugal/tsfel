@@ -1,6 +1,7 @@
 import json
 import numpy as np
 
+
 def compute_dictionary(features_json, default):
     """
     This function computes the dictionary
@@ -23,6 +24,7 @@ def compute_dictionary(features_json, default):
             dictionary = data
 
     return dictionary
+
 
 def feat_extract(dictionary, signal_window, signal_label, FS = 100, iteration=None):
     """
