@@ -54,6 +54,7 @@ def zero_cross(sig):
 
     return len(np.where(np.diff(np.sign(sig)))[0])
 
+
 def calc_meanadiff(sig):
     """Compute mean absolute differences along the specified axes.
 
@@ -139,7 +140,6 @@ def calc_meddiff(sig):
     return np.median(np.diff(sig))
 
 
-#create time
 def compute_time(sign, FS):
     """Creates the signal correspondent time array.
     """
@@ -184,7 +184,6 @@ def signal_energy(sign, time):
     return list(energy), list(time_energy)
 
 
-# Temporal Centroid
 def centroid(sign, FS):
     """Computes the centroid along the time axis.
     ----------
@@ -212,7 +211,6 @@ def centroid(sign, FS):
     return centroid
 
 
-# Total Energy
 def total_energy(sign, FS):
     """
     Compute the acc_total power, using the given windowSize and value time in samples
@@ -222,9 +220,12 @@ def total_energy(sign, FS):
 
     return np.sum(np.array(sign)**2)/(time[-1]-time[0])
 
+
 ########################################################################################################################
 # ############################################ SPECTRAL DOMAIN ####################################################### #
 ########################################################################################################################
+
+
 def plotfft(s, fmax):
     """ This functions computes the fft of a signal, returning the frequency
     and their magnitude values.
@@ -247,6 +248,7 @@ def plotfft(s, fmax):
     fs = abs(np.fft.fft(s))
     f = np.linspace(0, fmax // 2, len(s) // 2)
     return (f[1:len(s) // 2].copy(), fs[1:len(s) // 2].copy())
+
 
 def _bigPeaks(s, th, min_peak_distance=5, peak_return_percentage=0.1):
     pp = []
@@ -384,7 +386,6 @@ def ceps_coeff(sig,coefNumber):
     return cc
 
 
-# Power Spectrum Density
 def max_power_spectrum(sig, FS):
     """Compute power spectrum density along the specified axes.
 
@@ -474,9 +475,56 @@ def trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfilt, nlogfilt):
     return fbank, freqs
 
 
+def fast_fourier_transform(sig):
+    """
+    Computes the one-dimensional discrete Fourier Transform.
+    :param sig:ndarray
+        input from which cepstral coefficients are computed.
+    :return: fft_ndarray
+    """
+    fft = np.fft.fft(sig)
+
+    return fft
+
+
+def index_highest_fft(sig):
+    """Computes the index of the highest Fast Fourier Transform using an one-dimensional discrete Fourier Transform for real input.
+
+    Parameters
+    ---------
+    sig: ndarray
+        input from which cepstral coefficients are computed.
+    Returns
+    ---------
+    h_fft: int64
+
+    """
+    fft = fast_fourier_transform(sig)
+    h_fft = np.argmax(fft)
+
+    return h_fft
+
+
+def ratio_1st_2nd_highest_fft_values(sig):
+    """
+    Computes the ratio between the first and second highest FFT values.
+    :param sig:ndarray
+    :return:r_fft: float
+    """
+
+    fft = fast_fourier_transform(sig)
+    fft_1st = np.max(fft)
+    fft_2nd = np.max(np.delete(fft, np.where(fft == fft_1st)[0]))
+    r_fft =  fft_1st/fft_2nd
+
+    return r_fft
+
+
 ########################################################################################################################
 ####################################### STATISTICAL DOMAIN #############################################################
 ########################################################################################################################
+
+
 def interq_range(sig):
     """Compute interquartile range along the specified axis.
 
@@ -494,7 +542,6 @@ def interq_range(sig):
     return np.percentile(sig, 75) - np.percentile(sig, 25)
 
 
-# Kurtosis
 def calc_kurtosis(sig):
      """Compute kurtosis along the specified axes.
 
@@ -511,7 +558,6 @@ def calc_kurtosis(sig):
      return kurtosis(sig)
 
 
-# Skewness
 def calc_skewness(sig):
      """Compute skewness along the specified axes.
 
@@ -528,7 +574,6 @@ def calc_skewness(sig):
      return skew(sig)
 
 
-# Mean
 def calc_mean(sig):
      """Compute mean value along the specified axes.
 
@@ -546,7 +591,6 @@ def calc_mean(sig):
      return np.mean(sig)
 
 
-# Standard Deviation
 def calc_std(sig):
      """Compute standard deviation (std) along the specified axes.
 
@@ -563,7 +607,6 @@ def calc_std(sig):
      return np.std(sig)
 
 
-# Interquartile Range
 def calc_iqr(sig):
      """Compute interquartile range along the specified axes.
 
@@ -581,7 +624,6 @@ def calc_iqr(sig):
      return np.percentile(sig, 75) - np.percentile(sig, 25)
 
 
-# Mean Absolute Deviation
 def calc_meanad(sig):
      """Compute mean absolute deviation along the specified axes.
 
@@ -600,7 +642,7 @@ def calc_meanad(sig):
 
      return np.mean(diff)
 
-# Median Absolute Deviation
+
 def calc_medad(sig):
      """Compute mean absolute deviation along the specified axes.
 
@@ -619,7 +661,7 @@ def calc_medad(sig):
 
      return np.median(diff)
 
-# Root Mean Square
+
 def rms(sig):
      """Compute root mean square along the specified axes.
 
@@ -635,6 +677,7 @@ def rms(sig):
     """
 
      return np.sqrt(np.sum(np.array(sig)**2)/len(sig))
+
 
 # Histogram for json format
 def hist(sig, nbins, r):
@@ -658,12 +701,13 @@ def hist(sig, nbins, r):
 
     """
 
-    histsig, bin_edges = np.histogram(sig, bins=nbins[0], range=[-r[0], r[0]], density=True) #TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r], density=True)  # TODO:subsampling parameter
 
     # bin_edges = bin_edges[:-1]
     # bin_edges += (bin_edges[1]-bin_edges[0])/2.
 
     return tuple(histsig)
+
 
 def minpeaks(sig):
     """Compute number of minimum peaks along the specified axes.
@@ -703,7 +747,6 @@ def maxpeaks(sig):
     return np.sum([1 for nd in range(len(diff_sig[:-1])) if (diff_sig[nd+1]<0 and diff_sig[nd]>0)])
 
 
-# Spectral Centroid
 def spectral_centroid(sign, fs): #center portion of the signal
     """Barycenter of the spectrum.
 
@@ -725,7 +768,6 @@ def spectral_centroid(sign, fs): #center portion of the signal
         return np.dot(f,ff/np.sum(ff))
 
 
-# Spectral Spread
 def spectral_spread(sign, fs):
     """Measures the spread of the spectrum around its mean value.
 
@@ -748,7 +790,6 @@ def spectral_spread(sign, fs):
         return np.dot(((f-spect_centr)**2), (ff / np.sum(ff)))
 
 
-# Spectral Skewness
 def spectral_skewness(sign, fs):
     """Measures the asymmetry of a distribution around its mean value. Computed from the 3rd order moment.
 
@@ -772,7 +813,6 @@ def spectral_skewness(sign, fs):
         return np.sum(skew) / (spectral_spread(sign, fs) ** (3 / 2))
 
 
-# Spectral Kurtosis
 def spectral_kurtosis(sign, fs):
     """Measures the flatness of a distribution around its mean value. Computed from the 4th order moment.
 
@@ -795,7 +835,6 @@ def spectral_kurtosis(sign, fs):
         return np.sum(spect_kurt) / (spectral_spread(sign, fs)**2)
 
 
-# Spectral Slope
 def spectral_slope(sign, fs):
     """Computes the constants m and b of the function aFFT = mf + b, obtained by linear regression of the
     spectral amplitude.
@@ -823,7 +862,6 @@ def spectral_slope(sign, fs):
             return (len(f) * np.dot(f, ff) - np.sum(f) * np.sum(ff)) / (len(f) * np.dot(f, f) - np.sum(f) ** 2)
 
 
-# Spectral Decrease
 def spectral_decrease(sign, fs):
     """Represents the amount of decraesing of the spectra amplitude.
 
@@ -960,7 +998,6 @@ def spect_variation(sign, fs):
     return variation
 
 
-# Variance
 def variance(sign, FS):
     """ Measures how far the numbers are spread out.
 
@@ -986,7 +1023,6 @@ def variance(sign, FS):
     return soma_num/soma_den
 
 
-#Deviation
 def deviation(sign, FS):
     """Temporal deviation.
 
@@ -1051,4 +1087,3 @@ def spectral_maxpeaks(sign, FS):
     diff_sig = np.diff(ff)
 
     return np.sum([1 for nd in range(len(diff_sig[:-1])) if (diff_sig[nd+1]<0 and diff_sig[nd]>0)])
-
