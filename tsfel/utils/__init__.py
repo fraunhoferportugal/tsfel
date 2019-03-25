@@ -1,2 +1,2 @@
-from tsfel.tsfel.utils.gSheetsFilters import *
-from tsfel.tsfel.utils.read_json import *
+from tsfel.utils.gSheetsFilters import *
+from tsfel.utils.read_json import *

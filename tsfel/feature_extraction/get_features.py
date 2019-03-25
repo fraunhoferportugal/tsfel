@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-#import src.feature_extraction.utils.read_json as rj
-from tsfel.tsfel.utils.read_json import feat_extract
+from tsfel.utils.read_json import feat_extract
+
 
 def extract_features(sig, label, cfg, segment=True, window_size=5):
     """ Performs a forward feature selection.

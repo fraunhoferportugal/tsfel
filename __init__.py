@@ -1,1 +1,1 @@
-from tsfel.tsfel import *
+from tsfel import *

@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-#Imports
 from scipy.stats import kurtosis, skew
 import novainstrumentation as ni
 import numpy as np
 from scipy import signal
+
+
 # ####################################  TEMPORAL DOMAIN  ############################################################# #
 ########################################################################################################################
 def distance(sig):
@@ -20,7 +20,7 @@ def distance(sig):
     df_sig = np.diff(sig)
     return np.sum([np.sqrt(1+df**2) for df in df_sig])
 
-# Autocorrelation
+
 def autocorr(sig):
     """Compute autocorrelation along the specified axis.
 
