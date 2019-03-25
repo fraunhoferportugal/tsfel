@@ -30,12 +30,12 @@ def filter_features(dic, filters):
 
 
 def extract_sheet(gSheetName):
-    FEATURES_JSON = 'tsfel/utils/features.json'
+    FEATURES_JSON = 'features.json'
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
     DICTIONARY = compute_dictionary(FEATURES_JSON, DEFAULT)
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('tsfel/utils/client_secret.json', scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
     confManager = client.open(gSheetName)
     sheet = confManager.sheet1
