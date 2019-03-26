@@ -26,7 +26,7 @@ def compute_dictionary(features_json, default):
     return dictionary
 
 
-def feat_extract(dictionary, signal_window, signal_label, iteration=None):
+def feat_extract(dictionary, signal_window, signal_label, FS=100, iteration=None):
     """
     This function computes features matrix for one window.
     :param dictionary: (json file)
@@ -174,7 +174,7 @@ def feat_extract(dictionary, signal_window, signal_label, iteration=None):
     return res, nam
 
 
-def one_extract(feat_dict, signal_window, iteration=None):
+def one_extract(feat_dict, signal_window, FS=100, iteration=None):
     """
     This function computes features matrix for one window.
     :param dictionary: (json file)
