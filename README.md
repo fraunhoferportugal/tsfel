@@ -1,6 +1,6 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
-[![py368 status](https://img.shields.io/badge/python3.6.8-supported-green.svg)]
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/TSFEL_HAR_Example.ipynb)
+![py368 status](https://img.shields.io/badge/python3.6.8-supported-green.svg)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
