@@ -11,7 +11,7 @@
             "parameters": "FS",
             "reference": "Carina Figueira, 2015.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Fundamental frequency": {
             "Complexity": "Linear",
@@ -25,7 +25,7 @@
             "parameters": "FS",
             "reference": "yesvaInstrumentation Library",
             "source": "yesvaInstrumentation Library",
-            "use": "no"
+            "use": "yes"
         },
         "Linear regression": {
             "Complexity": "Linear",
@@ -37,7 +37,7 @@
             "number of features": 1,
             "parameters": "",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Max power spectrum": {
             "Complexity": "Linear",
@@ -50,7 +50,7 @@
             "parameters": "FS",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Maximum frequency": {
             "Complexity": "Linear",
@@ -63,7 +63,7 @@
             "parameters": "FS",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Median frequency": {
             "Complexity": "Linear",
@@ -76,7 +76,7 @@
             "parameters": "FS",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral centroid": {
             "Complexity": "Linear",
@@ -89,7 +89,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral decrease": {
             "Complexity": "Linear",
@@ -102,7 +102,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral kurtosis": {
             "Complexity": "Linear",
@@ -115,7 +115,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral maximum peaks": {
             "Complexity": "Linear",
@@ -128,7 +128,7 @@
             "parameters": "FS",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral roll-off": {
             "Complexity": "Linear",
@@ -141,7 +141,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral roll-on": {
             "Complexity": "Linear",
@@ -154,7 +154,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral skewness": {
             "Complexity": "Linear",
@@ -167,7 +167,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral slope": {
             "Complexity": "Linear",
@@ -180,7 +180,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral spread": {
             "Complexity": "Linear",
@@ -193,7 +193,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Spectral variation": {
             "Complexity": "Linear",
@@ -206,7 +206,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Total energy": {
             "Complexity": "Linear",
@@ -219,7 +219,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Index of highest fft": {
             "Complexity": "",
@@ -232,7 +232,7 @@
             "parameters": "",
             "reference": "",
             "source": "",
-            "use": "no"
+            "use": "yes"
         },
         "Ratio between first and second highest fft": {
             "Complexity": "",
@@ -245,7 +245,7 @@
             "parameters": "",
             "reference": "",
             "source": "",
-            "use": "no"
+            "use": "yes"
         }
     },
     "Statistical": {
@@ -281,7 +281,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Kurtosis": {
             "Complexity": "Log",
@@ -294,7 +294,7 @@
             "parameters": "",
             "reference": "Zwillinger, D. and Kokoska, S. (2000). CRC Standard Probability and Statistics Tables and Formulae. Champman and Hall: New York. 2000.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Max": {
             "Complexity": "Log",
@@ -307,7 +307,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Mean": {
             "Complexity": "Constant",
@@ -320,7 +320,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Mean absolute deviation": {
             "Complexity": "Linear",
@@ -333,7 +333,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Median": {
             "Complexity": "Log",
@@ -346,7 +346,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Median absolute deviation": {
             "Complexity": "Linear",
@@ -359,7 +359,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Min": {
             "Complexity": "Constant",
@@ -372,7 +372,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Root mean square": {
             "Complexity": "Log",
@@ -385,7 +385,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Skewness": {
             "Complexity": "Log",
@@ -398,7 +398,7 @@
             "parameters": "",
             "reference": "Zwillinger, D. and Kokoska, S. (2000). CRC Standard Probability and Statistics Tables and Formulae. Champman and Hall: New York. 2000. ",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Standard Deviation": {
             "Complexity": "Log",
@@ -411,7 +411,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Variance": {
             "Complexity": "Log",
@@ -424,7 +424,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         }
     },
     "Temporal": {
@@ -439,7 +439,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Centroid": {
             "Complexity": "Linear",
@@ -452,7 +452,7 @@
             "parameters": "FS",
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Maximum peaks": {
             "Complexity": "Linear",
@@ -465,7 +465,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Mean absolute diff": {
             "Complexity": "Log",
@@ -478,7 +478,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Mean diff": {
             "Complexity": "Constant",
@@ -491,7 +491,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Median absolute diff": {
             "Complexity": "Log",
@@ -504,7 +504,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Median diff": {
             "Complexity": "Log",
@@ -517,7 +517,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Minimum peaks": {
             "Complexity": "Linear",
@@ -530,7 +530,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Signal distance": {
             "Complexity": "Linear",
@@ -543,7 +543,7 @@
             "parameters": "",
             "reference": "",
             "source": "",
-            "use": "no"
+            "use": "yes"
         },
         "Sum absolute diff": {
             "Complexity": "Log",
@@ -556,7 +556,7 @@
             "parameters": "",
             "reference": "Python 2.7, Numpy Library",
             "source": "Python 2.7, Numpy Library",
-            "use": "no"
+            "use": "yes"
         },
         "Zero crossing rate": {
             "Complexity": "Log",
@@ -569,7 +569,7 @@
             "parameters": "",
             "reference": "novaInstrumentation",
             "source": "novaInstrumentation",
-            "use": "no"
+            "use": "yes"
         }
     }
 }
