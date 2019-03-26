@@ -89,7 +89,7 @@ def extract_sheet(gSheetName):
             if list_of_features[i] == 'Histogram':
                 val = sheet.cell(i + 5, 5).value
                 DICTIONARY['Statistical'][list_of_features[i]]['free parameters'] = {
-                    'nbins': [ast.literal_eval(val)['nbins']], "r": [ast.literal_eval(val)['r']]}
+                    'nbins': ast.literal_eval(val)['nbins'], "r": ast.literal_eval(val)['r']}
         else:
             DICTIONARY['Statistical'][list_of_features[i]]['use']='no'
 
