@@ -30,12 +30,12 @@ def filter_features(dic, filters):
 
 
 def extract_sheet(gSheetName):
-    FEATURES_JSON = 'tsfel/tsfel/utils/features.json'
+    FEATURES_JSON = '/usr/local/lib/python3.6/dist-packages/tsfel/utils/features.json'
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
     DICTIONARY = compute_dictionary(FEATURES_JSON, DEFAULT)
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('tsfel/tsfel/utils/client_secret.json', scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name('/usr/local/lib/python3.6/dist-packages/tsfel/utils/client_secret.json', scope)
     client = gspread.authorize(creds)
     confManager = client.open(gSheetName)
     sheet = confManager.sheet1
@@ -89,7 +89,7 @@ def extract_sheet(gSheetName):
             if list_of_features[i] == 'Histogram':
                 val = sheet.cell(i + 5, 5).value
                 DICTIONARY['Statistical'][list_of_features[i]]['free parameters'] = {
-                    'nbins': [ast.literal_eval(val)['nbins']], "r": [ast.literal_eval(val)['r']]}
+                    'nbins': ast.literal_eval(val)['nbins'], "r": ast.literal_eval(val)['r']}
         else:
             DICTIONARY['Statistical'][list_of_features[i]]['use']='no'
 
