@@ -1,13 +1,10 @@
 from numpy.testing import assert_array_equal, run_module_suite
 import numpy as np
-# import os,sys,inspect
-# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-# parentdir = os.path.dirname(currentdir)
-# sys.path.insert(0, parentdir)
-# from utils.features import *
-import matplotlib.pylab as plt
 import novainstrumentation as ni
 import time
+from tsfel import *
+
+
 const0 = np.zeros(20)
 const1 = np.ones(20)
 constNeg = np.ones(20)*(-1)
@@ -22,7 +19,6 @@ wave = np.sin(2 * np.pi * f * x / Fs)
 np.random.seed(seed=10)
 noiseWave = wave + np.random.normal(0,0.1,1000)
 offsetWave = wave + 2
-from tsfel import*
 
 #### STATISTICAL FEATURES ####
 def test_hist():

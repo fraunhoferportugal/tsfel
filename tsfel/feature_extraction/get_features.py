@@ -3,43 +3,38 @@ import numpy as np
 from tsfel.utils.read_json import feat_extract
 
 
-def extract_features(sig, label, cfg, segment=True, window_size=5):
-    """ Performs a forward feature selection.
-    Parameters
-    ----------
-    X_train: array-like
-      train set features
-    X_test: array-like
-      test set features
-    y_train: array-like
-      train set labels
-    y_test: array-like
-      test set labels
-    y_test: array-like
-      test set labels
-    features_descrition: list of strings
-      list with extracted features names
-    classifier: object
-      classifier object
-    Returns
-    -------
-    signal distance: if the signal was straightened distance
+def window_spliter(signal, window_size, overlap):
+    """
+
+    :param signal: input signal
+    :param window_size: number of points of window size
+    :param overlap: percentage of overlap. Value between 0 and 1
+    :return: list of signal windows
+    """
+    step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
+    return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
+
+
+def extract_features(sig, label, cfg, filename='Features.csv'):
+    """
+
+    :param sig: list of signal windows
+    :param label: label name to be concatenated with feature name
+    :param cfg: dictionary with selected features from json file
+    :param filename: optional parameter; filename for the output file with features values
+    :return: features values for each window size
     """
     feat_val = None
-    labels = None
+    feature_label = None
     print("*** Feature extraction started ***")
-    if segment:
-        sig = [sig[i:i + window_size] for i in range(0, len(sig), window_size)]
     for wind_idx, wind_sig in enumerate(sig):
-        row_idx, labels = feat_extract(cfg, wind_sig, label)
-        if wind_idx == 0:
-            feat_val = row_idx
-        else:
-            feat_val = np.vstack((feat_val, row_idx))
+        row_idx, feature_label = feat_extract(cfg, wind_sig, label)
+        feat_val = row_idx if wind_idx == 0 else np.vstack((feat_val, row_idx))
     feat_val = np.array(feat_val)
-    d = {str(lab): feat_val[:,idx] for idx, lab in enumerate(labels)}
+    d = {str(lab): feat_val[:,idx] for idx, lab in enumerate(feature_label)}
     df = pd.DataFrame(data=d)
-    df.to_csv('Features.csv', sep=',', encoding='utf-8', index_label="Sample")
+
+    df.to_csv(filename, sep=',', encoding='utf-8', index_label="Sample")
     print("*** Feature extraction finished ***")
 
     return df
