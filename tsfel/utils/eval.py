@@ -4,6 +4,8 @@ from tsfel.utils.read_json import compute_dictionary
 from tsfel.utils.read_json import one_extract
 import time
 import json
+import tsfel
+
 
 ###########################################
 # curves
