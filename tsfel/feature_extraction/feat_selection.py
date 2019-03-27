@@ -1,5 +1,5 @@
 import numpy as np
-import pandas_profiling
+import matplotlib
 from sklearn.metrics import accuracy_score
 
 
@@ -85,6 +85,12 @@ def correlation_report(df):
     -------
     df: feature dataframe without high correlated features
     """
+    # TODO use another package
+    # To correct a bug in pandas_profiling package
+    BACKEND = matplotlib.get_backend()
+    import pandas_profiling
+    matplotlib.use(BACKEND)
+
     profile = pandas_profiling.ProfileReport(df)
     profile.to_file(outputfile="CorrelationReport.html")
     inp = str(input('Do you wish to remove correlated features? Enter y/n: '))

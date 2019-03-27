@@ -114,4 +114,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
-data/
+tests/test_get_features_result.csv

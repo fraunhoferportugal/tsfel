@@ -1,5 +1,8 @@
 from numpy.testing import assert_array_equal, run_module_suite
 import numpy as np
+from tsfel import *
+
+
 const0 = np.zeros(20)
 const1 = np.ones(20)
 constNeg = np.ones(20)*(-1)
@@ -14,7 +17,7 @@ wave = np.sin(2 * np.pi * f * x / Fs)
 np.random.seed(seed=10)
 noiseWave = wave + np.random.normal(0,0.1,1000)
 offsetWave = wave + 2
-from tsfel import*
+
 
 #### STATISTICAL FEATURES ####
 def test_skew():
@@ -502,7 +505,4 @@ def test_spectral_maxpeaks():
     np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 160, decimal=1)
     np.testing.assert_almost_equal(spectral_maxpeaks(noiseWave, Fs), 171.0, decimal=1)
 
-
-#if __name__ == "__main__":
-    #run_module_suite()
 run_module_suite()

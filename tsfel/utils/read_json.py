@@ -19,11 +19,10 @@ def compute_dictionary(features_json, default):
     for atype in domain:
         domain_feats = data[atype].keys()
         for feat in domain_feats:
-            #Concatenate two dictionaries
+            # Concatenate two dictionaries
             data[atype][feat] = dict(list(default.items()) + list(data[atype][feat].items()))
-            dictionary = data
 
-    return dictionary
+    return data
 
 
 def feat_extract(dictionary, signal_window, signal_label, FS=100, iteration=None):
