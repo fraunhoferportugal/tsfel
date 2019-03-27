@@ -2,6 +2,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import ast
+import tsfel
 from tsfel.utils.read_json import compute_dictionary
 from tsfel.utils.eval import compute_complexity
 
