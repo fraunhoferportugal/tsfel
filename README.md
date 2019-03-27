@@ -1,6 +1,6 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![py368 status](https://img.shields.io/badge/python3.6.8-supported-green.svg)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/tsfel/notebooks/TSFEL_HAR_Example.ipynb)
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
@@ -13,7 +13,7 @@ It does not requires installation as it relies on Google Colabs and a user inter
 ##### Offline
 Advanced users can take full potential of *TSFEL* by installing as a *python* package
 ```python
-pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.2.tar.gz
+pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.2.zip
 ```
 
 ## Includes a comprehensive number of features
