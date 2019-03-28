@@ -69,7 +69,7 @@ def extract_sheet(gSheetName):
                         param = str({"fs": 100})
                     curve = feat_dict['Complexity']
                     curves_all = ['Linear','Log','Square','Nlog','Constant']
-                    complexity = compute_complexity(feat, domain) if curve not in curves_all else 1 if curve in ['Constant','Log'] else 2 if curve == 'Linear' else 3 
+                    complexity = compute_complexity(feat, domain, FEATURES_JSON) if curve not in curves_all else 1 if curve in ['Constant','Log'] else 2 if curve == 'Linear' else 3
                     new_feat = ['', feat, domain, complexity, param,
                                 feat_dict['description']]
                     idx_row = sheet.findall(domain)[-1].row

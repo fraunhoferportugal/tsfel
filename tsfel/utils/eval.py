@@ -72,11 +72,9 @@ def find_best_curve(t, signal):
     # Plot the data with error bars along with the fit result
 
 
-def compute_complexity(feat, domain):
-    lib_path = tsfel.__path__
-    FEATURES_JSON = lib_path[0] + '/utils/features.json'
+def compute_complexity(feat, domain, filename):
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
-    dictionary = compute_dictionary(FEATURES_JSON, DEFAULT)
+    dictionary = compute_dictionary(filename, DEFAULT)
     t = np.logspace(3.0, 5.0, 6)
     signal,s = [], []
     f = 0.05
