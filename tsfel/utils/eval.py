@@ -93,7 +93,7 @@ def compute_complexity(feat, domain, filename):
     chisq, curve_name = find_best_curve(t, signal)
     dictionary[domain][feat]['Complexity'] = curve_name
 
-    with open(FEATURES_JSON, "w") as write_file:
+    with open(filename, "w") as write_file:
         js = json.dump(dictionary, write_file, indent=4, sort_keys=True)
 
     if curve_name == 'Constant' or curve_name == 'Log':
