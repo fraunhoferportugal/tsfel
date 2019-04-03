@@ -475,6 +475,52 @@ def trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfilt, nlogfilt):
     return fbank, freqs
 
 
+def mfcc(sign, fs, num_coeffs=26):
+    """
+
+    :param sign:
+    :param fs:
+    :param num_coeffs:
+    :return:
+    """
+
+    f, ff = plotfft(sign, fs)
+
+    sp = np.square(ff) / len(f)
+
+    mel_freqs = np.linspace(0, 2595 * np.log10(1 + f[-1] / 700.), num_coeffs + 2)
+    freqs = 700 * (np.power(10, (mel_freqs / 2595)) - 1)
+
+    indexes = np.array(freqs * len(f) / freqs[-1], np.int32)
+    filter_results = np.empty(0)
+
+    for i in range(0, num_coeffs):
+        bin1 = indexes[i]
+        bin2 = indexes[i + 2]
+        peak = indexes[i + 1]
+
+        if bin1 != bin2 != peak:
+            a = sp[bin1:bin2]
+            b = mfcc_filter(bin2 - bin1, peak - bin1)
+            filter_results = np.append(filter_results, np.dot(a, b))
+        else:
+            filter_results = np.append(filter_results, [0])
+    out = fft.dct(filter_results, type=2, axis=0, norm='ortho')
+
+    return out
+
+
+def mfcc_filter(width, peak):
+    if width % 2 != 0:
+        out = np.linspace(0, 1, peak)
+        out = np.append(out, np.linspace(1. - 1. / (width - peak), 0, width - peak))
+    else:
+        out = np.linspace(0, 1, peak)
+        out = np.append(out, np.linspace(1, 0, int(width - peak)))
+
+    return out
+
+
 def fast_fourier_transform(sig):
     """
     Computes the one-dimensional discrete Fourier Transform.

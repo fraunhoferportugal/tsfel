@@ -13,6 +13,20 @@
             "source": "Python 2.7, Scipy Library",
             "use": "yes"
         },
+        "MFCC": {
+            "Complexity": "",
+            "cost": "",
+            "description": "Computes the mel frequency coefficients of the signal spectrum.",
+            "free parameters": "",
+            "function": "mfcc",
+            "imports": "from tsfel import *",
+            "metric": "euclidean",
+            "number of features": 1,
+            "parameters": "FS",
+            "reference": "",
+            "source": "",
+            "use": "no"
+        },
         "Fundamental frequency": {
             "Complexity": "Linear",
             "cost": "100",
