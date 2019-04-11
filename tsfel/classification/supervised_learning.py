@@ -71,4 +71,4 @@ def find_best_slclassifier(features, labels, X_train, X_test, y_train, y_test):
 
     print('******** Best Classifier: ' + str(best_classifier) + ' ********')
 
-    return c
+    return best_classifier

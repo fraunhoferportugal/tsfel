@@ -1,6 +1,53 @@
 import numpy as np
 import matplotlib
 from sklearn.metrics import accuracy_score
+from sklearn import svm
+from sklearn.model_selection import cross_val_score, LeaveOneGroupOut, GroupKFold, StratifiedKFold
+import multiprocessing
+import time
+# from src2.custom_svm import CustomSVC as cSVC
+import itertools
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import confusion_matrix as skcm
+
+
+def cross_val_strategy(cv, groups, X, y):
+    """
+    Configures the cross-validation strategy.
+    :param cv: Number of folds.
+    :param groups: Group that each sample belongs to.
+    :param X: Features of each sample.
+    :param y: Targets of each sample.
+    :return: Generator of training and validation sets accoding to the customized strategy.
+    """
+
+    RAND_STATE = 42
+    assert((cv is not None) or (groups is not None))
+
+    # Configure validation method according to parameters
+    if groups is not None:
+
+        # Default cv to None if cv > number of groups
+        if cv is not None:
+            cv = cv if cv < len(np.unique(groups)) else None
+
+        # Leave-One-Group-Out validation
+        if cv is None:
+            splitter = LeaveOneGroupOut()
+            cv = splitter.split(X, y, groups)
+            print('Number of splits: ' + str(splitter.get_n_splits(X, y, groups)))
+        # Cross-validation stratified by 'groups' instead of labels
+        else:
+            splitter = GroupKFold(cv)
+            cv = splitter.split(X, y, groups)
+            print('Number of splits: ' + str(splitter.get_n_splits(X, y, groups)))
+    # Stratified cross-validation
+    elif isinstance(cv, int):
+        splitter = StratifiedKFold(cv, random_state=RAND_STATE)
+        cv = splitter.split(X, y, groups)
+        print('Number of splits: ' + str(str(splitter.get_n_splits(X, y, groups))))
+
+    return cv
 
 
 def forward_feature_selection(clf, X, y, groups=None, cv=10, n_jobs=-1, feature_names=None):
@@ -28,10 +75,10 @@ def forward_feature_selection(clf, X, y, groups=None, cv=10, n_jobs=-1, feature_
 
     # If the svm's probability == True, disable it during feature selection to speed it up
     probability = False
-    if isinstance(clf, svm.SVC) or isinstance(clf, cSVC):
-        if clf.probability is True:
-            probability = True
-            clf.set_params(probability=False)
+    #if isinstance(clf, svm.SVC) or isinstance(clf, cSVC):
+    #    if clf.probability is True:
+    #        probability = True
+    #        clf.set_params(probability=False)
 
     # Starting time
     t_start = time.time()
