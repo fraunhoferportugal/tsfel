@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="tsfel",
     version="0.0.2",
-    author="Fraunhofer",
+    author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
