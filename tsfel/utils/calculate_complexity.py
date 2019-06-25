@@ -1,10 +1,9 @@
 import numpy as np
 from scipy.optimize import curve_fit
-from tsfel.utils.read_json import compute_dictionary
-from tsfel.utils.read_json import one_extract
+from tsfel.feature_extraction.features_settings import compute_dictionary
+from tsfel.feature_extraction.calc_features import calc_window_features
 import time
 import json
-import tsfel
 
 
 ###########################################
@@ -38,7 +37,6 @@ def n_Constant(x, No):
 
 
 def find_best_curve(t, signal):
-
     all_chisq = []
     list_curves = [n_Squared, n_Nlog, n_Linear, n_Log, n_Constant]
     all_curves = []
@@ -73,21 +71,26 @@ def find_best_curve(t, signal):
 
 
 def compute_complexity(feat, domain, filename):
+    # TODO remove compute_dictionary
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
     dictionary = compute_dictionary(filename, DEFAULT)
+
+    # The inputs from this function should be replaced by a dictionary
+    one_feat_dict = {domain: {feat: {dictionary[domain][feat]}}}
+
     t = np.logspace(3.0, 5.0, 6)
-    signal,s = [], []
+    signal, s = [], []
     f = 0.05
-    x = np.arange(0, t[-1]+1, 1)
+    x = np.arange(0, t[-1] + 1, 1)
     Fs = 100
     wave = np.sin(2 * np.pi * f * x / Fs)
     for ti in t:
         for _ in range(20):
             start = time.time()
-            res = one_extract(dictionary[domain][feat], wave[:int(ti)], Fs)
+            res = calc_window_features(one_feat_dict, wave[:int(ti)], Fs)
             end = time.time()
-            s += [end-start]
-        #print(np.mean(s))
+            s += [end - start]
+        # print(np.mean(s))
         signal += [np.mean(s)]
 
     chisq, curve_name = find_best_curve(t, signal)
@@ -104,5 +107,3 @@ def compute_complexity(feat, domain, filename):
         return 3
     else:
         return 0
-
-# find_best_curve(signal)

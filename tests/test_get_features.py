@@ -13,7 +13,7 @@ def test_get_features():
     # Get features
     signal = np.ones(100)
 
-    signal_windows = tsfel.window_spliter(signal, 20, 0.5)
+    signal_windows = tsfel.signal_window_spliter(signal, 20, 0.5)
 
     X_train = tsfel.extract_features(signal_windows, 'x', cfg_file, fs=20, filename='test_get_features_result.csv')
 

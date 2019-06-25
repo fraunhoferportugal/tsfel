@@ -3,8 +3,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import ast
 import tsfel
-from tsfel.utils.read_json import compute_dictionary
-from tsfel.utils.eval import compute_complexity
+from tsfel.feature_extraction.features_settings import compute_dictionary
+from tsfel.utils.calculate_complexity import compute_complexity
 
 
 def filter_features(dic, filters):
@@ -32,8 +32,9 @@ def filter_features(dic, filters):
 
 def extract_sheet(gSheetName):
     lib_path = tsfel.__path__
-    FEATURES_JSON = lib_path[0] + '/utils/features.json'
+    FEATURES_JSON = lib_path[0] + '/feature_extraction/features.json'
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
+    # TODO use load_user_settings
     DICTIONARY = compute_dictionary(FEATURES_JSON, DEFAULT)
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
@@ -44,7 +45,7 @@ def extract_sheet(gSheetName):
     metadata = confManager.fetch_sheet_metadata()
     list_of_features = sheet.col_values(2)[4:]
     filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
-    list_filt_features = filter_features(DICTIONARY,filters)
+    list_filt_features = filter_features(DICTIONARY, filters)
 
     use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
 
@@ -95,14 +96,11 @@ def extract_sheet(gSheetName):
         else:
             DICTIONARY['Statistical'][list_of_features[i]]['use']='no'
 
-
-
     for i in range(len_temp):
         if use_or_not[i+len_stat] == 'TRUE':
             DICTIONARY['Temporal'][list_of_features[i+len_stat]]['use'] = 'yes'
         else:
             DICTIONARY['Temporal'][list_of_features[i+len_stat]]['use']='no'
-
 
     for i in range(len_spec):
         if use_or_not[i+len_stat+len_temp] == 'TRUE':

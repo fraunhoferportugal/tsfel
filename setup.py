@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tsfel",
-    version="0.0.2",
-    author="Fraunhofer",
+    version="0.0.4",
+    author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -19,4 +19,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=['scipy', 'pandas', 'matplotlib', 'numpy'],
 )
