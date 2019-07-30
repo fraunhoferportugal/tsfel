@@ -13,7 +13,7 @@ It does not requires installation as it relies on Google Colabs and a user inter
 ##### Offline
 Advanced users can take full potential of *TSFEL* by installing as a *python* package
 ```python
-pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.2.zip
+pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.4.zip
 ```
 
 ## Includes a comprehensive number of features

@@ -26,7 +26,7 @@ def dataset_extract_features(dictionary, directory, window_size, overlap=0, fs_r
 
     features.to_csv(directory + '/Features.csv', sep=',', encoding='utf-8')
 
-    with open(directory + '/output_settings.json', 'w') as fp:
+    with open(directory + '/outpriut_settings.json', 'w') as fp:
         json.dump(output_settings, fp)
 
     return features
@@ -36,24 +36,21 @@ def extract_features(dictionary, signal_windows, fs=100):
     """
 
     :param dictionary: dictionary with selected features from json file
-    :param signal_windows: list of pandas DataFrame signal windows
+    :param signal_windows: list of signal windows
     :param ts_id: time series id to be concatenated with feature name
     :param fs: sampling frequency
     :return: features values for each window size
     """
-    feat_val = None
-    feature_names = None
+    feat_val = pd.DataFrame()
+    if np.ndim(signal_windows) == 1:
+        signal_windows = [signal_windows]
     print("*** Feature extraction started ***")
     for wind_idx, wind_sig in enumerate(signal_windows):
-        feature_results, feature_names = calc_window_features(dictionary, wind_sig, fs=fs)
-        feat_val = feature_results if wind_idx == 0 else np.vstack((feat_val, feature_results))
-    feat_val = np.array(feat_val)
-
-    d = {str(lab): feat_val[:, idx] for idx, lab in enumerate(feature_names)}
-    df = pd.DataFrame(data=d)
+        features = calc_window_features(dictionary, wind_sig, fs=fs)
+        feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
 
-    return df
+    return feat_val
 
 
 def calc_window_features(dictionary, signal_window, fs=100):
@@ -138,4 +135,6 @@ def calc_window_features(dictionary, signal_window, fs=100):
                 feature_results += [eval_result]
                 feature_names += [str(header_names[ax]) + '_' + func_names[i]]
 
-    return feature_results, feature_names
+    feature_results = np.array(feature_results)
+    features = pd.DataFrame(data=feature_results.reshape(1, len(feature_results)), columns=feature_names)
+    return features
