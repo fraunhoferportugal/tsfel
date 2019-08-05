@@ -12,7 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fraunhoferportugal/tsfel/",
-    package_data={'tsfel': ['utils/features.json', 'utils/client_secret.json']},
+    package_data={'tsfel': ['feature_extraction/features.json', 'utils/client_secret.json']},
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

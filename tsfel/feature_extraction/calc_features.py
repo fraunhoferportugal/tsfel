@@ -2,10 +2,31 @@ import pandas as pd
 import numpy as np
 import glob
 import json
+import toml
+import numbers
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
-def dataset_extract_features(dictionary, directory, window_size, overlap=0, fs_resample=30, time_unit=1e9, files_selection=None):
+def dataset_features_extractor(dictionary, dataset_configurator, pre_process=None):
+
+    dcfg = toml.load(dataset_configurator)
+    sensor_data = {}
+    for sensor, ax in dcfg['ontology'].items():
+        data = pd.read_csv(dcfg['dataset']['main_path'] + sensor + ".txt", header = None)
+        sensor_data[sensor] = data.iloc[:, ax]
+
+    pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
+
+    return pp_sensor_data
+
+
+def pre_process(sensor_data):
+    sensor_data['Accelerometer'].iloc[:, 1] = sensor_data['Accelerometer'].iloc[:, 1] - 10
+
+    return sensor_data
+
+
+def dataset_features_extractor2(dictionary, directory, window_size, overlap=0, fs_resample=30, time_unit=1e9, files_selection=None):
 
     output_settings = {'fs_resample': fs_resample, 'window_size': window_size, 'overlap': overlap,
                        'time_unit': time_unit, 'files_index': []}
@@ -22,17 +43,17 @@ def dataset_extract_features(dictionary, directory, window_size, overlap=0, fs_r
 
     windows = signal_window_spliter(data_new, window_size, overlap)
 
-    features = extract_features(dictionary, windows, fs=fs_resample)
+    features = time_series_features_extractor(dictionary, windows, fs=fs_resample)
 
     features.to_csv(directory + '/Features.csv', sep=',', encoding='utf-8')
 
-    with open(directory + '/outpriut_settings.json', 'w') as fp:
+    with open(directory + '/output_settings.json', 'w') as fp:
         json.dump(output_settings, fp)
 
     return features
 
 
-def extract_features(dictionary, signal_windows, fs=100):
+def time_series_features_extractor(dictionary, signal_windows, fs=100):
     """
 
     :param dictionary: dictionary with selected features from json file
@@ -42,18 +63,18 @@ def extract_features(dictionary, signal_windows, fs=100):
     :return: features values for each window size
     """
     feat_val = pd.DataFrame()
-    if np.ndim(signal_windows) == 1:
+    if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
     print("*** Feature extraction started ***")
     for wind_idx, wind_sig in enumerate(signal_windows):
-        features = calc_window_features(dictionary, wind_sig, fs=fs)
+        features = calc_window_features(dictionary, wind_sig, fs)
         feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
 
     return feat_val
 
 
-def calc_window_features(dictionary, signal_window, fs=100):
+def calc_window_features(dictionary, signal_window, fs):
     """
     This function computes features matrix for one window.
     :param dictionary: (json file)

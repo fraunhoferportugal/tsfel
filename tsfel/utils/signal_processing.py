@@ -21,7 +21,7 @@ def time_series_interpolation(data, fs_resample, time_unit):
 
     data_new = np.array([interp1d(data.iloc[:, 0], data.iloc[:, ax])(x_new) for ax in range(1, np.shape(data)[1])]).T
 
-    return pd.DataFrame(data=data_new)
+    return pd.DataFrame(data=data_new, columns=data.columns.values[1:])
 
 
 def merge_time_series(data, fs_resample, time_unit):
