@@ -1,56 +1,57 @@
+import os
+import glob
+import numbers
+import pathlib
 import pandas as pd
 import numpy as np
-import glob
-import json
-import toml
-import numbers
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
-def dataset_features_extractor(dictionary, dataset_configurator, pre_process=None):
+def dataset_features_extractor(main_directory, feat_dict, **kwargs):
+    """
 
-    dcfg = toml.load(dataset_configurator)
-    sensor_data = {}
-    for sensor, ax in dcfg['ontology'].items():
-        data = pd.read_csv(dcfg['dataset']['main_path'] + sensor + ".txt", header = None)
-        sensor_data[sensor] = data.iloc[:, ax]
+    :param main_directory:
+    :param search_criteria:
+    :param feat_dict:
+    :param kwargs:
+    :return:
+    """
 
-    pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
+    search_criteria = kwargs.get('search_criteria', None)
+    time_unit = kwargs.get('time_unit', 1e9)
+    resample_rate = kwargs.get('resample_rate', 30)
+    window_size = kwargs.get('window_size', 100)
+    overlap = kwargs.get('overlap', 0)
+    pre_process = kwargs.get('pre_process', None)
+    output_directory = kwargs.get('output_directory', None)
 
-    return pp_sensor_data
+    folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
+    for fl in folders:
+        sensor_data = {}
+        if search_criteria:
+            for c in search_criteria:
+                if os.path.isfile(fl + c):
+                    key = c.split('.')[0]
+                    sensor_data[key] = pd.read_csv(fl+c, header=None)
+        else:
+            all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
+            for c in all_files:
+                key = c.split(os.sep)[-1].split('.')[0]
+                sensor_data[key] = pd.read_csv(fl, header=None)
 
-def pre_process(sensor_data):
-    sensor_data['Accelerometer'].iloc[:, 1] = sensor_data['Accelerometer'].iloc[:, 1] - 10
+        pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
 
-    return sensor_data
+        data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
 
+        windows = signal_window_spliter(data_new, window_size, overlap)
 
-def dataset_features_extractor2(dictionary, directory, window_size, overlap=0, fs_resample=30, time_unit=1e9, files_selection=None):
+        features = time_series_features_extractor(feat_dict, windows, fs=resample_rate)
 
-    output_settings = {'fs_resample': fs_resample, 'window_size': window_size, 'overlap': overlap,
-                       'time_unit': time_unit, 'files_index': []}
+        pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
+        features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
-    if files_selection is None:
-        all_files = np.concatenate((glob.glob(directory+'/*.txt'), glob.glob(directory+'/*.csv')))
-        data = [pd.read_csv(fl, header=None) for fl in all_files]
-        output_settings['files_index'] = [[i, sensor_name.split('/')[-1]] for i, sensor_name in enumerate(all_files)]
-    else:
-        data = [pd.read_csv(directory + '/' + fl_s, header=None) for fl_s in files_selection]
-        output_settings['files_index'] = [[i, sensor_name] for i, sensor_name in enumerate(files_selection)]
-
-    data_new = merge_time_series(data, fs_resample, time_unit)
-
-    windows = signal_window_spliter(data_new, window_size, overlap)
-
-    features = time_series_features_extractor(dictionary, windows, fs=fs_resample)
-
-    features.to_csv(directory + '/Features.csv', sep=',', encoding='utf-8')
-
-    with open(directory + '/output_settings.json', 'w') as fp:
-        json.dump(output_settings, fp)
-
-    return features
+        print('Features saved')
 
 
 def time_series_features_extractor(dictionary, signal_windows, fs=100):
@@ -66,7 +67,7 @@ def time_series_features_extractor(dictionary, signal_windows, fs=100):
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
     print("*** Feature extraction started ***")
-    for wind_idx, wind_sig in enumerate(signal_windows):
+    for wind_sig in signal_windows:
         features = calc_window_features(dictionary, wind_sig, fs)
         feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
@@ -82,8 +83,7 @@ def calc_window_features(dictionary, signal_window, fs):
     :param signal_window: (pandas DataFrame)
            input from which features are computed, window.
     :param fs: (int)
-           sampling frequency
-    :return: res: (narray-like)
+           sampling frequency    :return: res: (narray-like)
              values of each features for signal.
              nam: (narray-like)
              names of the features
@@ -159,3 +159,5 @@ def calc_window_features(dictionary, signal_window, fs):
     feature_results = np.array(feature_results)
     features = pd.DataFrame(data=feature_results.reshape(1, len(feature_results)), columns=feature_names)
     return features
+
+
