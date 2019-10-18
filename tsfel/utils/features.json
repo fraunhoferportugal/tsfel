@@ -220,32 +220,6 @@
             "reference": "G. Peeters, \u201cA large set of audio features for sound description (similarity and classification) in the cuidado project\u201d, 2004.",
             "source": "Python 2.7, Scipy Library",
             "use": "yes"
-        },
-        "Index of highest fft": {
-            "Complexity": "",
-            "description": "Computes the index of the highest fft value.",
-            "free parameters": "",
-            "function": "index_highest_fft",
-            "imports": "from tsfel import *",
-            "metric": "",
-            "number of features": 1,
-            "parameters": "",
-            "reference": "",
-            "source": "",
-            "use": "yes"
-        },
-        "Ratio between first and second highest fft": {
-            "Complexity": "",
-            "description": "Computes the ratio between the first and second highest FFT values.",
-            "free parameters": "",
-            "function": "ratio_1st_2nd_highest_fft_values",
-            "imports": "from tsfel import *",
-            "metric": "",
-            "number of features": 1,
-            "parameters": "",
-            "reference": "",
-            "source": "",
-            "use": "no"
         }
     },
     "Statistical": {
@@ -254,12 +228,8 @@
             "cost": "10",
             "description": "The grouping of the data into bins, plotting the number of members in each bin against the bin number.",
             "free parameters": {
-                "nbins": [
-                    10
-                ],
-                "r": [
-                    1
-                ]
+                "nbins": 10,
+                "r": 1
             },
             "function": "hist",
             "imports": "from tsfel import *",
