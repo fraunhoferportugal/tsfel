@@ -4,6 +4,7 @@ import numbers
 import pathlib
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -11,7 +12,6 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     """
 
     :param main_directory:
-    :param search_criteria:
     :param feat_dict:
     :param kwargs:
     :return:
@@ -23,7 +23,7 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
     pre_process = kwargs.get('pre_process', None)
-    output_directory = kwargs.get('output_directory', None)
+    output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
 
     folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
@@ -40,6 +40,9 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
                 key = c.split(os.sep)[-1].split('.')[0]
                 sensor_data[key] = pd.read_csv(fl, header=None)
 
+        if not sensor_data:
+            continue
+
         pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
 
         data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
@@ -51,10 +54,10 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
-        print('Features saved')
+        print('Features file saved in: ', output_directory)
 
 
-def time_series_features_extractor(dictionary, signal_windows, fs=100):
+def time_series_features_extractor(dictionary, signal_windows, fs=100, window_spliter=False, **kwargs):
     """
 
     :param dictionary: dictionary with selected features from json file
@@ -63,7 +66,14 @@ def time_series_features_extractor(dictionary, signal_windows, fs=100):
     :param fs: sampling frequency
     :return: features values for each window size
     """
+
+    window_size = kwargs.get('window_size', 100)
+    overlap = kwargs.get('overlap', 0)
+
     feat_val = pd.DataFrame()
+    if window_spliter:
+        signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
+
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
     print("*** Feature extraction started ***")
