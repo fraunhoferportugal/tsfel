@@ -309,7 +309,7 @@ def hist(sig, nbins=10, r=1):
 
     """
 
-    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r], density=True)  # TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
 
     # bin_edges = bin_edges[:-1]
     # bin_edges += (bin_edges[1]-bin_edges[0])/2.
@@ -1219,3 +1219,26 @@ def ratio_1st_2nd_highest_fft_values(sig):
     r_fft =  fft_1st/fft_2nd
 
     return r_fft
+
+# Developing
+def human_range_energy(sig,fs):
+    """
+    Computes the ratio between the energy in frequency 0.6-2.5Hz and the whole band
+    :param sig: ndarray
+    :param fs: sampling rate
+    :return: float
+    """
+
+    f, fmag = _plotfft(sig,fs)
+
+    allenergy = np.sum(fmag**2)
+
+    if allenergy == 0:
+        # For handling the occurrence of Nan values
+        return 0.0
+
+    hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
+
+    ratio = hr_energy/allenergy
+
+    return ratio
