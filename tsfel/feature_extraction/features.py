@@ -1187,40 +1187,7 @@ def fast_fourier_transform(sig):
 
     return fft
 
-
-def index_highest_fft(sig):
-    """Computes the index of the highest Fast Fourier Transform using an one-dimensional discrete Fourier Transform for real input.
-
-    Parameters
-    ---------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    Returns
-    ---------
-    h_fft: int64
-
-    """
-    fft = fast_fourier_transform(sig)
-    h_fft = np.argmax(fft)
-
-    return h_fft
-
-
-def ratio_1st_2nd_highest_fft_values(sig):
-    """
-    Computes the ratio between the first and second highest FFT values.
-    :param sig:ndarray
-    :return:r_fft: float
-    """
-
-    fft = fast_fourier_transform(sig)
-    fft_1st = np.max(fft)
-    fft_2nd = np.max(np.delete(fft, np.where(fft == fft_1st)[0]))
-    r_fft =  fft_1st/fft_2nd
-
-    return r_fft
-
-# Developing
+@set_domain("domain", "spectral")
 def human_range_energy(sig,fs):
     """
     Computes the ratio between the energy in frequency 0.6-2.5Hz and the whole band
