@@ -505,4 +505,17 @@ def test_spectral_maxpeaks():
     np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 160, decimal=1)
     np.testing.assert_almost_equal(spectral_maxpeaks(noiseWave, Fs), 171.0, decimal=1)
 
+# Developing
+def test_human_range_energy():
+    np.testing.assert_equal(human_range_energy(const0, Fs), 0.0)
+    np.testing.assert_equal(human_range_energy(const1, Fs), 0.0)
+    np.testing.assert_equal(human_range_energy(constNeg, Fs), 0.0)
+    np.testing.assert_equal(human_range_energy(constF, Fs), 0.0)
+    np.testing.assert_equal(human_range_energy(lin, Fs), 0.0)
+    np.testing.assert_almost_equal(human_range_energy(lin0, Fs), 0.0)
+    np.testing.assert_almost_equal(human_range_energy(wave, Fs), 2.838300923247935e-33)
+    np.testing.assert_almost_equal(human_range_energy(offsetWave, Fs), 1.6194431630448383e-33)
+    np.testing.assert_almost_equal(human_range_energy(noiseWave, Fs), 4.5026865350839304e-05)
+
+
 run_module_suite()

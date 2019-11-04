@@ -309,7 +309,7 @@ def hist(sig, nbins=10, r=1):
 
     """
 
-    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r], density=True)  # TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
 
     # bin_edges = bin_edges[:-1]
     # bin_edges += (bin_edges[1]-bin_edges[0])/2.
@@ -1187,35 +1187,25 @@ def fast_fourier_transform(sig):
 
     return fft
 
-
-def index_highest_fft(sig):
-    """Computes the index of the highest Fast Fourier Transform using an one-dimensional discrete Fourier Transform for real input.
-
-    Parameters
-    ---------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    Returns
-    ---------
-    h_fft: int64
-
+@set_domain("domain", "spectral")
+def human_range_energy(sig,fs):
     """
-    fft = fast_fourier_transform(sig)
-    h_fft = np.argmax(fft)
-
-    return h_fft
-
-
-def ratio_1st_2nd_highest_fft_values(sig):
-    """
-    Computes the ratio between the first and second highest FFT values.
-    :param sig:ndarray
-    :return:r_fft: float
+    Computes the ratio between the energy in frequency 0.6-2.5Hz and the whole band
+    :param sig: ndarray
+    :param fs: sampling rate
+    :return: float
     """
 
-    fft = fast_fourier_transform(sig)
-    fft_1st = np.max(fft)
-    fft_2nd = np.max(np.delete(fft, np.where(fft == fft_1st)[0]))
-    r_fft =  fft_1st/fft_2nd
+    f, fmag = _plotfft(sig,fs)
 
-    return r_fft
+    allenergy = np.sum(fmag**2)
+
+    if allenergy == 0:
+        # For handling the occurrence of Nan values
+        return 0.0
+
+    hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
+
+    ratio = hr_energy/allenergy
+
+    return ratio

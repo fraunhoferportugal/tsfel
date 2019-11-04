@@ -118,6 +118,13 @@
             "function": "tsfel.total_energy",
             "parameters": "fs",
             "use": "no"
+        },
+        "Human range energy": {
+            "Complexity": "Log",
+            "free parameters": "",
+            "function": "tsfel.human_range_energy",
+            "parameters": "fs",
+            "use": "no"
         }
     },
     "Statistical": {
