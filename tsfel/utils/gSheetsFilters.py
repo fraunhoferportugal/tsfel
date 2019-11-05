@@ -3,8 +3,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import tsfel
 import ast
-from tsfel.feature_extraction.features_settings import compute_dictionary
 from tsfel.utils.calculate_complexity import compute_complexity
+import json
 
 def filter_features(dic, filters):
     """
@@ -46,10 +46,16 @@ def extract_sheet(gSheetName):
     # Access to features.json
 
     FEATURES_JSON = lib_path[0] + '/feature_extraction/features.json'
+    FEATURES_JSON = '../feature_extraction/features.json'
     DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1}
 
-    # Dict of features and parameters
-    DICTIONARY = compute_dictionary(FEATURES_JSON, DEFAULT)
+    # Read features.json into a dictionary of features and parameters
+    DICTIONARY = json.load(open(FEATURES_JSON))
+    for atype in DICTIONARY.keys():
+        domain_feats = DICTIONARY[atype].keys()
+        for feat in domain_feats:
+            # Concatenate two dictionaries
+            DICTIONARY[atype][feat] = dict(list(DEFAULT.items()) + list(DICTIONARY[atype][feat].items()))
 
     len_stat = len(DICTIONARY['Statistical'].keys())
     len_temp = len(DICTIONARY['Temporal'].keys())
@@ -108,7 +114,7 @@ def extract_sheet(gSheetName):
                     sheet.insert_row(new_feat, idx_row + 1)
                     print(feat + " was added to gsheet.")
 
-        # Update list of features an domain from gsheets
+        # Update list of features and domains from gsheets
         list_of_features = sheet.col_values(2)[4:]
         list_domain = sheet.col_values(3)[4:]
         # Update filtered features from gsheets
