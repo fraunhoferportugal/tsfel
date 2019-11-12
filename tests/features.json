@@ -4,120 +4,138 @@
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.curve_distance",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
+
         },
         "Fundamental frequency": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.fundamental_frequency",
-            "parameters": "fs",
-            "use": "no"
-        },
-        "Linear regression": {
-            "Complexity": "Linear",
-            "free parameters": "",
-            "function": "tsfel.linear_regression",
-            "parameters": "",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Max power spectrum": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.max_power_spectrum",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Maximum frequency": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.max_frequency",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Median frequency": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.median_frequency",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral centroid": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_centroid",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral decrease": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_decrease",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral kurtosis": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_kurtosis",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral maximum peaks": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_maxpeaks",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral roll-off": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_roll_off",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral roll-on": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_roll_on",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral skewness": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_skewness",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral slope": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_slope",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral spread": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_spread",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Spectral variation": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.spectral_variation",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Total energy": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.total_energy",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
+        },
+        "Human range energy": {
+            "Complexity": "Log",
+            "free parameters": "",
+            "function": "tsfel.human_range_energy",
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         }
     },
     "Statistical": {
@@ -128,92 +146,106 @@
                 "r": 1
             },
             "function": "tsfel.hist",
-            "parameters": "",
-            "use": "yes"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Interquartile range": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_iqr",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Kurtosis": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_kurtosis",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Skewness": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_skewness",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Max": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_max",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Mean": {
             "Complexity": "Constant",
             "free parameters": "",
             "function": "tsfel.calc_mean",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Mean absolute deviation": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.calc_meanad",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Median": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_median",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Median absolute deviation": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.calc_medad",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Min": {
             "Complexity": "Constant",
             "free parameters": "",
             "function": "tsfel.calc_min",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Root mean square": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.rms",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
+
         },
         "Standard Deviation": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_std",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Variance": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_var",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         }
     },
     "Temporal": {
@@ -221,78 +253,97 @@
             "Complexity": "Constant",
             "free parameters": "",
             "function": "tsfel.autocorr",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Centroid": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.centroid",
-            "parameters": "fs",
-            "use": "no"
+            "fs": 100,
+            "use": "yes",
+            "description": " "
         },
         "Maximum peaks": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.maxpeaks",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Mean absolute diff": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_meanadiff",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Mean diff": {
             "Complexity": "Constant",
             "free parameters": "",
             "function": "tsfel.calc_meandiff",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Median absolute diff": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_medadiff",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Median diff": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_meddiff",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Minimum peaks": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.minpeaks",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Signal distance": {
             "Complexity": "Linear",
             "free parameters": "",
             "function": "tsfel.distance",
-            "parameters": "",
-            "use": "yes"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Sum absolute diff": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.calc_sadiff",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
         },
         "Zero crossing rate": {
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.zero_cross",
-            "parameters": "",
-            "use": "no"
+            "fs": "",
+            "use": "yes",
+            "description": " "
+        },
+        "Linear regression": {
+            "Complexity": "Linear",
+            "free parameters": "",
+            "function": "tsfel.linear_regression",
+            "fs": "",
+            "use": "yes",
+            "description": " "
         }
     }
 }

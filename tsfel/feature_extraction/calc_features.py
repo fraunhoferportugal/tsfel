@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
-
+import warnings
 
 def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     """
@@ -16,7 +16,6 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     :param kwargs:
     :return:
     """
-
     search_criteria = kwargs.get('search_criteria', None)
     time_unit = kwargs.get('time_unit', 1e9)
     resample_rate = kwargs.get('resample_rate', 30)
@@ -57,16 +56,25 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
         print('Features file saved in: ', output_directory)
 
 
-def time_series_features_extractor(dictionary, signal_windows, fs=100, window_spliter=False, **kwargs):
-    """
+def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, **kwargs):
+    """Extraction of time series features.
 
-    :param dictionary: dictionary with selected features from json file
-    :param signal_windows: list of signal windows
-    :param ts_id: time series id to be concatenated with feature name
-    :param fs: sampling frequency
-    :return: features values for each window size
-    """
+    Parameters
+    ----------
+    dict_features : dict
+        Dictionary with features
+    signal_windows: list
+        Input from which features are computed, window
+    fs : int or None
+        Sampling frequency
+    window_spliter: bool
+        If True computes the signal windows
+    Returns
+    -------
+    DataFrame
+        Extracted features
 
+    """
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
 
@@ -76,29 +84,36 @@ def time_series_features_extractor(dictionary, signal_windows, fs=100, window_sp
 
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
+
     print("*** Feature extraction started ***")
     for wind_sig in signal_windows:
-        features = calc_window_features(dictionary, wind_sig, fs)
+        features = calc_window_features(dict_features, wind_sig, fs)
         feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
 
     return feat_val
 
 
-def calc_window_features(dictionary, signal_window, fs):
+def calc_window_features(dict_features, signal_window, fs):
+    """This function computes features matrix for one window.
+
+    Parameters
+    ----------
+    dict_features : dict
+        Dictionary with features
+    signal_window: pandas DataFrame
+        Input from which features are computed, window
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    pandas DataFrame
+        (columns) names of the features
+        (data) values of each features for signal
+
     """
-    This function computes features matrix for one window.
-    :param dictionary: (json file)
-           list of features
-    :param signal_window: (pandas DataFrame)
-           input from which features are computed, window.
-    :param fs: (int)
-           sampling frequency    :return: res: (narray-like)
-             values of each features for signal.
-             nam: (narray-like)
-             names of the features
-    """
-    domain = dictionary.keys()
+    domain = dict_features.keys()
 
     # Create global arrays
     func_total = []
@@ -107,24 +122,29 @@ def calc_window_features(dictionary, signal_window, fs):
     parameters_total = []
     free_total = []
 
-    for atype in domain:
-        domain_feats = dictionary[atype].keys()
+    for _type in domain:
+        domain_feats = dict_features[_type].keys()
 
         for feat in domain_feats:
             # Only returns used functions
-            if dictionary[atype][feat]['use'] == 'yes':
+            if dict_features[_type][feat]['use'] == 'yes':
 
                 # Read Function Name (generic name)
                 func_names += [feat]
 
                 # Read Function (real name of function)
-                func_total += [dictionary[atype][feat]['function']]
+                func_total += [dict_features[_type][feat]['function']]
 
-                # Read Parameters
-                parameters_total += [dictionary[atype][feat]['parameters']]
+                # Read fs parameter
+                if fs is not None:
+                    parameters_total += [fs]
+                else:
+                    parameters_total += [dict_features[_type][feat]['fs']]
+                    # raise a warning
+                    warnings.warn('Using default sampling frequency: ' + str(parameters_total[0]) + ' Hz.')
 
                 # Read Free Parameters
-                free_total += [dictionary[atype][feat]['free parameters']]
+                free_total += [dict_features[_type][feat]['free parameters']]
 
     # Execute imports
     exec("import tsfel")
@@ -144,11 +164,10 @@ def calc_window_features(dictionary, signal_window, fs):
             execf = func_total[i] + '(window'
 
             if parameters_total[i] != '':
-                execf += ', ' + parameters_total[i]
+                execf += ', ' + str(parameters_total[i])
 
             if free_total[i] != '':
                 for n, v in free_total[i].items():
-                    # TODO: conversion may loose precision (str)
                     execf += ', ' + n + '=' + str(v)
 
             execf += ')'
@@ -168,6 +187,7 @@ def calc_window_features(dictionary, signal_window, fs):
 
     feature_results = np.array(feature_results)
     features = pd.DataFrame(data=feature_results.reshape(1, len(feature_results)), columns=feature_names)
+
     return features
 
 
