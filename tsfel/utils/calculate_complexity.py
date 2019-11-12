@@ -1,44 +1,59 @@
-import numpy as np
-from scipy.optimize import curve_fit
-from tsfel.feature_extraction.features_settings import compute_dictionary
-from tsfel.feature_extraction.calc_features import calc_window_features
 import time
 import json
+import warnings
+import numpy as np
+from scipy.optimize import curve_fit
+from tsfel.feature_extraction.calc_features import calc_window_features
 
 
 ###########################################
 # curves
-def n_Squared(x, No):
+def n_squared(x, no):
     """The model function"""
-    return No * (x) ** 2
+    return no * x ** 2
 
 
-def n_Nlog(x, No):
+def n_nlog(x, no):
     """The model function"""
-    return No * x * np.log(x)
+    return no * x * np.log(x)
 
 
-def n_Linear(x, No):
+def n_linear(x, no):
     """The model function"""
-    return No * (x)
+    return no * x
 
 
-def n_Log(x, No):
+def n_log(x, no):
     """The model function"""
-    return No * np.log(x)
+    return no * np.log(x)
 
 
-def n_Constant(x, No):
+def n_constant(x, no):
     """The model function"""
-    return np.zeros(len(x)) + No
+    return np.zeros(len(x)) + no
 
 
-###########################################a
+###########################################
 
 
 def find_best_curve(t, signal):
+    """Finds the best curve.
+
+    Parameters
+    ----------
+    t : nd-array
+        Log space
+    signal : nd-array
+        Mean execution time array
+
+    Returns
+    -------
+    str
+        Best fit curve name
+
+    """
     all_chisq = []
-    list_curves = [n_Squared, n_Nlog, n_Linear, n_Log, n_Constant]
+    list_curves = [n_squared, n_nlog, n_linear, n_log, n_constant]
     all_curves = []
     # Model parameters
     stdev = 2
@@ -50,13 +65,11 @@ def find_best_curve(t, signal):
         popt, pcov = curve_fit(curve, t, signal, sigma=sig, p0=start, absolute_sigma=True)
 
         # Compute chi square
-        Nexp = curve(t, *popt)
-        r = signal - Nexp
+        nexp = curve(t, *popt)
+        r = signal - nexp
         chisq = np.sum((r / stdev) ** 2)
-        df = len(signal) - 2
-
         all_chisq.append(chisq)
-        all_curves.append(Nexp)
+        all_curves.append(nexp)
 
     idx_best = np.argmin(all_chisq)
 
@@ -65,45 +78,67 @@ def find_best_curve(t, signal):
     idx2 = curve_name.find("at")
     curve_name = curve_name[idx1 + 2:idx2 - 1]
 
-    return np.min(all_chisq), curve_name
-
-    # Plot the data with error bars along with the fit result
+    return curve_name
 
 
-def compute_complexity(feat, domain, filename):
-    # TODO remove compute_dictionary
-    DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
-    dictionary = compute_dictionary(filename, DEFAULT)
+def compute_complexity(feature, domain, json_file):
+    """Computes the feature complexity.
+
+    Parameters
+    ----------
+    feature : string
+        Feature name
+    domain : string
+        Feature domain
+    json_file: json
+        Features json file
+
+    Returns
+    -------
+    int
+        Feature complexity
+
+    Writes complexity in json file
+
+    """
+
+    dictionary = json.load(open(json_file))
 
     # The inputs from this function should be replaced by a dictionary
-    one_feat_dict = {domain: {feat: {dictionary[domain][feat]}}}
+    one_feat_dict = {domain: {feature: dictionary[domain][feature]}}
 
     t = np.logspace(3.0, 5.0, 6)
     signal, s = [], []
     f = 0.05
     x = np.arange(0, t[-1] + 1, 1)
-    Fs = 100
-    wave = np.sin(2 * np.pi * f * x / Fs)
+    fs = 100
+    wave = np.sin(2 * np.pi * f * x / fs)
+
+    if one_feat_dict[domain][feature]['use'] == 'no':
+        warnings.warn("Feature is not being computed. Set 'use' in features.json to yes.", DeprecationWarning,
+                      stacklevel=2)
+        return
+
     for ti in t:
         for _ in range(20):
             start = time.time()
-            res = calc_window_features(one_feat_dict, wave[:int(ti)], Fs)
+            calc_window_features(one_feat_dict, wave[:int(ti)], fs)
             end = time.time()
             s += [end - start]
-        # print(np.mean(s))
+
         signal += [np.mean(s)]
 
-    chisq, curve_name = find_best_curve(t, signal)
-    dictionary[domain][feat]['Complexity'] = curve_name
+    curve_name = find_best_curve(t, signal)
+    dictionary[domain][feature]['Complexity'] = curve_name
 
-    with open(filename, "w") as write_file:
-        js = json.dump(dictionary, write_file, indent=4, sort_keys=True)
+    with open(json_file, "w") as write_file:
+        json.dump(dictionary, write_file, indent=4, sort_keys=True)
 
-    if curve_name == 'Constant' or curve_name == 'Log':
-        return 1
-    elif curve_name == 'Linear':
-        return 2
-    elif curve_name == 'Nlog' or curve_name == 'Squared':
-        return 3
+    if curve_name == 'constant' or curve_name == 'log':
+        return 1, curve_name
+    elif curve_name == 'linear':
+        return 2, curve_name
+    elif curve_name == 'nlog' or curve_name == 'squared':
+        return 3, curve_name
     else:
         return 0
