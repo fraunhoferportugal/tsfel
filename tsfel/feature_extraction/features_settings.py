@@ -51,7 +51,7 @@ def get_features_by_domain(domain):
             for param in iterator:
                 all_param += param + ','
 
-            settings[domain][fname]['parameters'] = all_param[:-1]
+            settings[domain][fname]['fs'] = all_param[:-1]
             settings[domain][fname]['free parameters'] = free_param
             settings[domain][fname]['function'] = 'tsfel.' + fname
             settings[domain][fname]['use'] = 'yes'
