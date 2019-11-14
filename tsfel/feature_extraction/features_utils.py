@@ -85,7 +85,8 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     # as the application of a hann window will overshadow the windows signal edges.
 
     # pre-emphasis filter to amplify the high frequencies
-    emphasized_signal = np.append(signal[0], signal[1:]-pre_emphasis*signal[:-1])
+
+    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:])-pre_emphasis*np.array(signal[:-1]))
 
     # Fourier transform and Power spectrum
     mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT

@@ -383,7 +383,7 @@
             "Complexity": "Log",
             "free parameters": "",
             "function": "tsfel.total_energy",
-            "fs": "",
+            "fs": 100,
             "use": "yes",
             "description": "Computes the total energy of the signal."
         },

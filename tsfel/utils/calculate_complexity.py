@@ -114,11 +114,6 @@ def compute_complexity(feature, domain, json_file):
     fs = 100
     wave = np.sin(2 * np.pi * f * x / fs)
 
-    if one_feat_dict[domain][feature]['use'] == 'no':
-        warnings.warn("Feature is not being computed. Set 'use' in features.json to yes.", DeprecationWarning,
-                      stacklevel=2)
-        return
-
     for ti in t:
         for _ in range(20):
             start = time.time()
