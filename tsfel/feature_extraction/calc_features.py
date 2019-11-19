@@ -1,12 +1,14 @@
-import os
 import glob
 import numbers
+import os
 import pathlib
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 import warnings
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
+
 
 def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     """
@@ -32,7 +34,7 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
             for c in search_criteria:
                 if os.path.isfile(fl + c):
                     key = c.split('.')[0]
-                    sensor_data[key] = pd.read_csv(fl+c, header=None)
+                    sensor_data[key] = pd.read_csv(fl + c, header=None)
         else:
             all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
             for c in all_files:
@@ -91,7 +93,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
 
-    return feat_val
+    return feat_val.reset_index(drop=True)
 
 
 def calc_window_features(dict_features, signal_window, fs):
@@ -113,6 +115,8 @@ def calc_window_features(dict_features, signal_window, fs):
         (data) values of each features for signal
 
     """
+    # Execute imports
+    exec("import tsfel")
     domain = dict_features.keys()
 
     # Create global arrays
@@ -120,74 +124,74 @@ def calc_window_features(dict_features, signal_window, fs):
     func_names = []
     imports_total = []
     parameters_total = []
-    free_total = []
+    feature_results = []
+    feature_names = []
 
     for _type in domain:
         domain_feats = dict_features[_type].keys()
 
         for feat in domain_feats:
+
             # Only returns used functions
             if dict_features[_type][feat]['use'] == 'yes':
 
                 # Read Function Name (generic name)
-                func_names += [feat]
+                func_names = [feat]
 
                 # Read Function (real name of function)
-                func_total += [dict_features[_type][feat]['function']]
+                func_total = [dict_features[_type][feat]['function']]
 
-                # Read fs parameter
-                if fs is not None:
-                    parameters_total += [fs]
+                # Check for parameters
+                if dict_features[_type][feat]['parameters'] != '':
+                    param = dict_features[_type][feat]['parameters']
+
+                    # Check assert fs parameter:
+                    if 'fs' in param:
+
+                        # Select which fs to use
+                        if fs is None:
+                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
+
+                            # raise a warning
+                            warnings.warn('Using default sampling frequency.')
+                        else:
+                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
+                                                if key not in 'fs']
+                            parameters_total += ['fs =' + str(fs)]
+
+                    # feature has no fs parameter
+                    else:
+                        parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
                 else:
-                    parameters_total += [dict_features[_type][feat]['fs']]
-                    # raise a warning
-                    warnings.warn('Using default sampling frequency: ' + str(parameters_total[0]) + ' Hz.')
+                    parameters_total = ''
 
-                # Read Free Parameters
-                free_total += [dict_features[_type][feat]['free parameters']]
+                # Name of each column to be concatenate with feature name
+                if not isinstance(signal_window, pd.DataFrame):
+                    signal_window = pd.DataFrame(data=signal_window)
+                header_names = signal_window.columns.values
 
-    # Execute imports
-    exec("import tsfel")
+                for ax in range(len(header_names)):
+                    window = signal_window.iloc[:, ax]
+                    execf = func_total[0] + '(window'
 
-    # Name of each column to be concatenate with feature name
-    if not isinstance(signal_window, pd.DataFrame):
-        signal_window = pd.DataFrame(data=signal_window)
-    header_names = signal_window.columns.values
+                    if parameters_total != '':
+                        execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
 
-    feature_results = []
-    feature_names = []
+                    execf += ')'
+                    eval_result = eval(execf, locals())
 
-    for ax in range(len(header_names)):
-        window = signal_window.iloc[:, ax]
-        for i in range(len(func_total)):
+                    # Function returns more than one element
+                    if type(eval_result) == tuple:
+                        for rr in range(len(eval_result)):
+                            if np.isnan(eval_result[0]):
+                                eval_result = np.zeros(len(eval_result))
+                            feature_results += [eval_result[rr]]
+                            feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
+                    else:
+                        feature_results += [eval_result]
+                        feature_names += [str(header_names[ax]) + '_' + func_names[0]]
 
-            execf = func_total[i] + '(window'
-
-            if parameters_total[i] != '':
-                execf += ', ' + str(parameters_total[i])
-
-            if free_total[i] != '':
-                for n, v in free_total[i].items():
-                    execf += ', ' + n + '=' + str(v)
-
-            execf += ')'
-
-            eval_result = eval(execf, locals())
-
-            # Function returns more than one element
-            if type(eval_result) == tuple:
-                for rr in range(len(eval_result)):
-                    if np.isnan(eval_result[0]):
-                        eval_result = np.zeros(len(eval_result))
-                    feature_results += [eval_result[rr]]
-                    feature_names += [str(header_names[ax]) + '_' + func_names[i] + '_' + str(rr)]
-            else:
-                feature_results += [eval_result]
-                feature_names += [str(header_names[ax]) + '_' + func_names[i]]
-
-    feature_results = np.array(feature_results)
-    features = pd.DataFrame(data=feature_results.reshape(1, len(feature_results)), columns=feature_names)
+    features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
+                            columns=np.array(feature_names))
 
     return features
-
-

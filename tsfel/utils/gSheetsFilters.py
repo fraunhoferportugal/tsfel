@@ -64,7 +64,7 @@ def extract_sheet(gsheet_name):
         Features
 
     """
-    # path to Tsfel
+    # Path to Tsfel
     lib_path = tsfel.__path__
 
     # Access features.json
@@ -78,16 +78,15 @@ def extract_sheet(gsheet_name):
     len_spec = len(dict_features['Spectral'].keys())
 
     # Access Google sheet
-
     # Scope and credentials using the content of client_secret.json file
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name(lib_path[0] + '/utils/client_secret.json', scope)
 
-    # create a gspread client authorizing it using those credentials.
+    # Create a gspread client authorizing it using those credentials
     client = gspread.authorize(creds)
 
-    # and pass it to the spreadsheet name and getting access to sheet1
+    # and pass it to the spreadsheet name, getting access to sheet1
     confManager = client.open(gsheet_name)
     sheet = confManager.sheet1
     metadata = confManager.fetch_sheet_metadata()
@@ -95,8 +94,13 @@ def extract_sheet(gsheet_name):
     # Features from Google sheet
     list_of_features = sheet.col_values(2)[4:]
     list_domain = sheet.col_values(3)[4:]
-    filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
-    list_filt_features = filter_features(dict_features, filters)
+
+    try:
+        filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
+        list_filt_features = filter_features(dict_features, filters)
+    except KeyError:
+        print('No filters running. Check Google Sheet filters.')
+        list_filt_features = list_of_features.copy()
 
     use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
 
@@ -112,16 +116,23 @@ def extract_sheet(gsheet_name):
                 if feat not in list_of_features:
                     feat_dict = dict_features[domain][feat]
                     param = ''
-                    if feat_dict['free parameters']:
-                        param = str({"nbins": [10], 'r': [1]})
-                    if feat_dict['fs'] != '':
-                        param = str({"fs": 100})
+                    fs = 'no'
+
+                    # Read parameters from features.json
+                    if feat_dict['parameters']:
+                        param = feat_dict['parameters'].copy()
+                        if 'fs' in feat_dict['parameters']:
+                            fs = 'yes'
+                            param.pop('fs')
+                            if len(param) == 0:
+                                param = ''
+
                     curve = feat_dict['Complexity']
                     curves_all = ['Linear', 'Log', 'Square', 'Nlog', 'Constant']
                     complexity = compute_complexity(feat, domain,
                                                     path_json) if curve not in curves_all else 1 if curve in [
                         'Constant', 'Log'] else 2 if curve == 'Linear' else 3
-                    new_feat = ['', feat, domain, complexity, param,
+                    new_feat = ['', feat, domain, complexity, fs, str(param),
                                 feat_dict['description']]
 
                     # checks if the Google sheet has no features
@@ -139,8 +150,13 @@ def extract_sheet(gsheet_name):
         list_domain = sheet.col_values(3)[4:]
 
         # Update filtered features from Google sheet
-        filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
-        list_filt_features = filter_features(dict_features, filters)
+        try:
+            filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
+            list_filt_features = filter_features(dict_features, filters)
+        except KeyError:
+            list_filt_features = list_of_features.copy()
+            print('')
+
         use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
 
     assert 'TRUE' in use_or_not, 'Please select a feature to extract!' + '\n'
@@ -151,25 +167,19 @@ def extract_sheet(gsheet_name):
         if use_or_not[ii] == 'TRUE':
             dict_features[domain][feature]['use'] = 'yes'
 
-            # Check for histogram free parameters: nbins and r
-            if feature == 'Histogram':
-                if sheet.cell(ii + 5, 5).value != '':
-                    val = sheet.cell(ii + 5, 5).value
+            # Check features parameters from Google sheet
+            if sheet.cell(ii + 5, 6).value != '':
+                param_sheet = ast.literal_eval(sheet.cell(ii + 5, 6).value)
 
-                    # update dic of features based on Google sheet histogram parameters
-                    dict_features[domain][feature]['free parameters'] = \
-                        {'nbins': ast.literal_eval(val)['nbins'], "r": ast.literal_eval(val)['r']}
+                # update dic of features based on Google sheet
+                dict_features[domain][feature]['parameters'] = param_sheet
 
             # Check features that use sampling frequency parameter
-            if dict_features[domain][feature]['fs'] != '':
-                if (sheet.cell(4, 8).value != '') or (type(sheet.cell(4, 8).value) == str):
-                    # update dict of features based on Google sheet fs
-                    val = sheet.cell(4, 8).value
-                    dict_features[domain][feature]['fs'] = val
+            if sheet.cell(ii + 5, 5).value != 'no':
 
-                    # update fs parameter in Google sheet
-                    param = str({"fs": int(val)})
-                    sheet.update_cell(ii + 5, 5, param)
+                # update dict of features based on Google sheet fs
+                param_fs_sheet = int(sheet.cell(4, 9).value)
+                dict_features[domain][feature]['parameters']['fs'] = param_fs_sheet
         else:
             dict_features[domain][feature]['use'] = 'no'
 
