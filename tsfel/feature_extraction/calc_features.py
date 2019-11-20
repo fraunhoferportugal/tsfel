@@ -1,4 +1,5 @@
 import glob
+import sys
 import numbers
 import os
 import pathlib
@@ -150,10 +151,15 @@ def calc_window_features(dict_features, signal_window, fs):
 
                         # Select which fs to use
                         if fs is None:
-                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
 
-                            # raise a warning
-                            warnings.warn('Using default sampling frequency.')
+                            # Check if features dict has default sampling frequency value
+                            if type(param['fs']) is int or type(param['fs']) is float:
+                                parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
+                                
+                                # raise a warning
+                                warnings.warn('Using default sampling frequency.')
+                            else:
+                                raise Exception('No sampling frequency assigned.')
                         else:
                             parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
                                                 if key not in 'fs']
