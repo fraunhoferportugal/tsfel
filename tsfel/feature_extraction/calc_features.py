@@ -1,10 +1,13 @@
-import os
 import glob
+import sys
 import numbers
+import os
 import pathlib
-import pandas as pd
-import numpy as np
+import warnings
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -16,7 +19,6 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     :param kwargs:
     :return:
     """
-
     search_criteria = kwargs.get('search_criteria', None)
     time_unit = kwargs.get('time_unit', 1e9)
     resample_rate = kwargs.get('resample_rate', 30)
@@ -33,7 +35,7 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
             for c in search_criteria:
                 if os.path.isfile(fl + c):
                     key = c.split('.')[0]
-                    sensor_data[key] = pd.read_csv(fl+c, header=None)
+                    sensor_data[key] = pd.read_csv(fl + c, header=None)
         else:
             all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
             for c in all_files:
@@ -57,16 +59,25 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
         print('Features file saved in: ', output_directory)
 
 
-def time_series_features_extractor(dictionary, signal_windows, fs=100, window_spliter=False, **kwargs):
-    """
+def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, **kwargs):
+    """Extraction of time series features.
 
-    :param dictionary: dictionary with selected features from json file
-    :param signal_windows: list of signal windows
-    :param ts_id: time series id to be concatenated with feature name
-    :param fs: sampling frequency
-    :return: features values for each window size
-    """
+    Parameters
+    ----------
+    dict_features : dict
+        Dictionary with features
+    signal_windows: list
+        Input from which features are computed, window
+    fs : int or None
+        Sampling frequency
+    window_spliter: bool
+        If True computes the signal windows
+    Returns
+    -------
+    DataFrame
+        Extracted features
 
+    """
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
 
@@ -76,98 +87,117 @@ def time_series_features_extractor(dictionary, signal_windows, fs=100, window_sp
 
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
+
     print("*** Feature extraction started ***")
     for wind_sig in signal_windows:
-        features = calc_window_features(dictionary, wind_sig, fs)
+        features = calc_window_features(dict_features, wind_sig, fs)
         feat_val = feat_val.append(features)
     print("*** Feature extraction finished ***")
 
-    return feat_val
+    return feat_val.reset_index(drop=True)
 
 
-def calc_window_features(dictionary, signal_window, fs):
+def calc_window_features(dict_features, signal_window, fs):
+    """This function computes features matrix for one window.
+
+    Parameters
+    ----------
+    dict_features : dict
+        Dictionary with features
+    signal_window: pandas DataFrame
+        Input from which features are computed, window
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    pandas DataFrame
+        (columns) names of the features
+        (data) values of each features for signal
+
     """
-    This function computes features matrix for one window.
-    :param dictionary: (json file)
-           list of features
-    :param signal_window: (pandas DataFrame)
-           input from which features are computed, window.
-    :param fs: (int)
-           sampling frequency    :return: res: (narray-like)
-             values of each features for signal.
-             nam: (narray-like)
-             names of the features
-    """
-    domain = dictionary.keys()
+    # Execute imports
+    exec("import tsfel")
+    domain = dict_features.keys()
 
     # Create global arrays
     func_total = []
     func_names = []
     imports_total = []
     parameters_total = []
-    free_total = []
-
-    for atype in domain:
-        domain_feats = dictionary[atype].keys()
-
-        for feat in domain_feats:
-            # Only returns used functions
-            if dictionary[atype][feat]['use'] == 'yes':
-
-                # Read Function Name (generic name)
-                func_names += [feat]
-
-                # Read Function (real name of function)
-                func_total += [dictionary[atype][feat]['function']]
-
-                # Read Parameters
-                parameters_total += [dictionary[atype][feat]['parameters']]
-
-                # Read Free Parameters
-                free_total += [dictionary[atype][feat]['free parameters']]
-
-    # Execute imports
-    exec("import tsfel")
-
-    # Name of each column to be concatenate with feature name
-    if not isinstance(signal_window, pd.DataFrame):
-        signal_window = pd.DataFrame(data=signal_window)
-    header_names = signal_window.columns.values
-
     feature_results = []
     feature_names = []
 
-    for ax in range(len(header_names)):
-        window = signal_window.iloc[:, ax]
-        for i in range(len(func_total)):
+    for _type in domain:
+        domain_feats = dict_features[_type].keys()
 
-            execf = func_total[i] + '(window'
+        for feat in domain_feats:
 
-            if parameters_total[i] != '':
-                execf += ', ' + parameters_total[i]
+            # Only returns used functions
+            if dict_features[_type][feat]['use'] == 'yes':
 
-            if free_total[i] != '':
-                for n, v in free_total[i].items():
-                    # TODO: conversion may loose precision (str)
-                    execf += ', ' + n + '=' + str(v)
+                # Read Function Name (generic name)
+                func_names = [feat]
 
-            execf += ')'
+                # Read Function (real name of function)
+                func_total = [dict_features[_type][feat]['function']]
 
-            eval_result = eval(execf, locals())
+                # Check for parameters
+                if dict_features[_type][feat]['parameters'] != '':
+                    param = dict_features[_type][feat]['parameters']
 
-            # Function returns more than one element
-            if type(eval_result) == tuple:
-                for rr in range(len(eval_result)):
-                    if np.isnan(eval_result[0]):
-                        eval_result = np.zeros(len(eval_result))
-                    feature_results += [eval_result[rr]]
-                    feature_names += [str(header_names[ax]) + '_' + func_names[i] + '_' + str(rr)]
-            else:
-                feature_results += [eval_result]
-                feature_names += [str(header_names[ax]) + '_' + func_names[i]]
+                    # Check assert fs parameter:
+                    if 'fs' in param:
 
-    feature_results = np.array(feature_results)
-    features = pd.DataFrame(data=feature_results.reshape(1, len(feature_results)), columns=feature_names)
+                        # Select which fs to use
+                        if fs is None:
+
+                            # Check if features dict has default sampling frequency value
+                            if type(param['fs']) is int or type(param['fs']) is float:
+                                parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
+                                
+                                # raise a warning
+                                warnings.warn('Using default sampling frequency.')
+                            else:
+                                raise Exception('No sampling frequency assigned.')
+                        else:
+                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
+                                                if key not in 'fs']
+                            parameters_total += ['fs =' + str(fs)]
+
+                    # feature has no fs parameter
+                    else:
+                        parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
+                else:
+                    parameters_total = ''
+
+                # Name of each column to be concatenate with feature name
+                if not isinstance(signal_window, pd.DataFrame):
+                    signal_window = pd.DataFrame(data=signal_window)
+                header_names = signal_window.columns.values
+
+                for ax in range(len(header_names)):
+                    window = signal_window.iloc[:, ax]
+                    execf = func_total[0] + '(window'
+
+                    if parameters_total != '':
+                        execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
+
+                    execf += ')'
+                    eval_result = eval(execf, locals())
+
+                    # Function returns more than one element
+                    if type(eval_result) == tuple:
+                        for rr in range(len(eval_result)):
+                            if np.isnan(eval_result[0]):
+                                eval_result = np.zeros(len(eval_result))
+                            feature_results += [eval_result[rr]]
+                            feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
+                    else:
+                        feature_results += [eval_result]
+                        feature_names += [str(header_names[ax]) + '_' + func_names[0]]
+
+    features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
+                            columns=np.array(feature_names))
+
     return features
-
-
