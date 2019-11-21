@@ -176,3 +176,36 @@ def create_symmetric_matrix(acf, n_coeff=12):
         for j in range(n_coeff):
             smatrix[i, j] = acf[np.abs(i-j)]
     return smatrix
+
+
+def lpc(signal, n_coeff=12):
+    """Computes the linear prediction coefficients.
+
+    Implementation details and description in:
+    https://ccrma.stanford.edu/~orchi/Documents/speaker_recognition_report.pdf
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from linear prediction coefficients are computed
+    n_coeff : int
+        Number of coefficients
+
+    Returns
+    -------
+    nd-array
+        Linear prediction coefficients
+
+    """
+
+    # Calculate LPC with Yule-Walker
+    acf = autocorr_norm(signal)
+    r = -acf[1:n_coeff+1].T
+    smatrix = create_symmetric_matrix(acf, n_coeff)
+    if np.sum(smatrix) == 0:
+        return tuple(np.zeros(n_coeff))
+
+    lpc_coeffs = np.dot(np.linalg.inv(smatrix), r)
+    lpc_coeffs = lpc_coeffs/np.max(np.abs(lpc_coeffs))
+
+    return tuple(lpc_coeffs)

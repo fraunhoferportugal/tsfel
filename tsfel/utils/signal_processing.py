@@ -4,24 +4,45 @@ from scipy.interpolate import interp1d
 
 
 def signal_window_spliter(signal, window_size, overlap):
+    """Splits the signal into windows
+
+    Parameters
+    ----------
+    signal : nd-array or pandas DataFrame
+        input signal
+    window_size :
+        number of points of window size
+    overlap :
+        percentage of overlap, value between 0 and 1
+
+    Returns
+    -------
+    list
+        list of signal windows
+
     """
 
-    :param signal: input signal (array or pandas data frame)
-    :param window_size: number of points of window size
-    :param overlap: percentage of overlap. Value between 0 and 1
-    :return: list of signal windows
-    """
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
     return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
 
 
 def merge_time_series(data, fs_resample, time_unit):
-    """
-    Time series data interpolation
-    :param data: dictionary
-    :param fs_resample: resample sampling frequency
-    :param time_unit: time unit in seconds
-    :return: DataFrame with interpolated data
+    """Time series data interpolation
+
+    Parameters
+    ----------
+    data : dict
+        data to interpolate
+    fs_resample :
+        resample sampling frequency
+    time_unit :
+        time unit in seconds
+
+    Returns
+    -------
+    DataFrame
+        Interpolated data
+
     """
 
     # time interval for interpolation
@@ -40,16 +61,21 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlation_report(df):
-    """ Performs a correlation report and removes highly correlated features.
+def correlation_report(features):
+    """Performs a correlation report and removes highly correlated features.
+
     Parameters
     ----------
-    df: dataframe
-      features
+    features : DataFrame
+        features
+
     Returns
     -------
-    df: feature dataframe without high correlated features
+    DataFrame
+        Uncorrelated features
+
     """
+
     # TODO use another package
     # To correct a bug in pandas_profiling package
     import matplotlib
@@ -57,7 +83,7 @@ def correlation_report(df):
     import pandas_profiling
     matplotlib.use(BACKEND)
 
-    profile = pandas_profiling.ProfileReport(df)
+    profile = pandas_profiling.ProfileReport(features)
     profile.to_file(outputfile="CorrelationReport.html")
     inp = str(input('Do you wish to remove correlated features? Enter y/n: '))
     if inp == 'y':
@@ -66,5 +92,5 @@ def correlation_report(df):
             print('No features to remove')
         for rej in reject:
             print('Removing ' + str(rej))
-            df = df.drop(rej, axis=1)
-    return df
+            features = features.drop(rej, axis=1)
+    return features
