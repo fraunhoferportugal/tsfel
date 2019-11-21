@@ -1,12 +1,10 @@
-import numpy as np
-from scipy.optimize import curve_fit
-from tsfel.feature_extraction.features_settings import compute_dictionary
-from tsfel.feature_extraction.calc_features import calc_window_features
 import time
 import json
+import numpy as np
+from scipy.optimize import curve_fit
+from tsfel.feature_extraction.calc_features import calc_window_features
 
 
-###########################################
 # curves
 def n_Squared(x, No):
     """The model function"""
@@ -31,9 +29,6 @@ def n_Log(x, No):
 def n_Constant(x, No):
     """The model function"""
     return np.zeros(len(x)) + No
-
-
-###########################################a
 
 
 def find_best_curve(t, signal):
@@ -67,13 +62,9 @@ def find_best_curve(t, signal):
 
     return np.min(all_chisq), curve_name
 
-    # Plot the data with error bars along with the fit result
-
 
 def compute_complexity(feat, domain, filename):
-    # TODO remove compute_dictionary
-    DEFAULT = {'use': 'yes', 'metric': 'euclidean', 'free parameters': '', 'number of features': 1, 'parameters': ''}
-    dictionary = compute_dictionary(filename, DEFAULT)
+    dictionary = json.load(open(filename))
 
     # The inputs from this function should be replaced by a dictionary
     one_feat_dict = {domain: {feat: {dictionary[domain][feat]}}}

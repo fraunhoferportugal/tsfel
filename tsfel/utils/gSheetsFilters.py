@@ -1,12 +1,10 @@
 import ast
 import json
-
+import tsfel
 import gspread
 import numpy as np
-from oauth2client.service_account import ServiceAccountCredentials
 from tsfel.utils.calculate_complexity import compute_complexity
-
-import tsfel
+from oauth2client.service_account import ServiceAccountCredentials
 
 
 def filter_features(features, filters):
@@ -73,9 +71,9 @@ def extract_sheet(gsheet_name):
     # Read features.json into a dictionary of features and parameters
     dict_features = json.load(open(path_json))
 
-    len_stat = len(dict_features['Statistical'].keys())
-    len_temp = len(dict_features['Temporal'].keys())
-    len_spec = len(dict_features['Spectral'].keys())
+    len_stat = len(dict_features['statistical'].keys())
+    len_temp = len(dict_features['temporal'].keys())
+    len_spec = len(dict_features['spectral'].keys())
 
     # Access Google sheet
     # Scope and credentials using the content of client_secret.json file

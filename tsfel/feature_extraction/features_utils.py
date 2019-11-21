@@ -1,7 +1,4 @@
-import scipy
 import numpy as np
-
-# Auxiliar functions
 
 
 def compute_time(signal, fs):
@@ -179,4 +176,3 @@ def create_symmetric_matrix(acf, n_coeff=12):
         for j in range(n_coeff):
             smatrix[i, j] = acf[np.abs(i-j)]
     return smatrix
-

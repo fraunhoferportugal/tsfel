@@ -1,5 +1,5 @@
 {
-  "Spectral": {
+  "spectral": {
     "Fundamental frequency": {
       "Complexity": "Log",
       "description": "Computes the fundamental frequency.",
@@ -159,7 +159,7 @@
       "use": "yes"
     }
   },
-  "Statistical": {
+  "statistical": {
     "Histogram": {
       "Complexity": "Log",
       "description": "Computes histogram of the signal.",
@@ -262,7 +262,7 @@
       "use": "yes"
     }
   },
-  "Temporal": {
+  "temporal": {
     "Autocorrelation": {
       "Complexity": "Constant",
       "description": "Computes autocorrelation of the signal.",

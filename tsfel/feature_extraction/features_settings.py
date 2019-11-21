@@ -2,6 +2,7 @@ import json
 import tsfel
 import inspect
 
+
 def load_user_settings(filename):
     return json.load(open(filename))
 

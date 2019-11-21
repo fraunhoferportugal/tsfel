@@ -38,3 +38,33 @@ def merge_time_series(data, fs_resample, time_unit):
         data_new = np.hstack((data_new, np.array([interp1d(dn.iloc[:, 0], dn.iloc[:, ax])(x_new) for ax in range(1, np.shape(dn)[1])]).T))
 
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
+
+
+def correlation_report(df):
+    """ Performs a correlation report and removes highly correlated features.
+    Parameters
+    ----------
+    df: dataframe
+      features
+    Returns
+    -------
+    df: feature dataframe without high correlated features
+    """
+    # TODO use another package
+    # To correct a bug in pandas_profiling package
+    import matplotlib
+    BACKEND = matplotlib.get_backend()
+    import pandas_profiling
+    matplotlib.use(BACKEND)
+
+    profile = pandas_profiling.ProfileReport(df)
+    profile.to_file(outputfile="CorrelationReport.html")
+    inp = str(input('Do you wish to remove correlated features? Enter y/n: '))
+    if inp == 'y':
+        reject = profile.get_rejected_variables(threshold=0.9)
+        if not list(reject):
+            print('No features to remove')
+        for rej in reject:
+            print('Removing ' + str(rej))
+            df = df.drop(rej, axis=1)
+    return df
