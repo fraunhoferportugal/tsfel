@@ -2,6 +2,7 @@ import time
 import json
 import numpy as np
 from scipy.optimize import curve_fit
+from tsfel.feature_extraction.features_settings import load_json
 from tsfel.feature_extraction.calc_features import calc_window_features
 
 
@@ -97,10 +98,10 @@ def compute_complexity(feature, domain, json_file):
     Writes complexity in json file
 
     """
-    dictionary = json.load(open(json_file))
+    dictionary = load_json(json_file)
 
     # The inputs from this function should be replaced by a dictionary
-    one_feat_dict = {domain: {feature: {dictionary[domain][feature]}}}
+    one_feat_dict = {domain: {feature: dictionary[domain][feature]}}
 
     t = np.logspace(3.0, 5.0, 6)
     signal, s = [], []
@@ -125,10 +126,10 @@ def compute_complexity(feature, domain, json_file):
         json.dump(dictionary, write_file, indent=4, sort_keys=True)
 
     if curve_name == 'constant' or curve_name == 'log':
-        return 1, curve_name
+        return 1
     elif curve_name == 'linear':
-        return 2, curve_name
+        return 2
     elif curve_name == 'nlog' or curve_name == 'squared':
-        return 3, curve_name
+        return 3
     else:
         return 0

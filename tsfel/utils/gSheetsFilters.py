@@ -4,6 +4,7 @@ import tsfel
 import gspread
 import numpy as np
 from tsfel.utils.calculate_complexity import compute_complexity
+from tsfel.feature_extraction.features_settings import load_json
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -69,7 +70,7 @@ def extract_sheet(gsheet_name):
     path_json = lib_path[0] + '/feature_extraction/features.json'
 
     # Read features.json into a dictionary of features and parameters
-    dict_features = json.load(open(path_json))
+    dict_features = load_json(path_json)
 
     len_stat = len(dict_features['statistical'].keys())
     len_temp = len(dict_features['temporal'].keys())

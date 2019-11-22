@@ -3,11 +3,39 @@ import tsfel
 import inspect
 
 
-def load_user_settings(filename):
+def load_json(filename):
+    """Loads the json file given by filename.
+
+    Parameters
+    ----------
+    filename : json
+        Json file
+
+    Returns
+    -------
+    Dict
+        Dictionary
+
+    """
+
     return json.load(open(filename))
 
 
 def get_features_by_domain(domain):
+    """Creates a dictionary with the features settings by domain.
+
+    Parameters
+    ----------
+    domain : string
+        Available domains: "statistical"; "spectral"; "temporal"
+
+    Returns
+    -------
+    Dict
+        Dictionary with the features settings by domain
+
+    """
+
     domain = domain.lower()
     settings = {domain: {}}
     for fname, f in tsfel.features.__dict__.items():
@@ -38,7 +66,19 @@ def get_features_by_domain(domain):
 
 
 def get_all_features():
+    """Creates a dictionary with the features settings from all domains.
+
+    Returns
+    -------
+    Dict
+        Dictionary with the features settings from all domains
+
+    """
+
     settings = {'statistical': get_features_by_domain('statistical')['statistical'],
                 'temporal': get_features_by_domain('temporal')['temporal'],
                 'spectral': get_features_by_domain('spectral')['spectral']}
+
     return settings
+
+

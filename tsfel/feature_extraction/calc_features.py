@@ -8,18 +8,19 @@ import importlib
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
-def dataset_features_extractor(main_directory, feat_dict, **kwargs):
+def dataset_features_extractor(main_directory, json_directory, **kwargs):
     """Extracts features from a dataset.
 
     Parameters
     ----------
     main_directory : String
         Input directory
-    feat_dict : json file
-        Json file
+    json_directory : json file directory
+        Json file directory
     \**kwargs:
     See below:
         * *search_criteria* (``list``) --
@@ -65,6 +66,8 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     pre_process = kwargs.get('pre_process', None)
     output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
     personal_dir = kwargs.get('personal_dir', None)
+
+    feat_dict = load_json(json_directory)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory+os.sep
@@ -149,20 +152,20 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     personal_dir = kwargs.get('personal_dir', None)
 
     feat_val = pd.DataFrame()
-    if window_spliter:
+    if window_spliter and (len(signal_windows) == 1):
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
+    elif window_spliter and (len(signal_windows) > 1):
+        warnings.warn('The signal is already segmented into windows.')
 
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
 
-    print("*** Feature extraction started ***")
     for wind_sig in signal_windows:
         if personal_dir:
             features = calc_window_features(dict_features, wind_sig, fs, personal_dir=personal_dir)
         else:
             features = calc_window_features(dict_features, wind_sig, fs)
         feat_val = feat_val.append(features)
-    print("*** Feature extraction finished ***")
 
     return feat_val.reset_index(drop=True)
 
@@ -240,9 +243,9 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                                 parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
                                 
                                 # raise a warning
-                                warnings.warn('Using default sampling frequency.')
+                                warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.")
                             else:
-                                raise Exception('No sampling frequency assigned.')
+                                raise SystemExit('No sampling frequency assigned.')
                         else:
                             parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
                                                 if key not in 'fs']

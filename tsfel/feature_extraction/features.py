@@ -1,5 +1,4 @@
 import scipy
-import scipy.signal
 import warnings
 import numpy as np
 from tsfel.feature_extraction.features_utils import *

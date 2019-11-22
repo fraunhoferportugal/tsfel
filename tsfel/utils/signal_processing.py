@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pandas_profiling
 from scipy.interpolate import interp1d
 
 
@@ -76,16 +77,10 @@ def correlation_report(features):
 
     """
 
-    # TODO use another package
-    # To correct a bug in pandas_profiling package
-    import matplotlib
-    BACKEND = matplotlib.get_backend()
-    import pandas_profiling
-    matplotlib.use(BACKEND)
-
     profile = pandas_profiling.ProfileReport(features)
-    profile.to_file(outputfile="CorrelationReport.html")
+    profile.to_file(output_file="CorrelationReport.html")
     inp = str(input('Do you wish to remove correlated features? Enter y/n: '))
+
     if inp == 'y':
         reject = profile.get_rejected_variables(threshold=0.9)
         if not list(reject):
