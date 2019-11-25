@@ -1,6 +1,7 @@
 import scipy
 import warnings
 import numpy as np
+import scipy.signal
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -310,8 +311,6 @@ def abs_energy(signal):
 def pk_pk_distance(signal):
     """Computes the peak to peak distance.
 
-    The quantile values are considered in order to reduce the influence of outlier measurements.
-
     Parameters
     ----------
     signal : nd-array
@@ -324,7 +323,7 @@ def pk_pk_distance(signal):
 
     """
 
-    return np.abs(np.quantile(signal, 0.95)-np.quantile(signal, 0.05))
+    return np.abs(np.max(signal)-np.min(signal))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -1215,6 +1214,9 @@ def power_bandwidth(signal, fs):
 def fft_mean_coeff(signal, fs, nfreq=256):
     """Computes the mean value of each spectrogram frequency.
 
+    nfreq can not be higher than half signal length plus one.
+    When it does, it is automatically set to half signal length plus one.
+
     Parameters
     ----------
     signal : nd-array
@@ -1233,8 +1235,6 @@ def fft_mean_coeff(signal, fs, nfreq=256):
 
     if nfreq > len(signal)//2+1:
         nfreq = len(signal)//2+1
-        warnings.warn("nfreq can not be higher than half signal length plus one. "
-                      "It was automatically set to half signal length plus one.")
 
     fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
 

@@ -1,6 +1,5 @@
 import json
 import tsfel
-import inspect
 
 
 def load_json(filename):
@@ -21,13 +20,15 @@ def load_json(filename):
     return json.load(open(filename))
 
 
-def get_features_by_domain(domain):
+def get_features_by_domain(domain, filename=None):
     """Creates a dictionary with the features settings by domain.
 
     Parameters
     ----------
     domain : string
         Available domains: "statistical"; "spectral"; "temporal"
+    filename : str
+        Directory of json file. Default: package features.json directory
 
     Returns
     -------
@@ -36,31 +37,11 @@ def get_features_by_domain(domain):
 
     """
 
-    domain = domain.lower()
-    settings = {domain: {}}
-    for fname, f in tsfel.features.__dict__.items():
-        if getattr(f, "domain", None) == domain:
-            settings[domain][fname] = {}
-            args = inspect.getfullargspec(f).args
-            defaults = inspect.getfullargspec(f).defaults
+    if filename is None:
+        filename = tsfel.__path__[0]+"/feature_extraction/features.json"
 
-            if defaults is None:
-                iterator = args[1:] if len(args) > 1 else ''
-                param = ''
-            else:
-                iterator = '' if len(args) - len(defaults) == 1 else args[1:-len(defaults)]
-                param = {str(fparam): defaults[i] for i, fparam in enumerate(args[-len(defaults):])}
-
-            all_param = ''
-            for param in iterator:
-                all_param += param + ','
-
-            if param == 'fs':
-                settings[domain][fname]['parameters'] = {str(param): None}
-            else:
-                settings[domain][fname]['parameters'] = param
-            settings[domain][fname]['function'] = 'tsfel.' + fname
-            settings[domain][fname]['use'] = 'yes'
+    dict_features = load_json(filename)
+    settings = dict_features[domain]
 
     return settings
 

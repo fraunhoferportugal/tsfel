@@ -12,15 +12,15 @@ from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
-def dataset_features_extractor(main_directory, json_directory, **kwargs):
+def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     """Extracts features from a dataset.
 
     Parameters
     ----------
     main_directory : String
         Input directory
-    json_directory : json file directory
-        Json file directory
+    feat_dict : json file
+        Json file
     \**kwargs:
     See below:
         * *search_criteria* (``list``) --
@@ -66,8 +66,6 @@ def dataset_features_extractor(main_directory, json_directory, **kwargs):
     pre_process = kwargs.get('pre_process', None)
     output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
     personal_dir = kwargs.get('personal_dir', None)
-
-    feat_dict = load_json(json_directory)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory+os.sep

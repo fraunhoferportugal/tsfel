@@ -38,7 +38,7 @@
       "use": "yes"
     },
     "MFCC": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes the MEL cepstral coefficients.",
       "parameters": {
         "fs": 100,
@@ -52,7 +52,7 @@
       "use": "yes"
     },
     "Max power spectrum": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the maximum power spectrum density.",
       "parameters": {
         "fs": 100
@@ -61,7 +61,7 @@
       "use": "yes"
     },
     "Maximum frequency": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the maximum frequency.",
       "parameters": {
         "fs": 100
@@ -70,7 +70,7 @@
       "use": "yes"
     },
     "Median frequency": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the median frequency.",
       "parameters": {
         "fs": 100
@@ -88,7 +88,7 @@
       "use": "yes"
     },
     "Spectral centroid": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the barycenter of the spectrum.",
       "parameters": {
         "fs": 100
@@ -97,7 +97,7 @@
       "use": "yes"
     },
     "Spectral decrease": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the amount of decreasing of the spectra amplitude.",
       "parameters": {
         "fs": 100
@@ -106,7 +106,7 @@
       "use": "yes"
     },
     "Spectral distance": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the signal spectral distance.",
       "parameters": {
         "fs": 100
@@ -115,7 +115,7 @@
       "use": "yes"
     },
     "Spectral kurtosis": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the flatness of a distribution around its mean value.",
       "parameters": {
         "fs": 100
@@ -133,7 +133,7 @@
       "use": "yes"
     },
     "Spectral roll-off": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the frequency where 95% of the signal magnitude is contained below of this value.",
       "parameters": {
         "fs": 100
@@ -142,7 +142,7 @@
       "use": "yes"
     },
     "Spectral roll-on": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the frequency where 5% of the signal magnitude is contained below of this value.",
       "parameters": {
         "fs": 100
@@ -151,7 +151,7 @@
       "use": "yes"
     },
     "Spectral skewness": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the asymmetry of a distribution around its mean value.",
       "parameters": {
         "fs": 100
@@ -160,7 +160,7 @@
       "use": "yes"
     },
     "Spectral slope": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes the spectral slope, obtained by linear regression of the spectral amplitude.",
       "parameters": {
         "fs": 100
@@ -169,7 +169,7 @@
       "use": "yes"
     },
     "Spectral spread": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the spread of the spectrum around its mean value.",
       "parameters": {
         "fs": 100
@@ -178,7 +178,7 @@
       "use": "yes"
     },
     "Spectral variation": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the amount of variation of the spectrum along time.",
       "parameters": {
         "fs": 100
@@ -189,7 +189,7 @@
   },
   "statistical": {
     "Histogram": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes histogram of the signal.",
       "parameters": {
         "nbins": 10,
@@ -199,21 +199,21 @@
       "use": "yes"
     },
     "Interquartile range": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes interquartile range of the signal.",
       "parameters": "",
       "function": "tsfel.interq_range",
       "use": "yes"
     },
     "Kurtosis": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes kurtosis of the signal.",
       "parameters": "",
       "function": "tsfel.kurtosis",
       "use": "yes"
     },
     "Max": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes the maximum value of the signal.",
       "parameters": "",
       "function": "tsfel.calc_max",
@@ -227,21 +227,21 @@
       "use": "yes"
     },
     "Mean absolute deviation": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes mean absolute deviation of the signal.",
       "parameters": "",
       "function": "tsfel.mean_abs_deviation",
       "use": "yes"
     },
     "Median": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes median of the signal.",
       "parameters": "",
       "function": "tsfel.calc_median",
       "use": "yes"
     },
     "Median absolute deviation": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes median absolute deviation of the signal.",
       "parameters": "",
       "function": "tsfel.median_abs_deviation",
@@ -255,35 +255,35 @@
       "use": "yes"
     },
     "Root mean square": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes root mean square of the signal.",
       "parameters": "",
       "function": "tsfel.rms",
       "use": "yes"
     },
     "Skewness": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes skewness of the signal.",
       "parameters": "",
       "function": "tsfel.skewness",
       "use": "yes"
     },
     "Slope": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the slope of the signal by fitting a linear equation to the observed data.",
       "parameters": "",
       "function": "tsfel.slope",
       "use": "yes"
     },
     "Standard Deviation": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes standard deviation of the signal.",
       "parameters": "",
       "function": "tsfel.calc_std",
       "use": "yes"
     },
     "Variance": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes variance of the signal.",
       "parameters": "",
       "function": "tsfel.calc_var",
@@ -299,7 +299,7 @@
       "use": "yes"
     },
     "Centroid": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the centroid along the time axis.",
       "parameters": {
         "fs": 100
@@ -315,7 +315,7 @@
       "use": "yes"
     },
     "Mean absolute diff": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes mean absolute differences of the signal.",
       "parameters": "",
       "function": "tsfel.mean_abs_diff",
@@ -329,14 +329,14 @@
       "use": "yes"
     },
     "Median absolute diff": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes median absolute differences of the signal.",
       "parameters": "",
       "function": "tsfel.median_abs_diff",
       "use": "yes"
     },
     "Median diff": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes median of differences of the signal.",
       "parameters": "",
       "function": "tsfel.median_diff",
@@ -357,7 +357,7 @@
       "use": "yes"
     },
     "Sum absolute diff": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes sum of absolute differences of the signal.",
       "parameters": "",
       "function": "tsfel.sum_abs_diff",
@@ -373,7 +373,7 @@
       "use": "yes"
     },
     "Zero crossing rate": {
-      "complexity": "log",
+      "complexity": "constant",
       "parameters": "",
       "description": "Computes Zero-crossing rate of the signal.",
       "function": "tsfel.zero_cross",
