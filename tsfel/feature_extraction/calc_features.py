@@ -1,23 +1,62 @@
-import glob
-import sys
-import numbers
 import os
+import sys
+import glob
+import numbers
 import pathlib
 import warnings
-from pathlib import Path
-
+import importlib
 import numpy as np
 import pandas as pd
+from pathlib import Path
+from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
 def dataset_features_extractor(main_directory, feat_dict, **kwargs):
-    """
+    """Extracts features from a dataset.
 
-    :param main_directory:
-    :param feat_dict:
-    :param kwargs:
-    :return:
+    Parameters
+    ----------
+    main_directory : String
+        Input directory
+    feat_dict : json file
+        Json file
+    \**kwargs:
+    See below:
+        * *search_criteria* (``list``) --
+            List of file names to compute features.
+            (default: ``None``)
+
+        * *time_unit* (``float``) --
+            Time unit
+            (default: ``1e9``)
+
+        * *resampling_rate* (``int``) --
+            Resampling rate
+            (default: ``100``)
+
+        * *window_size* (``int``) --
+            Window size in number of samples
+            (default: ``100``)
+
+        * *overlap* (``float``) --
+            Overlap between 0 and 1
+            (default: ``0``)
+
+        * *pre_process* (``function``) --
+            Function with pre processing code
+
+            (default: ``None``)
+
+        * *output_directory* (``String``) --
+            Output directory
+            (default: ``'output_directory', str(Path.home()) + '/tsfel_output'``)
+
+    Returns
+    -------
+    file
+        csv file with the extracted features
+
     """
     search_criteria = kwargs.get('search_criteria', None)
     time_unit = kwargs.get('time_unit', 1e9)
@@ -26,6 +65,10 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     overlap = kwargs.get('overlap', 0)
     pre_process = kwargs.get('pre_process', None)
     output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
+    personal_dir = kwargs.get('personal_dir', None)
+
+    if main_directory[-1] != os.sep:
+        main_directory = main_directory+os.sep
 
     folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
@@ -40,7 +83,15 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
             all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
             for c in all_files:
                 key = c.split(os.sep)[-1].split('.')[0]
-                sensor_data[key] = pd.read_csv(fl, header=None)
+                try:
+                    data_file = pd.read_csv(c, header=None)
+                except pd.io.common.CParserError:
+                    continue
+
+                if np.dtype('O') in np.array(data_file.dtypes):
+                    continue
+
+                sensor_data[key] = pd.read_csv(c, header=None)
 
         if not sensor_data:
             continue
@@ -51,7 +102,10 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
 
         windows = signal_window_spliter(data_new, window_size, overlap)
 
-        features = time_series_features_extractor(feat_dict, windows, fs=resample_rate)
+        if personal_dir:
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, personal_dir=personal_dir)
+        else:
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate)
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
@@ -72,6 +126,19 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Sampling frequency
     window_spliter: bool
         If True computes the signal windows
+    \**kwargs:
+    See below:
+        * *window_size* (``int``) --
+            Window size in number of samples
+            (default: ``100``)
+
+        * *overlap* (``float``) --
+            Overlap between 0 and 1
+            (default: ``0``)
+
+        * *personal_dir* (``string``) --
+            Directory of script with personal features
+
     Returns
     -------
     DataFrame
@@ -80,24 +147,28 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     """
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
+    personal_dir = kwargs.get('personal_dir', None)
 
     feat_val = pd.DataFrame()
-    if window_spliter:
+    if window_spliter and (len(signal_windows) == 1):
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
+    elif window_spliter and (len(signal_windows) > 1):
+        warnings.warn('The signal is already segmented into windows.')
 
     if isinstance(signal_windows[0], numbers.Real):
         signal_windows = [signal_windows]
 
-    print("*** Feature extraction started ***")
     for wind_sig in signal_windows:
-        features = calc_window_features(dict_features, wind_sig, fs)
+        if personal_dir:
+            features = calc_window_features(dict_features, wind_sig, fs, personal_dir=personal_dir)
+        else:
+            features = calc_window_features(dict_features, wind_sig, fs)
         feat_val = feat_val.append(features)
-    print("*** Feature extraction finished ***")
 
     return feat_val.reset_index(drop=True)
 
 
-def calc_window_features(dict_features, signal_window, fs):
+def calc_window_features(dict_features, signal_window, fs, **kwargs):
     """This function computes features matrix for one window.
 
     Parameters
@@ -108,6 +179,10 @@ def calc_window_features(dict_features, signal_window, fs):
         Input from which features are computed, window
     fs : int
         Sampling frequency
+    \**kwargs:
+    See below:
+        * *personal_dir* (``string``) --
+            Directory of script with personal features
 
     Returns
     -------
@@ -116,9 +191,18 @@ def calc_window_features(dict_features, signal_window, fs):
         (data) values of each features for signal
 
     """
+
+    personal_dir = kwargs.get('personal_dir', None)
+
     # Execute imports
     exec("import tsfel")
     domain = dict_features.keys()
+
+    if personal_dir:
+        sys.path.append(personal_dir[:-len(personal_dir.split(os.sep)[-1])-1])
+        exec("import "+personal_dir.split(os.sep)[-1][:-3])
+        importlib.reload(sys.modules[personal_dir.split(os.sep)[-1][:-3]])
+        exec("from " + personal_dir.split(os.sep)[-1][:-3]+" import *")
 
     # Create global arrays
     func_total = []
@@ -157,9 +241,9 @@ def calc_window_features(dict_features, signal_window, fs):
                                 parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
                                 
                                 # raise a warning
-                                warnings.warn('Using default sampling frequency.')
+                                warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.")
                             else:
-                                raise Exception('No sampling frequency assigned.')
+                                raise SystemExit('No sampling frequency assigned.')
                         else:
                             parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
                                                 if key not in 'fs']

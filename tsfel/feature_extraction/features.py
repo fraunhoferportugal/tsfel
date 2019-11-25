@@ -1,7 +1,7 @@
 import scipy
-import scipy.signal
 import warnings
 import numpy as np
+import scipy.signal
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -265,6 +265,65 @@ def total_energy(signal, fs):
     time = compute_time(signal, fs)
 
     return np.sum(np.array(signal)**2)/(time[-1]-time[0])
+
+
+@set_domain("domain", "temporal")
+def auc(signal, fs):
+    """Computes the area under the curve of the signal computed with trapezoid rule.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+    fs : int
+        Sampling Frequency
+    Returns
+    -------
+    float
+        The area under the curve value
+
+    """
+    t = compute_time(signal, fs)
+
+    return np.sum(np.diff(t)*signal[:-1]+signal[1:]/2)
+
+
+@set_domain("domain", "temporal")
+def abs_energy(signal):
+    """Computes the absolute energy of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+
+    Returns
+    -------
+    float
+        Absolute energy
+
+    """
+
+    return np.sum(signal**2)
+
+
+@set_domain("domain", "temporal")
+def pk_pk_distance(signal):
+    """Computes the peak to peak distance.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+
+    Returns
+    -------
+    float
+        peak to peak distance
+
+    """
+
+    return np.abs(np.max(signal)-np.min(signal))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -1105,3 +1164,113 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     mel_coeff *= lift
 
     return tuple(mel_coeff)
+
+
+@set_domain("domain", "spectral")
+def power_bandwidth(signal, fs):
+    """Computes power spectrum density bandwidth of the signal.
+
+    It corresponds to the width of the frequency band in which 95% of its power is located.
+
+    Description in article:
+    Power Spectrum and Bandwidth Ulf Henriksson, 2003 Translated by Mikael Olofsson, 2005
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the power bandwidth computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Occupied power in bandwidth
+
+    """
+
+    # Computing the power spectrum density
+    if np.std(signal) == 0:
+        freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
+    else:
+        freq, power = scipy.signal.welch(signal/np.std(signal), fs, nperseg=len(signal))
+
+    if np.sum(power) == 0:
+        return 0.0
+
+    # Computing the lower and upper limits of power bandwidth
+    cum_power = np.cumsum(power)
+    f_lower = freq[np.where(cum_power >= cum_power[-1]*0.95)[0][0]]
+
+    cum_power_inv = np.cumsum(power[::-1])
+    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1]*0.95)[0][0]-len(power)+1)]
+
+    # Returning the bandwidth in terms of frequency
+
+    return abs(f_upper-f_lower)
+
+
+@set_domain("domain", "spectral")
+def fft_mean_coeff(signal, fs, nfreq=256):
+    """Computes the mean value of each spectrogram frequency.
+
+    nfreq can not be higher than half signal length plus one.
+    When it does, it is automatically set to half signal length plus one.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which fft mean coefficients are computed
+    fs : int
+        Sampling frequency
+    nfreq : int
+        The number of frequencies
+
+    Returns
+    -------
+    nd-array
+        The mean value of each spectrogram frequency
+
+    """
+
+    if nfreq > len(signal)//2+1:
+        nfreq = len(signal)//2+1
+
+    fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
+
+    return tuple(fmag_mean)
+
+
+@set_domain("domain", "spectral")
+def lpcc(signal, n_coeff=12):
+    """Computes the linear prediction cepstral coefficients.
+
+    Implementation details and description in:
+    http://www.practicalcryptography.com/miscellaneous/machine-learning/tutorial-cepstrum-and-lpccs/
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from linear prediction cepstral coefficients are computed
+    n_coeff : int
+        Number of coefficients
+
+    Returns
+    -------
+    nd-array
+        Linear prediction cepstral coefficients
+
+    """
+
+    # 12-20 cepstral coefficients are sufficient for speech recognition
+    lpc_coeffs = lpc(signal, n_coeff)
+
+    if np.sum(lpc_coeffs) == 0:
+        return tuple(np.zeros(n_coeff))
+
+    # Power spectrum
+    powerspectrum = np.abs(np.fft.fft(lpc_coeffs)) ** 2
+    lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
+
+    return tuple(abs(lpcc_coeff))
+

@@ -1,6 +1,6 @@
 import numpy as np
+from tsfel.feature_extraction.features import *
 from numpy.testing import assert_array_equal, run_module_suite
-from tsfel.feature_extraction import *
 
 # Implementing signals for testing features
 
@@ -188,6 +188,18 @@ def test_rms():
     np.testing.assert_almost_equal(rms(noiseWave), 0.7128245483240299, decimal=5)
 
 
+def test_slope():
+    np.testing.assert_equal(slope(const0), 0.0)
+    np.testing.assert_equal(slope(const1), -8.935559365603017e-18)
+    np.testing.assert_equal(slope(constNeg), 8.935559365603017e-18)
+    np.testing.assert_equal(slope(constF), 1.7871118731206033e-17)
+    np.testing.assert_equal(slope(lin), 1.0)
+    np.testing.assert_equal(slope(lin0), 1.0526315789473686)
+    np.testing.assert_equal(slope(wave), -0.0003819408289180587)
+    np.testing.assert_equal(slope(offsetWave), -0.00038194082891805853)
+    np.testing.assert_equal(slope(noiseWave), -0.00040205425841671337)
+
+
 # ################################################ TEMPORAL FEATURES ################################################# #
 def test_distance():
     np.testing.assert_equal(distance(const0), 19.0)
@@ -321,16 +333,40 @@ def test_autocorr():
     np.testing.assert_almost_equal(autocorr(noiseWave), 508.6149018530489, decimal=0)
 
 
-def test_slope():
-    np.testing.assert_equal(slope(const0), 0.0)
-    np.testing.assert_equal(slope(const1), -8.935559365603017e-18)
-    np.testing.assert_equal(slope(constNeg), 8.935559365603017e-18)
-    np.testing.assert_equal(slope(constF), 1.7871118731206033e-17)
-    np.testing.assert_equal(slope(lin), 1.0)
-    np.testing.assert_equal(slope(lin0), 1.0526315789473686)
-    np.testing.assert_equal(slope(wave), -0.0003819408289180587)
-    np.testing.assert_equal(slope(offsetWave), -0.00038194082891805853)
-    np.testing.assert_equal(slope(noiseWave), -0.00040205425841671337)
+def test_auc():
+    np.testing.assert_equal(auc(const0, Fs), 0.0)
+    np.testing.assert_equal(auc(const1, Fs), 9.518999999999998)
+    np.testing.assert_equal(auc(constNeg, Fs), -9.518999999999998)
+    np.testing.assert_equal(auc(constF, Fs), 23.797500000000003)
+    np.testing.assert_equal(auc(lin, Fs), 95.171)
+    np.testing.assert_equal(auc(lin0, Fs), 4.989999999999997)
+    np.testing.assert_equal(auc(wave, Fs), 3.1410759074645966e-05)
+    np.testing.assert_equal(auc(offsetWave, Fs), 1000.998031410759)
+    np.testing.assert_equal(auc(noiseWave, Fs), -0.7958996038449087)
+
+
+def test_abs_energy():
+    np.testing.assert_equal(abs_energy(const0), 0.0)
+    np.testing.assert_equal(abs_energy(const1), 20.0)
+    np.testing.assert_equal(abs_energy(constNeg), 20.0)
+    np.testing.assert_equal(abs_energy(constF), 125.0)
+    np.testing.assert_equal(abs_energy(lin), 2470)
+    np.testing.assert_equal(abs_energy(lin0), 736.8421052631579)
+    np.testing.assert_equal(abs_energy(wave), 500.0)
+    np.testing.assert_equal(abs_energy(offsetWave), 4500.0)
+    np.testing.assert_equal(abs_energy(noiseWave), 508.11883669335725)
+
+
+def test_pk_pk_distance():
+    np.testing.assert_equal(pk_pk_distance(const0), 0.0)
+    np.testing.assert_equal(pk_pk_distance(const1), 0.0)
+    np.testing.assert_equal(pk_pk_distance(constNeg), 0.0)
+    np.testing.assert_equal(pk_pk_distance(constF), 0.0)
+    np.testing.assert_equal(pk_pk_distance(lin), 17.1)
+    np.testing.assert_equal(pk_pk_distance(lin0), 18.0)
+    np.testing.assert_equal(pk_pk_distance(wave), 1.9753766811902755)
+    np.testing.assert_equal(pk_pk_distance(offsetWave), 1.9753766811902755)
+    np.testing.assert_equal(pk_pk_distance(noiseWave), 2.0052536460296393)
 
 
 # ################################################ SPECTRAL FEATURES ################################################# #
@@ -579,6 +615,82 @@ def test_mfcc():
                                                          13.868391975194648, 65.73380784148053, 67.65563377433688,
                                                          35.223042940942214, 73.01746718829553, 137.50395589362876,
                                                          111.61718917042731, 82.69709467796633, 110.67135918512074))
+
+
+def test_power_bandwidth():
+    np.testing.assert_equal(power_bandwidth(const0, Fs), 0.0)
+    np.testing.assert_equal(power_bandwidth(const1, Fs), 0.0)
+    np.testing.assert_equal(power_bandwidth(constNeg, Fs), 0.0)
+    np.testing.assert_equal(power_bandwidth(constF, Fs), 0.0)
+    np.testing.assert_equal(power_bandwidth(lin, Fs), 0.0)
+    np.testing.assert_almost_equal(power_bandwidth(lin0, Fs), 0.0)
+    np.testing.assert_almost_equal(power_bandwidth(wave, Fs), 2.0)
+    np.testing.assert_almost_equal(power_bandwidth(offsetWave, Fs), 2.0)
+    np.testing.assert_almost_equal(power_bandwidth(noiseWave, Fs), 2.0)
+
+
+def test_fft_mean_coeff():
+    np.testing.assert_equal(fft_mean_coeff(const0, Fs, nfreq=10), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    np.testing.assert_equal(fft_mean_coeff(const1, Fs, nfreq=10), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    np.testing.assert_equal(fft_mean_coeff(constNeg, Fs, nfreq=10), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    np.testing.assert_equal(fft_mean_coeff(constF, Fs, nfreq=10), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    np.testing.assert_equal(fft_mean_coeff(lin, Fs, nfreq=10), (0.00408221375370652, 0.29732082717207287,
+                                                                0.04400486791011177, 0.006686945426272411,
+                                                                0.00027732608206304087, 0.0003337183893114616,
+                                                                0.0008722727267959805, 0.0007221373313148659,
+                                                                0.00024061479410220662, 2.1097101108186473e-07))
+    np.testing.assert_almost_equal(fft_mean_coeff(lin0, Fs, nfreq=10), (0.004523228535962903, 0.3294413597474491,
+                                                                        0.04875885641009613, 0.007409357813044217,
+                                                                        0.00030728651752137475, 0.0003697710684891545,
+                                                                        0.0009665071765052403, 0.0008001521676618994,
+                                                                        0.00026660919014094884, 2.337628931654879e-07))
+    np.testing.assert_almost_equal(fft_mean_coeff(wave, Fs, nfreq=10), (2.0234880089914443e-06, 0.0001448004568848076,
+                                                                        2.1047578415647817e-05, 3.2022732210152474e-06,
+                                                                        1.52158292419209e-07, 1.7741879185514087e-07,
+                                                                        4.2795757073284126e-07, 3.5003942541628605e-07,
+                                                                        1.1626895252132188e-07, 1.6727906953620535e-10))
+    np.testing.assert_almost_equal(fft_mean_coeff(offsetWave, Fs, nfreq=10), (2.0234880089914642e-06,
+                                                                              0.00014480045688480763,
+                                                                              2.104757841564781e-05,
+                                                                              3.2022732210152483e-06,
+                                                                              1.5215829241920897e-07,
+                                                                              1.7741879185514156e-07,
+                                                                              4.27957570732841e-07,
+                                                                              3.500394254162859e-07,
+                                                                              1.1626895252132173e-07,
+                                                                              1.6727906953620255e-10))
+    np.testing.assert_almost_equal(fft_mean_coeff(noiseWave, Fs, nfreq=10), (3.2947755935395495e-06,
+                                                                             0.00014466702099241778,
+                                                                             3.838265852158549e-05,
+                                                                             1.6729032217627548e-05,
+                                                                             1.6879950037320804e-05,
+                                                                             1.571169205601392e-05,
+                                                                             1.679718723715948e-05,
+                                                                             1.810371503556574e-05,
+                                                                             2.0106126483830693e-05,
+                                                                             8.91285109135437e-06))
+
+
+def test_lpcc():
+    np.testing.assert_equal(lpcc(const0), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_equal(lpcc(const1), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_equal(lpcc(constNeg), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_equal(lpcc(constF), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_equal(lpcc(lin), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_almost_equal(lpcc(lin0), (0.017793342850434657, 0.12419699587050197, 0.17985773867565555,
+                                                0.13749027713829948, 0.14521059821841656, 0.14362411136332903,
+                                                0.14403924127165643, 0.14362411136332903, 0.14521059821841656,
+                                                0.13749027713829948, 0.17985773867565555, 0.12419699587050197))
+    np.testing.assert_almost_equal(lpcc(wave), (8.08705689884851e-07, 0.10193422882411193, 0.0051922525746904875,
+                                                0.0003496693593067946, 2.355214618130234e-05, 1.2419899263690914e-06,
+                                                3.091008802744081e-06, 1.2419899263690914e-06, 2.355214618130234e-05,
+                                                0.0003496693593067946, 0.0051922525746904875, 0.10193422882411193))
+    np.testing.assert_almost_equal(lpcc(offsetWave), (8.087054868870942e-07, 0.10193422882503231, 0.005192252575236202,
+                                                      0.0003496693583308415, 2.3552147454092374e-05,
+                                                      1.241991615337501e-06, 3.0910069449505212e-06,
+                                                      1.241991615337501e-06, 2.3552147454092374e-05,
+                                                      0.0003496693583308415, 0.005192252575236202, 0.10193422882503231))
+    np.testing.assert_almost_equal(lpcc(noiseWave), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
 
 run_module_suite()

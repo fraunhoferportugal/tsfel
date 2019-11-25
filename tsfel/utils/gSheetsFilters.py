@@ -4,6 +4,7 @@ import tsfel
 import gspread
 import numpy as np
 from tsfel.utils.calculate_complexity import compute_complexity
+from tsfel.feature_extraction.features_settings import load_json
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -34,12 +35,12 @@ def filter_features(features, filters):
         feat_shown = [ff for ff in features_all if ff not in feat_hidden]
     if filters['3'] != {}:
         cost_numbers = filters['3']['hiddenValues']
-        cost_hidden = list(np.concatenate([['Constant', 'Log'] if int(cn) == 1 else
-                                           ['Squared', 'Nlog'] if int(cn) == 3 else ['Linear']
-                                           if int(cn) == 2 else ['Unknown'] for cn in cost_numbers]))
+        cost_hidden = list(np.concatenate([['constant', 'log'] if int(cn) == 1 else
+                                           ['squared', 'nlog'] if int(cn) == 3 else ['linear']
+                                           if int(cn) == 2 else ['unknown'] for cn in cost_numbers]))
         cost_shown = []
         for dk in features.keys():
-            cost_shown += [ff for ff in features[dk].keys() if features[dk][ff]['Complexity'] not in cost_hidden]
+            cost_shown += [ff for ff in features[dk].keys() if features[dk][ff]['complexity'] not in cost_hidden]
     features_filtered = list(np.concatenate([list(features[dk].keys())
                                              for dk in sorted(features.keys()) if dk in list_shown]))
     features_filtered = [ff for ff in features_filtered if ff in feat_shown]
@@ -69,7 +70,7 @@ def extract_sheet(gsheet_name):
     path_json = lib_path[0] + '/feature_extraction/features.json'
 
     # Read features.json into a dictionary of features and parameters
-    dict_features = json.load(open(path_json))
+    dict_features = load_json(path_json)
 
     len_stat = len(dict_features['statistical'].keys())
     len_temp = len(dict_features['temporal'].keys())
@@ -125,11 +126,11 @@ def extract_sheet(gsheet_name):
                             if len(param) == 0:
                                 param = ''
 
-                    curve = feat_dict['Complexity']
-                    curves_all = ['Linear', 'Log', 'Square', 'Nlog', 'Constant']
+                    curve = feat_dict['complexity']
+                    curves_all = ['linear', 'log', 'square', 'nlog', 'constant']
                     complexity = compute_complexity(feat, domain,
                                                     path_json) if curve not in curves_all else 1 if curve in [
-                        'Constant', 'Log'] else 2 if curve == 'Linear' else 3
+                        'constant', 'log'] else 2 if curve == 'linear' else 3
                     new_feat = ['', feat, domain, complexity, fs, str(param),
                                 feat_dict['description']]
 
