@@ -78,7 +78,7 @@ def find_best_curve(t, signal):
     return curve_name
 
 
-def compute_complexity(feature, domain, json_file):
+def compute_complexity(feature, domain, json_file, **kwargs):
     """Computes the feature complexity.
 
     Parameters
@@ -89,6 +89,10 @@ def compute_complexity(feature, domain, json_file):
         Feature domain
     json_file: json
         Features json file
+    \**kwargs:
+    See below:
+        * *personal_dir* (``string``) --
+            Directory of script with personal features
 
     Returns
     -------
@@ -98,7 +102,10 @@ def compute_complexity(feature, domain, json_file):
     Writes complexity in json file
 
     """
+
     dictionary = load_json(json_file)
+
+    personal_dir = kwargs.get('personal_dir', None)
 
     # The inputs from this function should be replaced by a dictionary
     one_feat_dict = {domain: {feature: dictionary[domain][feature]}}
@@ -112,9 +119,11 @@ def compute_complexity(feature, domain, json_file):
 
     for ti in t:
         for _ in range(20):
+
             start = time.time()
-            calc_window_features(one_feat_dict, wave[:int(ti)], fs)
+            calc_window_features(one_feat_dict, wave[:int(ti)], fs, personal_dir=personal_dir)
             end = time.time()
+
             s += [end - start]
 
         signal += [np.mean(s)]

@@ -188,18 +188,6 @@ def test_rms():
     np.testing.assert_almost_equal(rms(noiseWave), 0.7128245483240299, decimal=5)
 
 
-def test_slope():
-    np.testing.assert_equal(slope(const0), 0.0)
-    np.testing.assert_equal(slope(const1), -8.935559365603017e-18)
-    np.testing.assert_equal(slope(constNeg), 8.935559365603017e-18)
-    np.testing.assert_equal(slope(constF), 1.7871118731206033e-17)
-    np.testing.assert_equal(slope(lin), 1.0)
-    np.testing.assert_equal(slope(lin0), 1.0526315789473686)
-    np.testing.assert_equal(slope(wave), -0.0003819408289180587)
-    np.testing.assert_equal(slope(offsetWave), -0.00038194082891805853)
-    np.testing.assert_equal(slope(noiseWave), -0.00040205425841671337)
-
-
 # ################################################ TEMPORAL FEATURES ################################################# #
 def test_distance():
     np.testing.assert_equal(distance(const0), 19.0)
@@ -367,6 +355,18 @@ def test_pk_pk_distance():
     np.testing.assert_equal(pk_pk_distance(wave), 1.9753766811902755)
     np.testing.assert_equal(pk_pk_distance(offsetWave), 1.9753766811902755)
     np.testing.assert_equal(pk_pk_distance(noiseWave), 2.0052536460296393)
+
+
+def test_slope():
+    np.testing.assert_equal(slope(const0), 0.0)
+    np.testing.assert_equal(slope(const1), -8.935559365603017e-18)
+    np.testing.assert_equal(slope(constNeg), 8.935559365603017e-18)
+    np.testing.assert_equal(slope(constF), 1.7871118731206033e-17)
+    np.testing.assert_equal(slope(lin), 1.0)
+    np.testing.assert_equal(slope(lin0), 1.0526315789473686)
+    np.testing.assert_equal(slope(wave), -0.0003819408289180587)
+    np.testing.assert_equal(slope(offsetWave), -0.00038194082891805853)
+    np.testing.assert_equal(slope(noiseWave), -0.00040205425841671337)
 
 
 # ################################################ SPECTRAL FEATURES ################################################# #

@@ -268,6 +268,28 @@ def total_energy(signal, fs):
 
 
 @set_domain("domain", "temporal")
+def slope(signal):
+    """Computes the slope of the signal.
+
+    Slope is computed by fitting a linear equation to the observed data.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which linear equation is computed
+
+    Returns
+    -------
+    float
+        Slope
+
+    """
+    t = np.linspace(0, len(signal)-1, len(signal))
+
+    return np.polyfit(t, signal, 1)[0]
+
+
+@set_domain("domain", "temporal")
 def auc(signal, fs):
     """Computes the area under the curve of the signal computed with trapezoid rule.
 
@@ -581,28 +603,6 @@ def calc_var(signal):
     """
 
     return np.var(signal)
-
-
-@set_domain("domain", "statistical")
-def slope(signal):
-    """Computes the slope of the signal.
-
-    Slope is computed by fitting a linear equation to the observed data.
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which linear equation is computed
-
-    Returns
-    -------
-    float
-        Slope
-
-    """
-    t = np.linspace(0, len(signal)-1, len(signal))
-
-    return np.polyfit(t, signal, 1)[0]
 
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #

@@ -8,7 +8,6 @@ import importlib
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -159,10 +158,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         signal_windows = [signal_windows]
 
     for wind_sig in signal_windows:
-        if personal_dir:
-            features = calc_window_features(dict_features, wind_sig, fs, personal_dir=personal_dir)
-        else:
-            features = calc_window_features(dict_features, wind_sig, fs)
+        features = calc_window_features(dict_features, wind_sig, fs, personal_dir=personal_dir)
         feat_val = feat_val.append(features)
 
     return feat_val.reset_index(drop=True)

@@ -1,5 +1,4 @@
 import ast
-import json
 import tsfel
 import gspread
 import numpy as np
@@ -49,13 +48,19 @@ def filter_features(features, filters):
     return features_filtered
 
 
-def extract_sheet(gsheet_name):
+def extract_sheet(gsheet_name, **kwargs):
     """Interaction between features.json and Google sheets.
 
     Parameters
     ----------
     gsheet_name : str
         Google Sheet name
+    \**kwargs:
+    See below:
+        * *personal_dir* (``string``) --
+            Directory of script with personal features
+        * *dict_features* (``json``) --
+            Json file
 
     Returns
     -------
@@ -66,8 +71,11 @@ def extract_sheet(gsheet_name):
     # Path to Tsfel
     lib_path = tsfel.__path__
 
+    # Personal features directory
+    personal_dir = kwargs.get('personal_dir', None)
+
     # Access features.json
-    path_json = lib_path[0] + '/feature_extraction/features.json'
+    path_json = kwargs.get('dict_features', lib_path[0] + '/feature_extraction/features.json')
 
     # Read features.json into a dictionary of features and parameters
     dict_features = load_json(path_json)
@@ -129,7 +137,7 @@ def extract_sheet(gsheet_name):
                     curve = feat_dict['complexity']
                     curves_all = ['linear', 'log', 'square', 'nlog', 'constant']
                     complexity = compute_complexity(feat, domain,
-                                                    path_json) if curve not in curves_all else 1 if curve in [
+                                                    path_json, personal_dir=personal_dir) if curve not in curves_all else 1 if curve in [
                         'constant', 'log'] else 2 if curve == 'linear' else 3
                     new_feat = ['', feat, domain, complexity, fs, str(param),
                                 feat_dict['description']]
