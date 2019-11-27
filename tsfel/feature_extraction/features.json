@@ -401,6 +401,15 @@
    "description": "Computes the peak to peak distance.",
    "function": "tsfel.pk_pk_distance",
    "use": "yes"
+  },
+  "Entropy": {
+   "complexity": "log",
+   "parameters": {
+    "prob": "kde"
+   },
+   "description": "Computes the entropy of the signal using the Shannon Entropy.",
+   "function": "tsfel.entropy",
+   "use": "yes"
   }
  }
 }

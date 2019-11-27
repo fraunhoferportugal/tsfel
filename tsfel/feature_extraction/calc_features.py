@@ -18,8 +18,8 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     ----------
     main_directory : String
         Input directory
-    feat_dict : json file
-        Json file
+    feat_dict : dict
+        Dictionary with features
     \**kwargs:
     See below:
         * *search_criteria* (``list``) --
@@ -64,7 +64,7 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
     overlap = kwargs.get('overlap', 0)
     pre_process = kwargs.get('pre_process', None)
     output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
-    personal_dir = kwargs.get('personal_dir', None)
+    features_path = kwargs.get('features_path', None)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory+os.sep
@@ -101,8 +101,8 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
 
         windows = signal_window_spliter(data_new, window_size, overlap)
 
-        if personal_dir:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, personal_dir=personal_dir)
+        if features_path:
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, features_path=features_path)
         else:
             features = time_series_features_extractor(feat_dict, windows, fs=resample_rate)
 
@@ -135,7 +135,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
             Overlap between 0 and 1
             (default: ``0``)
 
-        * *personal_dir* (``string``) --
+        * *features_path* (``string``) --
             Directory of script with personal features
 
     Returns
@@ -146,7 +146,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     """
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
-    personal_dir = kwargs.get('personal_dir', None)
+    features_path = kwargs.get('features_path', None)
 
     feat_val = pd.DataFrame()
     if window_spliter and (len(signal_windows) == 1):
@@ -158,7 +158,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         signal_windows = [signal_windows]
 
     for wind_sig in signal_windows:
-        features = calc_window_features(dict_features, wind_sig, fs, personal_dir=personal_dir)
+        features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
         feat_val = feat_val.append(features)
 
     return feat_val.reset_index(drop=True)
@@ -177,7 +177,7 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
         Sampling frequency
     \**kwargs:
     See below:
-        * *personal_dir* (``string``) --
+        * *features_path* (``string``) --
             Directory of script with personal features
 
     Returns
@@ -188,17 +188,17 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
 
     """
 
-    personal_dir = kwargs.get('personal_dir', None)
+    features_path = kwargs.get('features_path', None)
 
     # Execute imports
     exec("import tsfel")
     domain = dict_features.keys()
 
-    if personal_dir:
-        sys.path.append(personal_dir[:-len(personal_dir.split(os.sep)[-1])-1])
-        exec("import "+personal_dir.split(os.sep)[-1][:-3])
-        importlib.reload(sys.modules[personal_dir.split(os.sep)[-1][:-3]])
-        exec("from " + personal_dir.split(os.sep)[-1][:-3]+" import *")
+    if features_path:
+        sys.path.append(features_path[:-len(features_path.split(os.sep)[-1])-1])
+        exec("import "+features_path.split(os.sep)[-1][:-3])
+        importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
+        exec("from " + features_path.split(os.sep)[-1][:-3]+" import *")
 
     # Create global arrays
     func_total = []

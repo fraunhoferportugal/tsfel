@@ -369,6 +369,18 @@ def test_slope():
     np.testing.assert_equal(slope(noiseWave), -0.00040205425841671337)
 
 
+def test_entropy():
+    np.testing.assert_equal(entropy(const0), 0.0)
+    np.testing.assert_equal(entropy(const1), 0.0)
+    np.testing.assert_equal(entropy(constNeg),0.0)
+    np.testing.assert_equal(entropy(constF), 0.0)
+    np.testing.assert_equal(entropy(lin), 0.9949832746053182)
+    np.testing.assert_equal(entropy(lin0), 0.9949832746053182)
+    np.testing.assert_equal(entropy(wave), 0.9972021515128485)
+    np.testing.assert_equal(entropy(offsetWave), 0.9972021515128485)
+    np.testing.assert_equal(entropy(noiseWave), 0.9957000733996463)
+
+
 # ################################################ SPECTRAL FEATURES ################################################# #
 def test_max_fre():
     np.testing.assert_equal(max_frequency(const0, Fs), 0.0)

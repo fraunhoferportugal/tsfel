@@ -5,12 +5,6 @@ import scipy.signal
 from tsfel.feature_extraction.features_utils import *
 
 
-def set_domain(key, value):
-    def decorate_func(func):
-        setattr(func, key, value)
-        return func
-    return decorate_func
-
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -53,7 +47,7 @@ def calc_centroid(signal, fs):
 
     time = compute_time(signal, fs)
 
-    energy = np.array(signal)**2
+    energy = np.array(signal) ** 2
 
     t_energy = np.dot(np.array(time), np.array(energy))
     energy_sum = np.sum(energy)
@@ -102,7 +96,7 @@ def maxpeaks(signal):
     """
     diff_sig = np.diff(signal)
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd+1] < 0) and (diff_sig[nd] > 0))])
+    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
 
 
 @set_domain("domain", "temporal")
@@ -200,7 +194,7 @@ def distance(signal):
 
     """
     diff_sig = np.diff(signal)
-    return np.sum([np.sqrt(1+df**2) for df in diff_sig])
+    return np.sum([np.sqrt(1 + df ** 2) for df in diff_sig])
 
 
 @set_domain("domain", "temporal")
@@ -264,7 +258,7 @@ def total_energy(signal, fs):
 
     time = compute_time(signal, fs)
 
-    return np.sum(np.array(signal)**2)/(time[-1]-time[0])
+    return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
 
 
 @set_domain("domain", "temporal")
@@ -284,7 +278,7 @@ def slope(signal):
         Slope
 
     """
-    t = np.linspace(0, len(signal)-1, len(signal))
+    t = np.linspace(0, len(signal) - 1, len(signal))
 
     return np.polyfit(t, signal, 1)[0]
 
@@ -307,7 +301,7 @@ def auc(signal, fs):
     """
     t = compute_time(signal, fs)
 
-    return np.sum(np.diff(t)*signal[:-1]+signal[1:]/2)
+    return np.sum(np.diff(t) * signal[:-1] + signal[1:] / 2)
 
 
 @set_domain("domain", "temporal")
@@ -326,7 +320,7 @@ def abs_energy(signal):
 
     """
 
-    return np.sum(signal**2)
+    return np.sum(signal ** 2)
 
 
 @set_domain("domain", "temporal")
@@ -345,7 +339,46 @@ def pk_pk_distance(signal):
 
     """
 
-    return np.abs(np.max(signal)-np.min(signal))
+    return np.abs(np.max(signal) - np.min(signal))
+
+
+@set_domain("domain", "temporal")
+def entropy(signal, prob='kde'):
+    """Computes the entropy of the signal using the Shannon Entropy.
+
+    Description in Article:
+    Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
+    Authors: Crutchfield J. Feldman David
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which entropy is computed
+    prob : string
+        Probability function (kde or gaussian functions are available)
+
+    Returns
+    -------
+    float
+        The normalized entropy value
+
+    """
+
+    if prob == 'kde':
+        p = kde(signal)
+    elif prob == 'gauss':
+        p = gaussian(signal)
+
+    if np.sum(p) == 0:
+        return 0.0
+
+    # Handling zero probability values
+    p = p[np.where(p != 0)]
+
+    if sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+        return 0.0
+    else:
+        return - sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -524,7 +557,7 @@ def mean_abs_deviation(signal):
 
     """
 
-    return np.mean(abs(signal-np.mean(signal, axis=0)), axis=0)
+    return np.mean(abs(signal - np.mean(signal, axis=0)), axis=0)
 
 
 @set_domain("domain", "statistical")
@@ -564,7 +597,7 @@ def rms(signal):
 
     """
 
-    return np.sqrt(np.sum(np.array(signal)**2)/len(signal))
+    return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
 
 
 @set_domain("domain", "statistical")
@@ -635,7 +668,7 @@ def spectral_distance(signal, fs):
     # Computing the linear regression
     points_y = np.linspace(0, cum_fmag[-1], len(cum_fmag))
 
-    return np.sum(points_y-cum_fmag)
+    return np.sum(points_y - cum_fmag)
 
 
 @set_domain("domain", "spectral")
@@ -703,7 +736,7 @@ def max_power_spectrum(signal, fs):
     if np.std(signal) == 0:
         return float(max(scipy.signal.welch(signal, int(fs), nperseg=len(signal))[1]))
     else:
-        return float(max(scipy.signal.welch(signal/np.std(signal), int(fs), nperseg=len(signal))[1]))
+        return float(max(scipy.signal.welch(signal / np.std(signal), int(fs), nperseg=len(signal))[1]))
 
 
 @set_domain("domain", "spectral")
@@ -727,7 +760,7 @@ def max_frequency(signal, fs):
     cum_fmag = np.cumsum(fmag)
 
     try:
-        ind_mag = np.where(cum_fmag > cum_fmag[-1]*0.95)[0][0]
+        ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.95)[0][0]
     except IndexError:
         ind_mag = np.argmax(cum_fmag)
 
@@ -788,7 +821,7 @@ def spectral_centroid(signal, fs):
     if not np.sum(fmag):
         return 0
     else:
-        return np.dot(f, fmag/np.sum(fmag))
+        return np.dot(f, fmag / np.sum(fmag))
 
 
 @set_domain("domain", "spectral")
@@ -816,10 +849,10 @@ def spectral_decrease(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     fmag_band = fmag[1:]
-    len_fmag_band = np.arange(2, len(fmag)+1)
+    len_fmag_band = np.arange(2, len(fmag) + 1)
 
     # Sum of numerator
-    soma_num = np.sum((fmag_band-fmag[0])/(len_fmag_band-1), axis=0)
+    soma_num = np.sum((fmag_band - fmag[0]) / (len_fmag_band - 1), axis=0)
 
     if not np.sum(fmag_band):
         return 0
@@ -921,7 +954,7 @@ def spectral_spread(signal, fs):
     if not np.sum(fmag):
         return 0
     else:
-        return np.dot(((f-spect_centroid)**2), (fmag / np.sum(fmag)))**0.5
+        return np.dot(((f - spect_centroid) ** 2), (fmag / np.sum(fmag))) ** 0.5
 
 
 @set_domain("domain", "spectral")
@@ -951,13 +984,13 @@ def spectral_slope(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
 
-    if not(list(f)) or (np.sum(fmag) == 0):
+    if not (list(f)) or (np.sum(fmag) == 0):
         return 0
     else:
         if not (len(f) * np.dot(f, f) - np.sum(f) ** 2):
             return 0
         else:
-            num_ = (1/np.sum(fmag))*(len(f) * np.dot(f, fmag) - np.sum(f) * np.sum(fmag))
+            num_ = (1 / np.sum(fmag)) * (len(f) * np.dot(f, fmag) - np.sum(f) * np.sum(fmag))
             denom_ = (len(f) * np.dot(f, f) - np.sum(f) ** 2)
             return num_ / denom_
 
@@ -988,14 +1021,14 @@ def spectral_variation(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
 
-    sum1 = np.sum(np.array(fmag)[:-1]*np.array(fmag)[1:])
-    sum2 = np.sum(np.array(fmag)[1:]**2)
-    sum3 = np.sum(np.array(fmag)[:-1]**2)
+    sum1 = np.sum(np.array(fmag)[:-1] * np.array(fmag)[1:])
+    sum2 = np.sum(np.array(fmag)[1:] ** 2)
+    sum3 = np.sum(np.array(fmag)[:-1] ** 2)
 
     if not sum2 or not sum3:
         variation = 1
     else:
-        variation = 1-(sum1/((sum2**0.5)*(sum3**0.5)))
+        variation = 1 - (sum1 / ((sum2 ** 0.5) * (sum3 ** 0.5)))
 
     return variation
 
@@ -1021,7 +1054,7 @@ def spectral_maxpeaks(signal, fs):
     f, fmag = calc_fft(signal, fs)
     diff_sig = np.diff(fmag)
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd+1] < 0) and (diff_sig[nd] > 0))])
+    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
 
 
 @set_domain("domain", "spectral")
@@ -1047,7 +1080,7 @@ def spectral_roll_off(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.95*(sum(fmag))
+    value = 0.95 * (sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1075,7 +1108,7 @@ def spectral_roll_on(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.05*(sum(fmag))
+    value = 0.05 * (sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1101,9 +1134,9 @@ def human_range_energy(signal, fs):
 
     """
 
-    f, fmag = calc_fft(signal,fs)
+    f, fmag = calc_fft(signal, fs)
 
-    allenergy = np.sum(fmag**2)
+    allenergy = np.sum(fmag ** 2)
 
     if allenergy == 0:
         # For handling the occurrence of Nan values
@@ -1111,7 +1144,7 @@ def human_range_energy(signal, fs):
 
     hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
 
-    ratio = hr_energy/allenergy
+    ratio = hr_energy / allenergy
 
     return ratio
 
@@ -1152,7 +1185,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fftpack.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps+1)]  # Keep 2-13
+    mel_coeff = scipy.fftpack.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
 
     mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
 
@@ -1193,21 +1226,21 @@ def power_bandwidth(signal, fs):
     if np.std(signal) == 0:
         freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
     else:
-        freq, power = scipy.signal.welch(signal/np.std(signal), fs, nperseg=len(signal))
+        freq, power = scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))
 
     if np.sum(power) == 0:
         return 0.0
 
     # Computing the lower and upper limits of power bandwidth
     cum_power = np.cumsum(power)
-    f_lower = freq[np.where(cum_power >= cum_power[-1]*0.95)[0][0]]
+    f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
 
     cum_power_inv = np.cumsum(power[::-1])
-    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1]*0.95)[0][0]-len(power)+1)]
+    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
 
     # Returning the bandwidth in terms of frequency
 
-    return abs(f_upper-f_lower)
+    return abs(f_upper - f_lower)
 
 
 @set_domain("domain", "spectral")
@@ -1233,8 +1266,8 @@ def fft_mean_coeff(signal, fs, nfreq=256):
 
     """
 
-    if nfreq > len(signal)//2+1:
-        nfreq = len(signal)//2+1
+    if nfreq > len(signal) // 2 + 1:
+        nfreq = len(signal) // 2 + 1
 
     fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
 
@@ -1273,4 +1306,3 @@ def lpcc(signal, n_coeff=12):
     lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
 
     return tuple(abs(lpcc_coeff))
-

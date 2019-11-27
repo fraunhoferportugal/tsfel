@@ -1,91 +1,89 @@
-import os
-import json
+import importlib
 import inspect
+import json
+import os
+import sys
+
+from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.calculate_complexity import compute_complexity
 
 
-def add_feature_json(domain, json_path, func, feat=''):
+def add_feature_json(features_path, json_path):
     """Adds new feature to features.json.
 
     Parameters
     ----------
-    domain : str
-        Feature domain
-    json_path: json
-        Personal .json file containing existing features from TSFEL.
-        New customised features will be added to this file.
-    func: func
-        Feature function
-    feat: str
-        Feature name (optional)
+    features_path: string
+        Personal Python module directory containing new features implementation.
 
-    Returns
-    -------
-    dict
-        Features dictionary with new feature added.
+    json_path: string
+        Personal .json file directory containing existing features from TSFEL.
+        New customised features will be added to file in this directory.
 
     """
 
-    if domain not in ['statistical', 'temporal', 'spectral']:
-        raise SystemExit('No valid domain. Choose: statistical, temporal or spectral.')
+    sys.features_path.append(features_path[:-len(features_path.split(os.sep)[-1]) - 1])
+    exec("import " + features_path.split(os.sep)[-1][:-3])
 
-    # print(os.path.abspath(inspect.getfile(func)))
-    personal_dir = os.path.abspath(inspect.getfile(func))
-    # Access to personal features.json
-    feat_json = json.load(open(json_path))
+    # Reload module containing the new features
+    importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
+    exec("import " + features_path.split(os.sep)[-1][:-3] + " as pymodule")
 
-    # Feature specifications
-    # Name
-    name = func.__name__
-    # Description
-    if func.__doc__ is not None:
-        descrip = func.__doc__.split("\n")[0]
-    else:
-        descrip = ""
-    # Feature usage
-    use = "yes"
-    # Feature function arguments
-    param_name = inspect.getfullargspec(func)[0]
-    # Check if feature name is given
-    if feat == '':
-        feat = name
+    for fname, f in locals()['pymodule'].__dict__.items():
+        if getattr(f, "domain", None) is not None:
 
-    # Access feature parameters
-    if param_name != "":
-        # Retrieve default values of arguments
-        spec = inspect.getfullargspec(func)
-        defaults = dict(zip(spec.args[::-1], (spec.defaults or ())[::-1]))
-        defaults.update(spec.kwonlydefaults or {})
+            # Access to personal features.json
+            feat_json = load_json(json_path)
 
-        for p in param_name[1:]:
-            if p not in list(defaults.keys()):
-                if p is 'fs':
-                    # Assigning a default value for fs if not given
-                    defaults[p] = 100
-                else:
-                    defaults[p] = None
-        if len(defaults) == 0:
-            defaults = ""
-    else:
-        defaults = ""
+            # Assign domain
+            domain = getattr(f, "domain", None)
 
-    new_feature = {"description": descrip,
-                   "parameters": defaults,
-                   "function": name,
-                   "use": use
-                   }
-    # Check if domain exists
-    try:
-        feat_json[domain][feat] = new_feature
-    except KeyError:
-        feat_json[domain] = {feat: new_feature}
+            # Feature specifications
+            # Description
+            if f.__doc__ is not None:
+                descrip = f.__doc__.split("\n")[0]
+            else:
+                descrip = ""
+            # Feature usage
+            use = "yes"
+            # Feature function arguments
+            args_name = inspect.getfullargspec(f)[0]
 
-    # Write new feature on json file
-    with open(json_path, "w") as fout:
-        json.dump(feat_json, fout, indent=" ")
+            # Access feature parameters
+            if args_name != "":
+                # Retrieve default values of arguments
+                spec = inspect.getfullargspec(f)
+                defaults = dict(zip(spec.args[::-1], (spec.defaults or ())[::-1]))
+                defaults.update(spec.kwonlydefaults or {})
 
-    # Calculate feature complexity
-    compute_complexity(feat, domain, json_path, personal_dir=personal_dir)
+                for p in args_name[1:]:
+                    if p not in list(defaults.keys()):
+                        if p is 'fs':
+                            # Assigning a default value for fs if not given
+                            defaults[p] = 100
+                        else:
+                            defaults[p] = None
+                if len(defaults) == 0:
+                    defaults = ""
+            else:
+                defaults = ""
 
-    return feat_json
+            # Settings of new feature
+            new_feature = {"description": descrip,
+                           "parameters": defaults,
+                           "function": fname,
+                           "use": use
+                           }
 
+            # Check if domain exists
+            try:
+                feat_json[domain][fname] = new_feature
+            except KeyError:
+                feat_json[domain] = {fname: new_feature}
+
+            # Write new feature on json file
+            with open(json_path, "w") as fout:
+                json.dump(feat_json, fout, indent=" ")
+
+            # Calculate feature complexity
+            compute_complexity(fname, domain, json_path, features_path=features_path)

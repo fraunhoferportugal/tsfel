@@ -2,13 +2,13 @@ import json
 import tsfel
 
 
-def load_json(filename):
+def load_json(json_path):
     """Loads the json file given by filename.
 
     Parameters
     ----------
-    filename : json
-        Json file
+    json_path : string
+        Json path
 
     Returns
     -------
@@ -17,10 +17,10 @@ def load_json(filename):
 
     """
 
-    return json.load(open(filename))
+    return json.load(open(json_path))
 
 
-def get_features_by_domain(domain=None, filename=None):
+def get_features_by_domain(domain=None, json_path=None):
     """Creates a dictionary with the features settings by domain.
 
     Parameters
@@ -28,7 +28,7 @@ def get_features_by_domain(domain=None, filename=None):
     domain : string
         Available domains: "statistical"; "spectral"; "temporal"
         If domain equals None, then the features settings from all domains are returned.
-    filename : str
+    json_path : string
         Directory of json file. Default: package features.json directory
 
     Returns
@@ -41,10 +41,10 @@ def get_features_by_domain(domain=None, filename=None):
     if domain not in ['statistical', 'temporal', 'spectral', None]:
         raise SystemExit('No valid domain. Choose: statistical, temporal, spectral or None (for all feature settings).')
 
-    if filename is None:
-        filename = tsfel.__path__[0]+"/feature_extraction/features.json"
+    if json_path is None:
+        json_path = tsfel.__path__[0]+"/feature_extraction/features.json"
 
-    dict_features = load_json(filename)
+    dict_features = load_json(json_path)
     if domain is None:
         return dict_features
     else:
