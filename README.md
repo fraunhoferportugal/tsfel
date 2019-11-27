@@ -1,7 +1,7 @@
 [![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)]
-[![PyPI](https://img.shields.io/pypi/v/tsfel)]
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
+![PyPI](https://img.shields.io/pypi/v/tsfel)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/development/notebooks/TSFEL_HAR_Example.ipynb)
 

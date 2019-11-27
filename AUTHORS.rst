@@ -7,18 +7,19 @@ Lead Development Team
 ---------------------
 
 - Duarte Folgado (`duarte.folgado@fraunhofer.pt <duarte.folgado@fraunhofer.pt>`_)
-- Marília Barandas  (`marilia.barandas@fraunhofer.pt <marilia.barandas@fraunhofer.pt>`_)
 - Hugo Gamboa (`hugo.gamboa@fraunhofer.pt <hugo.gamboa@fraunhofer.pt>`_)
+- Marília Barandas  (`marilia.barandas@fraunhofer.pt <marilia.barandas@fraunhofer.pt>`_)
+
 
 Contributors
--------------
+------------
 - Letícia Fernandes
 - Mariana Abreu
 - Patrícia Bota
 - Sara Santos
 
 Citing `tsfel`
-----------------
+--------------
 
 If you used TSFEL in your scientific publication, we would very appreciated if you include the adequate citation:
 
