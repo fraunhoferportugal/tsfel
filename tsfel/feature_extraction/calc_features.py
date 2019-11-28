@@ -247,7 +247,11 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
 
                     # feature has no fs parameter
                     else:
-                        parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
+                        parameters_total = []
+                        for key, value in param.items():
+                            if type(value) is str:
+                                value = '"'+value+'"'
+                            parameters_total.append([str(key) + '=' + str(value)])
                 else:
                     parameters_total = ''
 

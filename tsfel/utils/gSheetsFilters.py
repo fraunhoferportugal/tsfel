@@ -57,10 +57,8 @@ def extract_sheet(gsheet_name, **kwargs):
         Google Sheet name
     \**kwargs:
     See below:
-        * *features_path* (``string``) --
-            Directory of script with personal features
-        * *dict_features* (``json``) --
-            Json file
+        * *path_json* (``string``) --
+            Json path
     Returns
     -------
     dict
@@ -70,11 +68,8 @@ def extract_sheet(gsheet_name, **kwargs):
     # Path to Tsfel
     lib_path = tsfel.__path__
 
-    # Personal features directory
-    features_path = kwargs.get('features_path', None)
-
     # Access features.json
-    path_json = lib_path[0] + '/feature_extraction/features.json'
+    path_json = kwargs.get('path_json', lib_path[0] + '/feature_extraction/features.json')
 
     # Read features.json into a dictionary of features and parameters
     dict_features = load_json(path_json)
@@ -137,7 +132,7 @@ def extract_sheet(gsheet_name, **kwargs):
                     curve = feat_dict['complexity']
                     curves_all = ['linear', 'log', 'square', 'nlog', 'constant']
                     complexity = compute_complexity(feat, domain,
-                                                    path_json, features_path=features_path) if curve not in curves_all else 1 if curve in [
+                                                    path_json) if curve not in curves_all else 1 if curve in [
                         'constant', 'log'] else 2 if curve == 'linear' else 3
                     new_feat = ['', feat, domain, complexity, fs, str(param),
                                 feat_dict['description']]

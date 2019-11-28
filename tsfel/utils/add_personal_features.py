@@ -3,6 +3,8 @@ import inspect
 import json
 import os
 import sys
+import warnings
+from inspect import getmembers, isfunction
 
 from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.calculate_complexity import compute_complexity
@@ -22,14 +24,19 @@ def add_feature_json(features_path, json_path):
 
     """
 
-    sys.features_path.append(features_path[:-len(features_path.split(os.sep)[-1]) - 1])
+    sys.path.append(features_path[:-len(features_path.split(os.sep)[-1]) - 1])
     exec("import " + features_path.split(os.sep)[-1][:-3])
 
     # Reload module containing the new features
     importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
     exec("import " + features_path.split(os.sep)[-1][:-3] + " as pymodule")
 
+    # Functions from module containing the new features
+    functions_list = [o for o in getmembers(locals()['pymodule']) if isfunction(o[1])]
+    function_names = [fname[0] for fname in functions_list]
+
     for fname, f in locals()['pymodule'].__dict__.items():
+
         if getattr(f, "domain", None) is not None:
 
             # Access to personal features.json
@@ -87,3 +94,6 @@ def add_feature_json(features_path, json_path):
 
             # Calculate feature complexity
             compute_complexity(fname, domain, json_path, features_path=features_path)
+        else:
+            if fname in function_names and fname is not 'set_domain':
+                warnings.warn('The @set_domain is not declared for function ' + str(fname) + '.')
