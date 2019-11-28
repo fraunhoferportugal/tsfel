@@ -2,8 +2,6 @@
 Get Started
 ===========
 
-In this page we will summarize the main features of TSFEL using a concrete example.
-
 Overview
 --------
 
@@ -46,10 +44,10 @@ Let us look to the data structure:
 
 =====  ===========
 Id     total_acc_x
------  ----------- 
-0      1.012817  
-1      1.022833  
-2      1.022028   
+-----  -----------
+0      1.012817
+1      1.022833
+2      1.022028
 3      1.017877
 4      1.023680
 =====  ===========
@@ -68,10 +66,42 @@ We finnaly have now X_train as the final feature vector composed by 205 features
 
 Extract from time series stored in datasets
 -------------------------------------------
-TBD 
+
+In the previous section, we observed how TSFEL can be used for feature extraction on time series stored in memory. The process of training machine learning models requires significant amounts of data. Time series datasets are often organised in a multitude of different schemas defined by the entities who collected and curated the data.
+TSFEL provides a method to increase flexibility when extracting features over multiple files stored in datasets. We provide below a list of assumptions when using this method and how TSFEL handles it:
+
+* **Time series are stored on different file locations**
+
+  * TSFEL crawls over a given dataset root directory and extracts features from all text files which match filenames provided by the user
 
 
-.. [1] `https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones <https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones>`_. 
+
+* **Files store time series in delimited format**
+
+  * TSFEL expects that the first column must contain the timestamp and following collumns contain the time series values.
 
 
+* **Files might not be syncronised in time**
 
+  * TSFEL handles this assumption by conducting a linear interpolation to ensure all the time series are syncronised in time before feature extraction. The resampling frequency is set by the user.
+
+
+The following code block extracts features on data residing over ``main_directory``, from all files named ``Accelerometer.txt``. Timestamps were recorded in nanoseconds and the resampling frequency is set to 100 Hz.
+
+.. code:: python
+
+  import tsfel
+
+  main_directory = '/my_root_dataset_directory/'        # The root directory of the dataset
+  output_directory = '/my_output_feature_directory/'    # The resulted file from the feature extraction will be saved on this directory
+
+  data = tsfel.dataset_features_extractor(
+                        main_directory, tsfel.get_all_features(), search_criteria="Accelerometer.txt",
+                        time_unit=1e-9, resample_rate=100, window_size=250,
+                        output_directory=output_directory
+         )
+
+References
+----------
+
+.. [1] `https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones <https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones>`_.

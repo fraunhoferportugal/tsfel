@@ -15,6 +15,7 @@ Create a new Python file for your features in any directory.
 An example of a feature implementation format is shown below.
 
 .. code:: python
+
     from tsfel.features_utils import set_domain
 
     @set_domain("domain", "temporal")
@@ -42,11 +43,11 @@ The available domains are *Statistical*, *Spectral* and *Temporal*. Also, note t
 2. Add the new feature to features.json
 ---------------------------------------
 
-After implementing your feature, use ``add_feature_json`` function, from ``tsfel.add_personal_features``, to store your personal feature information.
+After implementing your feature, use ``add_feature_json`` function, from ``tsfel.add_personal_features``, to store your personal feature information. This method adds the personal features stored in ``personal_dir``.
 
 .. code:: python
 
-    def add_feature_json(personal_dir, json_dir):
+    def add_feature_json(features_path, json_path):
         """Adds new feature to features.json.
 
         Parameters

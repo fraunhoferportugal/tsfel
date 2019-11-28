@@ -2,6 +2,11 @@ Authors
 ==========
 This package is being developed and maintained by `Fraunhofer AICOS <https://www.aicos.fraunhofer.pt/en/home.html>`_.
 
+.. image:: imgs/fhp_logo.png
+    :align: center
+    :scale: 25 %
+    :alt: FhP-AICOS
+
 
 Lead Development Team
 ---------------------
@@ -18,7 +23,7 @@ Contributors
 - Patrícia Bota
 - Sara Santos
 
-Citing `tsfel`
+Citing TSFEL
 --------------
 
 If you used TSFEL in your scientific publication, we would very appreciated if you include the adequate citation:
