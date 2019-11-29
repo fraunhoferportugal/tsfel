@@ -7,9 +7,9 @@ Overview
 
 Time series are passed as inputs for the main TSFEL extraction method either as arrays previously loaded in memory or stored in files on a dataset. Since TSFEL can handle multidimensional time series, a set of preprocessing methods is afterwards applied to ensure that not only the signal quality is adequate, but also, time series synchronisation, so that the window calculation process is properly achieved. After the feature extraction, the result is saved using a standard schema ready to be digested by most of the classification and data mining platforms. Each line corresponds to a window with the results of the feature extraction methods stored along the corresponding columns.
 
-.. image:: ../imgs/tsfel_pipeline.jpg
+.. image:: ../imgs/tsfel_pipeline.png
     :align: center
-    :scale: 50 %
+    :scale: 25 %
     :alt: TSFEL!
 
 Extract from time series as array objects
@@ -58,9 +58,8 @@ Now that we have the input data we are ready for the feature extraction step. TS
 
 .. code:: python
 
-    cfg_file = tsfel.get_all_features()
-    windows = tsfel.signal_window_spliter(X_train_sig, 250, 0)
-    X_train = tsfel.time_series_features_extractor(cfg_file, windows, fs=50)
+    cfg_file = tsfel.get_features_by_domain()                                                                              # If no argument is passed retrieves all available features
+    X_train = tsfel.time_series_features_extractor(cfg_file, X_train_sig, fs=50, window_splitter=True, window_size=250)    # Receives a time series sampled at 50 Hz, divides into windows of size 250 (i.e. 5 seconds) and extracts all features
 
 We finnaly have now X_train as the final feature vector composed by 205 features calculated for each of the 3764 extracted windows.
 
