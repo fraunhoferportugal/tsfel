@@ -35,9 +35,14 @@ def add_feature_json(features_path, json_path):
     functions_list = [o for o in getmembers(locals()['pymodule']) if isfunction(o[1])]
     function_names = [fname[0] for fname in functions_list]
 
+    # Check if @set_domain was declared on features module
+    vset_domain = False
+
     for fname, f in locals()['pymodule'].__dict__.items():
 
         if getattr(f, "domain", None) is not None:
+
+            vset_domain = True
 
             # Access to personal features.json
             feat_json = load_json(json_path)
@@ -94,6 +99,9 @@ def add_feature_json(features_path, json_path):
 
             # Calculate feature complexity
             compute_complexity(fname, domain, json_path, features_path=features_path)
-        else:
-            if fname in function_names and fname is not 'set_domain':
-                warnings.warn('The @set_domain is not declared for function ' + str(fname) + '.')
+            print('Feature '+str(fname)+' was added.')
+
+    if vset_domain is False:
+        warnings.warn('No features was added. Please declare @set_domain.')
+
+

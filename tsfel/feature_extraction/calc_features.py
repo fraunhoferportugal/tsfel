@@ -11,7 +11,7 @@ from pathlib import Path
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
-def dataset_features_extractor(main_directory, feat_dict, **kwargs):
+def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     """Extracts features from a dataset.
 
     Parameters
@@ -20,10 +20,13 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
         Input directory
     feat_dict : dict
         Dictionary with features
+    verbose : int
+        Level of function communication
+        (0 or 1 (Default))
     \**kwargs:
     See below:
         * *search_criteria* (``list``) --
-            List of file names to compute features.
+            List of file names to compute features. (Example: '/Accelerometer.txt')
             (default: ``None``)
 
         * *time_unit* (``float``) --
@@ -102,17 +105,22 @@ def dataset_features_extractor(main_directory, feat_dict, **kwargs):
         windows = signal_window_spliter(data_new, window_size, overlap)
 
         if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, features_path=features_path)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, features_path=features_path)
         else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0)
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
-        print('Features file saved in: ', output_directory)
+    if verbose not in [0, 1]:
+        verbose = 1
+        warnings.warn('Verbose level not identified. Level 1 was selected.')
+
+    if verbose == 1:
+        print('Features files saved in: ', output_directory)
 
 
-def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, **kwargs):
+def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, verbose=1, **kwargs):
     """Extraction of time series features.
 
     Parameters
@@ -125,6 +133,9 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Sampling frequency
     window_spliter: bool
         If True computes the signal windows
+    verbose : int
+        Level of function communication
+        (0 or 1 (Default))
     \**kwargs:
     See below:
         * *window_size* (``int``) --
@@ -144,6 +155,13 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Extracted features
 
     """
+    if verbose not in [0, 1]:
+        verbose = 1
+        warnings.warn('Verbose level not identified. Level 1 was selected.')
+
+    if verbose == 1:
+        print("*** Feature extraction started ***")
+
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
@@ -154,12 +172,18 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     elif window_spliter and (len(signal_windows) > 1):
         warnings.warn('The signal is already segmented into windows.')
 
-    if isinstance(signal_windows[0], numbers.Real):
-        signal_windows = [signal_windows]
-
     for wind_sig in signal_windows:
-        features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
-        feat_val = feat_val.append(features)
+        if (type(wind_sig) is not list) and (type(wind_sig) is not np.array) and (type(wind_sig) is not pd.DataFrame):
+            wind_sig = signal_windows
+            features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+            feat_val = feat_val.append(features)
+            break
+        else:
+            features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+            feat_val = feat_val.append(features)
+
+    if verbose == 1:
+        print("*** Feature extraction finished ***")
 
     return feat_val.reset_index(drop=True)
 
@@ -235,7 +259,7 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                             # Check if features dict has default sampling frequency value
                             if type(param['fs']) is int or type(param['fs']) is float:
                                 parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
-                                
+
                                 # raise a warning
                                 warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.")
                             else:
