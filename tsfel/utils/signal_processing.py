@@ -62,30 +62,34 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlation_report(features):
+def correlation_report(features, threshold=0.95):
     """Performs a correlation report and removes highly correlated features.
 
     Parameters
     ----------
     features : DataFrame
         features
-
+    threshold :
+        correlation value for removing highly correlated features
     Returns
     -------
     DataFrame
         Uncorrelated features
 
     """
+    corr_matrix = features.corr()
 
-    profile = pandas_profiling.ProfileReport(features)
-    profile.to_file(output_file="CorrelationReport.html")
     inp = str(input('Do you wish to remove correlated features? Enter y/n: '))
 
     if inp == 'y':
-        reject = profile.get_rejected_variables(threshold=0.9)
-        if not list(reject):
+        # Select upper triangle of correlation matrix
+        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+        # Find index and column name of features with correlation greater than 0.95
+        to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+
+        if len(to_drop) == 0:
             print('No features to remove')
-        for rej in reject:
+        for rej in to_drop:
             print('Removing ' + str(rej))
             features = features.drop(rej, axis=1)
     return features

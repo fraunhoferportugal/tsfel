@@ -112,10 +112,6 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
-    if verbose not in [0, 1]:
-        verbose = 1
-        warnings.warn('Verbose level not identified. Level 1 was selected.')
-
     if verbose == 1:
         print('Features files saved in: ', output_directory)
 
@@ -155,9 +151,6 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Extracted features
 
     """
-    if verbose not in [0, 1]:
-        verbose = 1
-        warnings.warn('Verbose level not identified. Level 1 was selected.')
 
     if verbose == 1:
         print("*** Feature extraction started ***")
