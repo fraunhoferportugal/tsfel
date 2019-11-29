@@ -160,20 +160,17 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     features_path = kwargs.get('features_path', None)
 
     feat_val = pd.DataFrame()
-    if window_spliter and (len(signal_windows) == 1):
+    if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
-    elif window_spliter and (len(signal_windows) > 1):
-        warnings.warn('The signal is already segmented into windows.')
 
     for wind_sig in signal_windows:
-        if (type(wind_sig) is not list) and (type(wind_sig) is not np.array) and (type(wind_sig) is not pd.DataFrame):
-            wind_sig = signal_windows
-            features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+        if isinstance(wind_sig, numbers.Real):
+            features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
             feat_val = feat_val.append(features)
             break
         else:
-            features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
-            feat_val = feat_val.append(features)
+           features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+           feat_val = feat_val.append(features)
 
     if verbose == 1:
         print("*** Feature extraction finished ***")

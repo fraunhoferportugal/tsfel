@@ -180,15 +180,15 @@ def extract_sheet(gsheet_name, **kwargs):
         try:
             if use_or_not[ii] == 'TRUE':
                 dict_features[domain][feature]['use'] = 'yes'
-                # Check features that use sampling frequency parameter
-                if gs_fs_list[ii] != 'no':
-                    # update dict of features based on Google sheet fs
-                    dict_features[domain][feature]['parameters']['fs'] = gs_fs
                 # Check features parameters from Google sheet
                 if gs_param_list[ii] != '':
                     param_sheet = ast.literal_eval(gs_param_list[ii])
                     # update dic of features based on Google sheet
                     dict_features[domain][feature]['parameters'] = param_sheet
+                # Check features that use sampling frequency parameter
+                if gs_fs_list[ii] != 'no':
+                    # update dict of features based on Google sheet fs
+                    dict_features[domain][feature]['parameters']['fs'] = gs_fs
             else:
                 dict_features[domain][feature]['use'] = 'no'
         except KeyError:
