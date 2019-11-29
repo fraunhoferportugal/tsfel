@@ -16,9 +16,26 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+# -- Hack for ReadTheDocs ------------------------------------------------------
+# This hack is necessary since RTD does not issue `sphinx-apidoc` before running
+# `sphinx-build -b html . _build/html`. See Issue:
+# https://github.com/rtfd/readthedocs.org/issues/1139
+# DON'T FORGET: Check the box "Install your project inside a virtualenv using
+# setup.py install" in the RTD Advanced Settings.
 import os
-import sys
-sys.path.insert(0, os.path.abspath('../tsfel'))
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    import inspect
+    from sphinx import apidoc
+
+    __location__ = os.path.join(os.getcwd(), os.path.dirname(
+        inspect.getfile(inspect.currentframe())))
+
+    output_dir = os.path.join(__location__, "../docs/api")
+    module_dir = os.path.join(__location__, "../tsfel")
+    cmd_line_template = "sphinx-apidoc -f -o {outputdir} {moduledir}"
+    cmd_line = cmd_line_template.format(outputdir=output_dir, moduledir=module_dir)
+    apidoc.main(cmd_line.split(" "))
 
 
 # -- General configuration ------------------------------------------------
