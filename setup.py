@@ -4,6 +4,13 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open('requirements.txt', 'r') as f:
+    install_reqs = [
+        s for s in [
+            line.strip(' \n') for line in f
+        ] if not s.startswith('#') and s != ''
+    ]
+
 setuptools.setup(
     name="tsfel",
     version="0.0.4",
@@ -19,5 +26,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['scipy', 'pandas', 'matplotlib', 'numpy'],
+    install_requires=install_reqs
 )

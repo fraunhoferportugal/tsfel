@@ -1,11 +1,10 @@
 import ast
-import json
 import tsfel
 import gspread
 import numpy as np
-from tsfel.utils.calculate_complexity import compute_complexity
-from tsfel.feature_extraction.features_settings import load_json
 from oauth2client.service_account import ServiceAccountCredentials
+from tsfel.feature_extraction.features_settings import load_json
+from tsfel.utils.calculate_complexity import compute_complexity
 
 
 def filter_features(features, filters):
@@ -49,14 +48,17 @@ def filter_features(features, filters):
     return features_filtered
 
 
-def extract_sheet(gsheet_name):
+def extract_sheet(gsheet_name, **kwargs):
     """Interaction between features.json and Google sheets.
 
     Parameters
     ----------
     gsheet_name : str
         Google Sheet name
-
+    \**kwargs:
+    See below:
+        * *path_json* (``string``) --
+            Json path
     Returns
     -------
     dict
@@ -67,14 +69,15 @@ def extract_sheet(gsheet_name):
     lib_path = tsfel.__path__
 
     # Access features.json
-    path_json = lib_path[0] + '/feature_extraction/features.json'
+    path_json = kwargs.get('path_json', lib_path[0] + '/feature_extraction/features.json')
 
     # Read features.json into a dictionary of features and parameters
     dict_features = load_json(path_json)
 
-    len_stat = len(dict_features['statistical'].keys())
-    len_temp = len(dict_features['temporal'].keys())
-    len_spec = len(dict_features['spectral'].keys())
+    # Number of features from json file
+    len_json = 0
+    for domain in list(dict_features.keys()):
+        len_json += len(dict_features[domain].keys())
 
     # Access Google sheet
     # Scope and credentials using the content of client_secret.json file
@@ -90,9 +93,9 @@ def extract_sheet(gsheet_name):
     sheet = confManager.sheet1
     metadata = confManager.fetch_sheet_metadata()
 
-    # Features from Google sheet
+    # Reading from Google Sheet
+    # Features
     list_of_features = sheet.col_values(2)[4:]
-    list_domain = sheet.col_values(3)[4:]
 
     try:
         filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
@@ -103,11 +106,11 @@ def extract_sheet(gsheet_name):
 
     use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
 
-    assert len(list_of_features) <= (len_spec + len_stat + len_temp), \
+    assert len(list_of_features) <= (len_json), \
         "To insert a new feature, please add it to data/features.json with the code in src/utils/features.py"
 
     # adds a new feature in Google sheet if it is missing from features.json
-    if len(list_of_features) < (len_spec + len_stat + len_temp):
+    if len(list_of_features) < (len_json):
 
         # new feature was added
         for domain in dict_features.keys():
@@ -146,40 +149,49 @@ def extract_sheet(gsheet_name):
 
         # Update list of features and domains from Google sheet
         list_of_features = sheet.col_values(2)[4:]
-        list_domain = sheet.col_values(3)[4:]
 
-        # Update filtered features from Google sheet
+        # Update filtered features from Google sheet. Check if filters exist.
         try:
             filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
             list_filt_features = filter_features(dict_features, filters)
         except KeyError:
             list_filt_features = list_of_features.copy()
-            print('')
 
         use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
 
     assert 'TRUE' in use_or_not, 'Please select a feature to extract!' + '\n'
 
+    # Reading from Google Sheet
+    # Domain
+    list_domain = sheet.col_values(3)[4:]
+    # Parameters and fs
+    gs_param_list = sheet.col_values(6)[4:]
+    gs_fs_list = sheet.col_values(5)[4:]
+    gs_fs = int(sheet.cell(4, 9).value)
+
+    # Fix for empty cells in parameters column
+    if len(gs_param_list) < len(list_of_features):
+        empty = [''] * (len(list_of_features) - len(gs_param_list))
+        gs_param_list = gs_param_list + empty
+
     # Update dict of features with changes from Google sheet
     for ii, feature in enumerate(list_of_features):
         domain = list_domain[ii]
-        if use_or_not[ii] == 'TRUE':
-            dict_features[domain][feature]['use'] = 'yes'
-
-            # Check features parameters from Google sheet
-            if sheet.cell(ii + 5, 6).value != '':
-                param_sheet = ast.literal_eval(sheet.cell(ii + 5, 6).value)
-
-                # update dic of features based on Google sheet
-                dict_features[domain][feature]['parameters'] = param_sheet
-
-            # Check features that use sampling frequency parameter
-            if sheet.cell(ii + 5, 5).value != 'no':
-
-                # update dict of features based on Google sheet fs
-                param_fs_sheet = int(sheet.cell(4, 9).value)
-                dict_features[domain][feature]['parameters']['fs'] = param_fs_sheet
-        else:
-            dict_features[domain][feature]['use'] = 'no'
+        try:
+            if use_or_not[ii] == 'TRUE':
+                dict_features[domain][feature]['use'] = 'yes'
+                # Check features that use sampling frequency parameter
+                if gs_fs_list[ii] != 'no':
+                    # update dict of features based on Google sheet fs
+                    dict_features[domain][feature]['parameters']['fs'] = gs_fs
+                # Check features parameters from Google sheet
+                if gs_param_list[ii] != '':
+                    param_sheet = ast.literal_eval(gs_param_list[ii])
+                    # update dic of features based on Google sheet
+                    dict_features[domain][feature]['parameters'] = param_sheet
+            else:
+                dict_features[domain][feature]['use'] = 'no'
+        except KeyError:
+            print('Unknown domain at cell', int(ii + 5))
 
     return dict_features

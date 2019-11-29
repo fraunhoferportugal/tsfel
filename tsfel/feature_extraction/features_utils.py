@@ -1,4 +1,13 @@
+import scipy
 import numpy as np
+
+
+def set_domain(key, value):
+    def decorate_func(func):
+        setattr(func, key, value)
+        return func
+
+    return decorate_func
 
 
 def compute_time(signal, fs):
@@ -19,7 +28,7 @@ def compute_time(signal, fs):
     """
 
     time = range(len(signal))
-    time = [float(x)/fs for x in time]
+    time = [float(x) / fs for x in time]
     return time
 
 
@@ -84,7 +93,7 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # pre-emphasis filter to amplify the high frequencies
 
-    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:])-pre_emphasis*np.array(signal[:-1]))
+    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]))
 
     # Fourier transform and Power spectrum
     mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
@@ -145,7 +154,7 @@ def autocorr_norm(signal):
     if np.sum(signal) == 0:
         return np.zeros(len(signal))
 
-    acf = r/(np.var(signal)*(np.arange(len(signal), 0, -1)))
+    acf = r / (np.var(signal) * (np.arange(len(signal), 0, -1)))
 
     return acf
 
@@ -174,7 +183,7 @@ def create_symmetric_matrix(acf, n_coeff=12):
 
     for i in range(n_coeff):
         for j in range(n_coeff):
-            smatrix[i, j] = acf[np.abs(i-j)]
+            smatrix[i, j] = acf[np.abs(i - j)]
     return smatrix
 
 
@@ -200,12 +209,97 @@ def lpc(signal, n_coeff=12):
 
     # Calculate LPC with Yule-Walker
     acf = autocorr_norm(signal)
-    r = -acf[1:n_coeff+1].T
+    r = -acf[1:n_coeff + 1].T
     smatrix = create_symmetric_matrix(acf, n_coeff)
     if np.sum(smatrix) == 0:
         return tuple(np.zeros(n_coeff))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), r)
-    lpc_coeffs = lpc_coeffs/np.max(np.abs(lpc_coeffs))
+    lpc_coeffs = lpc_coeffs / np.max(np.abs(lpc_coeffs))
 
     return tuple(lpc_coeffs)
+
+
+def create_xx(features):
+    """Computes the range of features amplitude for the probability density function calculus.
+
+    Parameters
+    ----------
+    features : nd-array
+        Input features
+
+    Returns
+    -------
+    nd-array
+        range of features amplitude
+
+    """
+
+    features_ = np.copy(features)
+
+    if max(features_) < 0:
+        max_f = - max(features_)
+        min_f = min(features_)
+    else:
+        min_f = min(features_)
+        max_f = max(features_)
+
+    if min(features_) == max(features_):
+        xx = np.linspace(min_f, min_f + 10, len(features_))
+    else:
+        xx = np.linspace(min_f, max_f, len(features_))
+
+    return xx
+
+
+def kde(features):
+    """Computes the probability density function of the input signal using a Gaussian KDE (Kernel Density Estimate)
+
+    Parameters
+    ----------
+    features : nd-array
+        Input from which probability density function is computed
+
+    Returns
+    -------
+    nd-array
+        probability density values
+
+    """
+    features_ = np.copy(features)
+    xx = create_xx(features_)
+
+    if min(features_) == max(features_):
+        noise = np.random.randn(len(features_)) * 0.0001
+        features_ = np.copy(features_ + noise)
+
+    kernel = scipy.stats.gaussian_kde(features_, bw_method='silverman')
+
+    return np.array(kernel(xx) / np.sum(kernel(xx)))
+
+
+def gaussian(features):
+    """Computes the probability density function of the input signal using a Gaussian function
+
+    Parameters
+    ----------
+    features : nd-array
+        Input from which probability density function is computed
+    Returns
+    -------
+    nd-array
+        probability density values
+
+    """
+
+    features_ = np.copy(features)
+
+    xx = create_xx(features_)
+    std_value = np.std(features_)
+    mean_value = np.mean(features_)
+
+    if std_value == 0:
+        return 0.0
+    pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
+
+    return np.array(pdf_gauss / np.sum(pdf_gauss))

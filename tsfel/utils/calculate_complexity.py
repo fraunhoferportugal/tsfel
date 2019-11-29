@@ -78,7 +78,7 @@ def find_best_curve(t, signal):
     return curve_name
 
 
-def compute_complexity(feature, domain, json_file):
+def compute_complexity(feature, domain, json_path, **kwargs):
     """Computes the feature complexity.
 
     Parameters
@@ -87,8 +87,12 @@ def compute_complexity(feature, domain, json_file):
         Feature name
     domain : string
         Feature domain
-    json_file: json
+    json_path: json
         Features json file
+    \**kwargs:
+    See below:
+        * *features_path* (``string``) --
+            Directory of script with personal features
 
     Returns
     -------
@@ -98,7 +102,10 @@ def compute_complexity(feature, domain, json_file):
     Writes complexity in json file
 
     """
-    dictionary = load_json(json_file)
+
+    dictionary = load_json(json_path)
+
+    features_path = kwargs.get('features_path', None)
 
     # The inputs from this function should be replaced by a dictionary
     one_feat_dict = {domain: {feature: dictionary[domain][feature]}}
@@ -112,9 +119,11 @@ def compute_complexity(feature, domain, json_file):
 
     for ti in t:
         for _ in range(20):
+
             start = time.time()
-            calc_window_features(one_feat_dict, wave[:int(ti)], fs)
+            calc_window_features(one_feat_dict, wave[:int(ti)], fs, features_path=features_path)
             end = time.time()
+
             s += [end - start]
 
         signal += [np.mean(s)]
@@ -122,7 +131,7 @@ def compute_complexity(feature, domain, json_file):
     curve_name = find_best_curve(t, signal)
     dictionary[domain][feature]['complexity'] = curve_name
 
-    with open(json_file, "w") as write_file:
+    with open(json_path, "w") as write_file:
         json.dump(dictionary, write_file, indent=4, sort_keys=True)
 
     if curve_name == 'constant' or curve_name == 'log':
