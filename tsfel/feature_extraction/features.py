@@ -1,1089 +1,1308 @@
-from scipy.stats import kurtosis, skew
-import novainstrumentation as ni
+import scipy
+import warnings
 import numpy as np
-from scipy import signal
+import scipy.signal
+from tsfel.feature_extraction.features_utils import *
 
 
-# ####################################  TEMPORAL DOMAIN  ############################################################# #
-########################################################################################################################
-def distance(sig):
-    """ Calculates the total distance traveled by the signal,
-    using the hipotenusa between 2 datapoints
-    Parameters
-    ----------
-    s: array-like
-      the input signal.
-    Returns
-    -------
-    signal distance: if the signal was straightened distance
-    """
-    df_sig = np.diff(sig)
-    return np.sum([np.sqrt(1+df**2) for df in df_sig])
+# ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
-def autocorr(sig):
-    """Compute autocorrelation along the specified axis.
+@set_domain("domain", "temporal")
+def autocorr(signal):
+    """Computes autocorrelation of the signal.
 
     Parameters
     ----------
-    sig: ndarray
-        input from which autocorrelation is computed.
+    signal : nd-array
+        Input from which autocorrelation is computed
 
     Returns
     -------
-    corr: float
-        Cross correlation of 1-dimensional sequence.
-    """
-    return float(np.correlate(sig, sig))
+    float
+        Cross correlation of 1-dimensional sequence
 
-
-def zero_cross(sig):
-    """Compute Zero-crossing rate along the specified axis.
-         total number of times that the signal changes from positive to negative or vice versa, normalized by the window length.
-    Parameters
-    ----------
-    sig: ndarray
-        input from which the zero-crossing rate are computed.
-
-    Returns
-    -------
-    count_vector: int
-        number of times that signal value cross the zero axe.
-    """
-    #return np.where(ny.diff(ny.sign(sig)))[0]
-
-    return len(np.where(np.diff(np.sign(sig)))[0])
-
-
-def calc_meanadiff(sig):
-    """Compute mean absolute differences along the specified axes.
-
-   Parameters
-   ----------
-   input: ndarray
-       input from which mean absolute deviation is computed.
-
-   Returns
-   -------
-   mad: int
-      mean absolute difference result.
-   """
-
-    return np.mean(abs(np.diff(sig)))
-
-
-def calc_medadiff(sig):
-    """Compute median absolute differences along the specified axes.
-
-   Parameters
-   ----------
-   input: ndarray
-       input from which mean absolute deviation is computed.
-
-   Returns
-   -------
-   mad: int
-      mean absolute difference result.
-   """
-
-    return np.median(abs(np.diff(sig)))
-
-
-def calc_sadiff(sig):
-    """Compute sum of absolute differences along the specified axes.
-
-   Parameters
-   ----------
-   input: ndarray
-       input from which sum absolute diff is computed.
-
-   Returns
-   -------
-   mad: int
-      sum absolute difference result.
-   """
-
-    return np.sum(abs(np.diff(sig)))
-
-
-def calc_meandiff(sig):
-    """Compute mean of differences along the specified axes.
-
-   Parameters
-   ----------
-   input: ndarray
-       input from which mean absolute deviation is computed.
-
-   Returns
-   -------
-   mad: int
-      mean absolute difference result.
-   """
-
-    return np.mean(np.diff(sig))
-
-
-def calc_meddiff(sig):
-    """Compute mean of differences along the specified axes.
-
-   Parameters
-   ----------
-   input: ndarray
-       input from which mean absolute deviation is computed.
-
-   Returns
-   -------
-   mad: int
-      mean absolute difference result.
-   """
-
-    return np.median(np.diff(sig))
-
-
-def compute_time(sign, FS):
-    """Creates the signal correspondent time array.
-    """
-    time = range(len(sign))
-    time = [float(x)/FS for x in time]
-    return time
-
-
-def signal_energy(sign, time):
-    """Computes the energy of the signal. For that, first is made the segmentation of the signal in 10 windows
-    and after it's considered that the energy of the signal is the sum of all calculated points in each window.
-    Parameters
-    ----------
-    sign: ndarray
-        input from which max frequency is computed.
-    Returns
-    -------
-    energy: float list
-       signal energy.
-    time_energy: float list
-        signal time energy
     """
 
-    window_len = len(sign)
-
-    # window for energy calculation
-    if window_len < 10:
-        window = 1
-    else:
-        window = window_len//10 # each window of the total signal will have 10 windows
-
-    energy = np.zeros(window_len//window)
-    time_energy = np.zeros(window_len//window)
-
-    i = 0
-    for a in range(0, len(sign) - window, window):
-        energy[i] = np.sum(np.array(sign[a:a+window])**2)
-        interval_time = time[int(a+(window//2))]
-        time_energy[i] = interval_time
-        i += 1
-
-    return list(energy), list(time_energy)
+    return float(np.correlate(signal, signal))
 
 
-def centroid(sign, FS):
+@set_domain("domain", "temporal")
+def calc_centroid(signal, fs):
     """Computes the centroid along the time axis.
+
+    Parameters
     ----------
-    sign: ndarray
-        input from which max frequency is computed.
+    signal : nd-array
+        Input from which centroid is computed
     fs: int
-        signal sampling frequency.
+        Signal sampling frequency
+
     Returns
     -------
-    centroid: float
-        temporal centroid
+    float
+        Temporal centroid
+
     """
 
-    time = compute_time(sign, FS)
+    time = compute_time(signal, fs)
 
-    energy, time_energy=signal_energy(sign, time)
+    energy = np.array(signal) ** 2
 
-    total_energy = np.dot(np.array(time_energy),np.array(energy))
+    t_energy = np.dot(np.array(time), np.array(energy))
     energy_sum = np.sum(energy)
 
-    if energy_sum == 0 or total_energy == 0:
+    if energy_sum == 0 or t_energy == 0:
         centroid = 0
     else:
-        centroid = total_energy / energy_sum
+        centroid = t_energy / energy_sum
+
     return centroid
 
 
-def total_energy(sign, FS):
-    """
-    Compute the acc_total power, using the given windowSize and value time in samples
+@set_domain("domain", "temporal")
+def minpeaks(signal):
+    """Computes number of minimum peaks of the signal.
 
-    """
-    time = compute_time(sign, FS)
-
-    return np.sum(np.array(sign)**2)/(time[-1]-time[0])
-
-
-########################################################################################################################
-# ############################################ SPECTRAL DOMAIN ####################################################### #
-########################################################################################################################
-
-
-def plotfft(s, fmax):
-    """ This functions computes the fft of a signal, returning the frequency
-    and their magnitude values.
     Parameters
     ----------
-    s: array-like
-      the input signal.
-    fmax: int
-      the sampling frequency.
-    doplot: boolean
-      a variable to indicate whether the plot is done or not.
+    signal : nd-array
+        Input from which minimum number of peaks is counted
     Returns
     -------
-    f: array-like
-      the frequency values (xx axis)
-    fs: array-like
-      the amplitude of the frequency values (yy axis)
+    float
+        Minimum number of peaks
+
+    """
+    diff_sig = np.diff(signal)
+
+    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd] < 0) and (diff_sig[nd + 1] > 0))])
+
+
+@set_domain("domain", "temporal")
+def maxpeaks(signal):
+    """Computes number of maximum peaks of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which maximum number of peaks is counted
+
+    Returns
+    -------
+    float
+        Maximum number of peaks
+
+    """
+    diff_sig = np.diff(signal)
+
+    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
+
+
+@set_domain("domain", "temporal")
+def mean_abs_diff(signal):
+    """Computes mean absolute differences of the signal.
+
+   Parameters
+   ----------
+   signal : nd-array
+       Input from which mean absolute deviation is computed
+
+   Returns
+   -------
+   float
+       Mean absolute difference result
+
+   """
+
+    return np.mean(abs(np.diff(signal)))
+
+
+@set_domain("domain", "temporal")
+def mean_diff(signal):
+    """Computes mean of differences of the signal.
+
+   Parameters
+   ----------
+   signal : nd-array
+       Input from which mean of differences is computed
+
+   Returns
+   -------
+   float
+       Mean difference result
+
+   """
+
+    return np.mean(np.diff(signal))
+
+
+@set_domain("domain", "temporal")
+def median_abs_diff(signal):
+    """Computes median absolute differences of the signal.
+
+   Parameters
+   ----------
+   signal : nd-array
+       Input from which median absolute difference is computed
+
+   Returns
+   -------
+   float
+       Median absolute difference result
+
+   """
+
+    return np.median(abs(np.diff(signal)))
+
+
+@set_domain("domain", "temporal")
+def median_diff(signal):
+    """Computes median of differences of the signal.
+
+   Parameters
+   ----------
+   signal : nd-array
+       Input from which median of differences is computed
+
+   Returns
+   -------
+   float
+       Median difference result
+
+   """
+
+    return np.median(np.diff(signal))
+
+
+@set_domain("domain", "temporal")
+def distance(signal):
+    """Computes signal traveled distance.
+
+    Calculates the total distance traveled by the signal
+    using the hipotenusa between 2 datapoints.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which distance is computed
+
+    Returns
+    -------
+    float
+        Signal distance
+
+    """
+    diff_sig = np.diff(signal)
+    return np.sum([np.sqrt(1 + df ** 2) for df in diff_sig])
+
+
+@set_domain("domain", "temporal")
+def sum_abs_diff(signal):
+    """Computes sum of absolute differences of the signal.
+
+   Parameters
+   ----------
+   signal : nd-array
+       Input from which sum absolute difference is computed
+
+   Returns
+   -------
+   float
+       Sum absolute difference result
+
+   """
+
+    return np.sum(abs(np.diff(signal)))
+
+
+@set_domain("domain", "temporal")
+def zero_cross(signal):
+    """Computes Zero-crossing rate of the signal.
+
+    Corresponds to the total number of times that the signal changes from
+    positive to negative or vice versa.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the zero-crossing rate are computed
+
+    Returns
+    -------
+    int
+        Number of times that signal value cross the zero axis
+
     """
 
-    fs = abs(np.fft.fft(s))
-    f = np.linspace(0, fmax // 2, len(s) // 2)
-    return (f[1:len(s) // 2].copy(), fs[1:len(s) // 2].copy())
+    return len(np.where(np.diff(np.sign(signal)))[0])
 
 
-def _bigPeaks(s, th, min_peak_distance=5, peak_return_percentage=0.1):
-    pp = []
-    if not list(s):
-        return pp
+@set_domain("domain", "temporal")
+def total_energy(signal, fs):
+    """Computes the total energy of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which total energy is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Total energy
+
+    """
+
+    time = compute_time(signal, fs)
+
+    return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
+
+
+@set_domain("domain", "temporal")
+def slope(signal):
+    """Computes the slope of the signal.
+
+    Slope is computed by fitting a linear equation to the observed data.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which linear equation is computed
+
+    Returns
+    -------
+    float
+        Slope
+
+    """
+    t = np.linspace(0, len(signal) - 1, len(signal))
+
+    return np.polyfit(t, signal, 1)[0]
+
+
+@set_domain("domain", "temporal")
+def auc(signal, fs):
+    """Computes the area under the curve of the signal computed with trapezoid rule.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+    fs : int
+        Sampling Frequency
+    Returns
+    -------
+    float
+        The area under the curve value
+
+    """
+    t = compute_time(signal, fs)
+
+    return np.sum(np.diff(t) * signal[:-1] + signal[1:] / 2)
+
+
+@set_domain("domain", "temporal")
+def abs_energy(signal):
+    """Computes the absolute energy of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+
+    Returns
+    -------
+    float
+        Absolute energy
+
+    """
+
+    return np.sum(signal ** 2)
+
+
+@set_domain("domain", "temporal")
+def pk_pk_distance(signal):
+    """Computes the peak to peak distance.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+
+    Returns
+    -------
+    float
+        peak to peak distance
+
+    """
+
+    return np.abs(np.max(signal) - np.min(signal))
+
+
+@set_domain("domain", "temporal")
+def entropy(signal, prob='kde'):
+    """Computes the entropy of the signal using the Shannon Entropy.
+
+    Description in Article:
+    Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
+    Authors: Crutchfield J. Feldman David
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which entropy is computed
+    prob : string
+        Probability function (kde or gaussian functions are available)
+
+    Returns
+    -------
+    float
+        The normalized entropy value
+
+    """
+
+    if prob == 'kde':
+        p = kde(signal)
+    elif prob == 'gauss':
+        p = gaussian(signal)
+
+    if np.sum(p) == 0:
+        return 0.0
+
+    # Handling zero probability values
+    p = p[np.where(p != 0)]
+
+    if sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+        return 0.0
     else:
-        p = ni.peaks(s, th)
-        if not list(p):
-            return pp
-        else:
-            p = ni.clean_near_peaks(s, p, min_peak_distance)
-            if not list(p):
-                return pp
-            else:
-                ars = np.argsort(s[p])
-                pp = p[ars]
-
-                num_peaks_to_return = int(np.ceil(len(p) * peak_return_percentage))
-
-                pp = pp[-num_peaks_to_return:]
-
-            return pp
+        return - sum(p * np.log2(p)) / np.log2(len(signal))
 
 
-# Compute Fundamental Frequency
-def fundamental_frequency(s, FS):
-    # TODO: review fundamental frequency to guarantee that f0 exists
-    # suggestion peak level should be bigger
-    # TODO: explain code
-    """Compute fundamental frequency along the specified axes.
+# ############################################ STATISTICAL DOMAIN #################################################### #
+
+
+@set_domain("domain", "statistical")
+def hist(signal, nbins=10, r=1):
+    """Computes histogram of the signal.
+
     Parameters
     ----------
-    s: ndarray
-        input from which fundamental frequency is computed.
-    FS: int
-        sampling frequency
+    signal : nd-array
+        Input from histogram is computed
+    nbins : int
+        The number of equal-width bins in the givel range
+    r : float
+        The lower(-r) and upper(r) range of the bins
+
     Returns
     -------
-    f0: int
-       its integer multiple best explain the content of the signal spectrum.
+    nd-array
+        The values of the histogram
+
     """
 
-    s = s - np.mean(s)
-    f, fs = plotfft(s, FS)
+    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
 
-    fs = fs[1:len(fs) // 2]
-    f = f[1:len(f) // 2]
+    return tuple(histsig)
+
+
+@set_domain("domain", "statistical")
+def interq_range(signal):
+    """Computes interquartile range of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which interquartile range is computed
+
+    Returns
+    -------
+    float
+        Interquartile range result
+
+    """
+
+    return np.percentile(signal, 75) - np.percentile(signal, 25)
+
+
+@set_domain("domain", "statistical")
+def kurtosis(signal):
+    """Computes kurtosis of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which kurtosis is computed
+
+    Returns
+    -------
+    float
+        Kurtosis result
+
+    """
+
+    return scipy.stats.kurtosis(signal)
+
+
+@set_domain("domain", "statistical")
+def skewness(signal):
+    """Computes skewness of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which skewness is computed
+
+    Returns
+    -------
+    int
+        Skewness result
+
+    """
+
+    return scipy.stats.skew(signal)
+
+
+@set_domain("domain", "statistical")
+def calc_max(signal):
+    """Computes the maximum value of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+       Input from which max is computed
+
+    Returns
+    -------
+    float
+        Maximum result
+
+    """
+
+    return np.max(signal)
+
+
+@set_domain("domain", "statistical")
+def calc_min(signal):
+    """Computes the minimum value of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which min is computed
+
+    Returns
+    -------
+    float
+        Minimum result
+
+    """
+
+    return np.min(signal)
+
+
+@set_domain("domain", "statistical")
+def calc_mean(signal):
+    """Computes mean value of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean is computed.
+
+    Returns
+    -------
+    float
+        Mean result
+
+    """
+
+    return np.mean(signal)
+
+
+@set_domain("domain", "statistical")
+def calc_median(signal):
+    """Computes median of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median is computed
+
+    Returns
+    -------
+    float
+        Median result
+
+    """
+    return np.median(signal)
+
+
+@set_domain("domain", "statistical")
+def mean_abs_deviation(signal):
+    """Computes mean absolute deviation of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean absolute deviation is computed
+
+    Returns
+    -------
+    float
+        Mean absolute deviation result
+
+    """
+
+    return np.mean(abs(signal - np.mean(signal, axis=0)), axis=0)
+
+
+@set_domain("domain", "statistical")
+def median_abs_deviation(signal):
+    """Computes median absolute deviation of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median absolute deviation is computed
+
+    Returns
+    -------
+    float
+        Mean absolute deviation result
+
+    """
+
+    return scipy.stats.median_absolute_deviation(signal, scale=1)
+
+
+@set_domain("domain", "statistical")
+def rms(signal):
+    """Computes root mean square of the signal.
+
+    Square root of the arithmetic mean (average) of the squares of the original values.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which root mean square is computed
+
+    Returns
+    -------
+    float
+        Root mean square
+
+    """
+
+    return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
+
+
+@set_domain("domain", "statistical")
+def calc_std(signal):
+    """Computes standard deviation (std) of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which std is computed
+
+    Returns
+    -------
+    float
+        Standard deviation result
+
+    """
+
+    return np.std(signal)
+
+
+@set_domain("domain", "statistical")
+def calc_var(signal):
+    """Computes variance of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+       Input from which var is computed
+
+    Returns
+    -------
+    float
+        Variance result
+
+    """
+
+    return np.var(signal)
+
+
+# ############################################## SPECTRAL DOMAIN ##################################################### #
+
+@set_domain("domain", "spectral")
+def spectral_distance(signal, fs):
+    """Computes the signal spectral distance.
+
+    Distance of the signal's cumulative sum of the FFT elements to
+    the respective linear regression.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which spectral distance is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        spectral distance
+
+    """
+
+    f, fmag = calc_fft(signal, fs)
+
+    cum_fmag = np.cumsum(fmag)
+
+    # Computing the linear regression
+    points_y = np.linspace(0, cum_fmag[-1], len(cum_fmag))
+
+    return np.sum(points_y - cum_fmag)
+
+
+@set_domain("domain", "spectral")
+def fundamental_frequency(signal, fs):
+    """Computes fundamental frequency of the signal.
+
+    The fundamental frequency integer multiple best explain
+    the content of the signal spectrum.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which fundamental frequency is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    f0: float
+       Predominant frequency of the signal
+
+    """
+
+    signal = signal - np.mean(signal)
+    f, fmag = calc_fft(signal, fs)
+
+    # Condition for offset removal, since the offset generates a peak at frequency zero
     try:
-        cond = np.where(f > 0.5)[0][0]
-    except:
+        # With 0.1 the offset frequency is discarded
+        cond = np.where(f > 0.1)[0][0]
+    except IndexError:
         cond = 0
 
-    bp = _bigPeaks(fs[cond:], 0)
+    # Finding big peaks, not considering noise peaks with low amplitude
+    bp = scipy.signal.find_peaks(fmag[cond:], threshold=10)[0]
     if not list(bp):
         f0 = 0
     else:
+        # add cond for correcting the indices position
         bp = bp + cond
+        # f0 is the minimum big peak frequency
         f0 = f[min(bp)]
+
     return f0
 
 
-def max_frequency(sig, FS):
-    """Compute max frequency along the specified axes.
+@set_domain("domain", "spectral")
+def max_power_spectrum(signal, fs):
+    """Computes maximum power spectrum density of the signal.
 
     Parameters
     ----------
-    sig: ndarray
-        input from which max frequency is computed.
-    FS: int
-        sampling frequency
+    signal : nd-array
+        Input from which maximum power spectrum is computed
+    fs : scalar
+        Sampling frequency
+
     Returns
     -------
-    f_max: int
-       0.95 of max_frequency using cumsum.
+    nd-array
+        Max value of the power spectrum density
+
     """
 
-    f, fs = plotfft(sig, FS)
-    t = np.cumsum(fs)
-
-    try:
-        ind_mag = np.where(t > t[-1]*0.95)[0][0]
-    except:
-        ind_mag = np.argmax(t)
-    f_max = f[ind_mag]
-
-    return f_max
+    if np.std(signal) == 0:
+        return float(max(scipy.signal.welch(signal, int(fs), nperseg=len(signal))[1]))
+    else:
+        return float(max(scipy.signal.welch(signal / np.std(signal), int(fs), nperseg=len(signal))[1]))
 
 
-def median_frequency(sig, FS):
-    """Compute median frequency along the specified axes.
+@set_domain("domain", "spectral")
+def max_frequency(signal, fs):
+    """Computes maximum frequency of the signal.
+
     Parameters
     ----------
-    sig: ndarray
-        input from which median frequency is computed.
-    FS: int
-        sampling frequency
+    signal : nd-array
+        Input from which maximum frequency is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    f_max: int
-       0.50 of max_frequency using cumsum.
+    float
+        0.95 of maximum frequency using cumsum
     """
 
-    f, fs = plotfft(sig, FS)
-    t = np.cumsum(fs)
+    f, fmag = calc_fft(signal, fs)
+    cum_fmag = np.cumsum(fmag)
+
     try:
-        ind_mag = np.where(t > t[-1] * 0.50)[0][0]
-    except:
-        ind_mag = np.argmax(t)
+        ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.95)[0][0]
+    except IndexError:
+        ind_mag = np.argmax(cum_fmag)
+
+    return f[ind_mag]
+
+
+@set_domain("domain", "spectral")
+def median_frequency(signal, fs):
+    """Computes median frequency of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median frequency is computed
+    fs: int
+        Sampling frequency
+
+    Returns
+    -------
+    f_median : int
+       0.50 of maximum frequency using cumsum.
+    """
+
+    f, fmag = calc_fft(signal, fs)
+    cum_fmag = np.cumsum(fmag)
+    try:
+        ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.50)[0][0]
+    except IndexError:
+        ind_mag = np.argmax(cum_fmag)
     f_median = f[ind_mag]
 
     return f_median
 
 
-def ceps_coeff(sig,coefNumber):
-    """Compute cepstral coefficients along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    coefNumber:
-    Returns
-    -------
-    cc: ndarray
-
-    """
-
-    est=lpc_coef(sig,coefNumber)
-    cc=lpcar2cc(est)
-    if len(cc)==1:
-        cc=float(cc)
-    else:
-        cc=tuple(cc)
-
-    return cc
-
-
-def max_power_spectrum(sig, FS):
-    """Compute power spectrum density along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    FS: scalar
-        sampling frequency
-    Returns
-    -------
-    max_power: ndarray
-        max value of the power spectrum.
-    peak_freq: ndarray
-        max frequency corresponding to the elements in power spectrum.
-
-    """
-
-    if np.std(sig) == 0:
-        return float(max(signal.welch(sig, int(FS), nperseg=len(sig))[1]))
-    else:
-        return float(max(signal.welch(sig/np.std(sig), int(FS), nperseg=len(sig))[1]))
-
-
-def power_bandwidth(sig, FS, samples):
-    """Compute power spectrum density bandwidth along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    FS: scalar
-        sampling frequency
-    samples: int
-        number of bands
-    Returns
-    -------
-    bandwidth: ndarray
-        power in bandwidth
-    """
-    bd = []
-    bdd = []
-    freq, power = signal.welch(sig/np.std(sig), FS, nperseg=len(sig))
-
-    for i in range(len(power)):
-        bd += [float(power[i])]
-
-    bdd += bd[:samples]
-
-    return tuple(bdd)
-
-
-def trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfilt, nlogfilt):
-    """Compute triangular filterbank for MFCC computation."""
-    # Total number of filters
-    nfilt = nlinfilt + nlogfilt
-
-    #------------------------
-    # Compute the filter bank
-    #------------------------
-    # Compute start/middle/end points of the triangular filters in spectral domain
-    freqs = np.zeros(nfilt+2) #modified
-    freqs[:nlinfilt] = lowfreq + np.arange(nlinfilt) * linsc
-    freqs[nlinfilt:] = freqs[nlinfilt-1] * logsc ** np.arange(1, nlogfilt + 3)
-
-    heights = 2./(freqs[2:] - freqs[0:-2])
-
-    # Compute filterbank coeff (in fft domain, in bins)
-    fbank = np.zeros((nfilt, nfft))
-
-    # FFT bins (in Hz)
-    nfreqs = np.arange(nfft) / (1. * nfft) * fs
-    for i in range(nfilt):
-        low = freqs[i]
-        cen = freqs[i+1] #modified
-        hi = freqs[i+2] #modified
-
-        lid = np.arange(np.floor(low * nfft / fs) + 1,
-                        np.floor(cen * nfft / fs) + 1, dtype=int)
-        lslope = heights[i] / (cen - low)
-        rid = np.arange(np.floor(cen * nfft / fs) + 1,
-                        np.floor(hi * nfft / fs) + 1, dtype=int)
-        rslope = heights[i] / (hi - cen)
-        fbank[i][lid] = lslope * (nfreqs[lid] - low)
-        fbank[i][rid] = rslope * (hi - nfreqs[rid])
-
-    return fbank, freqs
-
-
-def fast_fourier_transform(sig):
-    """
-    Computes the one-dimensional discrete Fourier Transform.
-    :param sig:ndarray
-        input from which cepstral coefficients are computed.
-    :return: fft_ndarray
-    """
-    fft = np.fft.fft(sig)
-
-    return fft
-
-
-def index_highest_fft(sig):
-    """Computes the index of the highest Fast Fourier Transform using an one-dimensional discrete Fourier Transform for real input.
-
-    Parameters
-    ---------
-    sig: ndarray
-        input from which cepstral coefficients are computed.
-    Returns
-    ---------
-    h_fft: int64
-
-    """
-    fft = fast_fourier_transform(sig)
-    h_fft = np.argmax(fft)
-
-    return h_fft
-
-
-def ratio_1st_2nd_highest_fft_values(sig):
-    """
-    Computes the ratio between the first and second highest FFT values.
-    :param sig:ndarray
-    :return:r_fft: float
-    """
-
-    fft = fast_fourier_transform(sig)
-    fft_1st = np.max(fft)
-    fft_2nd = np.max(np.delete(fft, np.where(fft == fft_1st)[0]))
-    r_fft =  fft_1st/fft_2nd
-
-    return r_fft
-
-
-########################################################################################################################
-####################################### STATISTICAL DOMAIN #############################################################
-########################################################################################################################
-
-
-def interq_range(sig):
-    """Compute interquartile range along the specified axis.
-
-        Parameters
-        ----------
-        sig: ndarray
-            input from which interquartile range is computed.
-
-        Returns
-        -------
-        corr: float
-            Interquartile range of 1-dimensional sequence.
-        """
-    #ny.percentile(sig, 75) - ny.percentile(sig, 25)
-    return np.percentile(sig, 75) - np.percentile(sig, 25)
-
-
-def calc_kurtosis(sig):
-     """Compute kurtosis along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which kurtosis is computed.
-
-    Returns
-    -------
-    k: int
-       kurtosis result.
-    """
-     return kurtosis(sig)
-
-
-def calc_skewness(sig):
-     """Compute skewness along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which skewness is computed.
-
-    Returns
-    -------
-    s: int
-       skewness result.
-    """
-     return skew(sig)
-
-
-def calc_mean(sig):
-     """Compute mean value along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which mean is computed.
-
-    Returns
-    -------
-    m: int
-       mean result.
-    """
-     # m = mean(sig)
-     return np.mean(sig)
-
-
-def calc_std(sig):
-     """Compute standard deviation (std) along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which std is computed.
-
-    Returns
-    -------
-    std_value: int
-       std result.
-    """
-     return np.std(sig)
-
-
-def calc_iqr(sig):
-     """Compute interquartile range along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which interquartile range is computed.
-
-    Returns
-    -------
-    iqr: int
-       interquartile range result.
-    """
-     # iqr = subtract(*percentile(sig, [75, 25]))
-     return np.percentile(sig, 75) - np.percentile(sig, 25)
-
-
-def calc_meanad(sig):
-     """Compute mean absolute deviation along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which mean absolute deviation is computed.
-
-    Returns
-    -------
-    mad: int
-       mean absolute deviation result.
-    """
-     m = np.mean(sig)
-     diff = [abs(x-m) for x in sig]
-
-     return np.mean(diff)
-
-
-def calc_medad(sig):
-     """Compute mean absolute deviation along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which mean absolute deviation is computed.
-
-    Returns
-    -------
-    mad: int
-       mean absolute deviation result.
-    """
-     m = np.median(sig)
-     diff = [abs(x-m) for x in sig]
-
-     return np.median(diff)
-
-
-def rms(sig):
-     """Compute root mean square along the specified axes.
-
-    Parameters
-    ----------
-    input: ndarray
-        input from which root mean square is computed.
-
-    Returns
-    -------
-    rms: int
-       square root of the arithmetic mean (average) of the squares of the original values.
-    """
-
-     return np.sqrt(np.sum(np.array(sig)**2)/len(sig))
-
-
-# Histogram for json format
-def hist(sig, nbins, r):
-    """Compute histogram along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-        input from histogram is computed.
-    nbins: int
-     the number of equal-width bins in the givel range.
-    rang: float
-        the lower(-r) and upper(r) range of the bins.
-    Returns
-    -------
-    histsig: ndarray
-        the values of the histogram
-
-    bin_edges: ndarray
-        the bin_edges, 'len(hist)+1'
-
-    """
-
-    histsig, bin_edges = np.histogram(sig, bins=nbins, range=[-r, r], density=True)  # TODO:subsampling parameter
-
-    # bin_edges = bin_edges[:-1]
-    # bin_edges += (bin_edges[1]-bin_edges[0])/2.
-
-    return tuple(histsig)
-
-
-def minpeaks(sig):
-    """Compute number of minimum peaks along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-
-    Returns
-    -------
-     float
-        min number of peaks
-
-    """
-    diff_sig = np.diff(sig)
-
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if (diff_sig[nd]<0 and diff_sig[nd + 1]>0)])
-
-
-def maxpeaks(sig):
-    """Compute number of peaks along the specified axes.
-
-    Parameters
-    ----------
-    sig: ndarray
-        input from histogram is computed.
-    type: string
-        can be 'all', 'max', and 'min', and expresses which peaks are going to be accounted
-    Returns
-    -------
-    num_p: float
-        total number of peaks
-
-    """
-    diff_sig = np.diff(sig)
-
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if (diff_sig[nd+1]<0 and diff_sig[nd]>0)])
-
-
-def spectral_centroid(sign, fs): #center portion of the signal
+@set_domain("domain", "spectral")
+def spectral_centroid(signal, fs):
     """Barycenter of the spectrum.
 
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
+
     Parameters
     ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
+    signal : nd-array
+        Signal from which spectral centroid is computed
     fs: int
-        sampling frequency of the signal
+        Sampling frequency
+
     Returns
     -------
-    spread: float
-        centroid
+    float
+        Centroid
+
     """
-    f, ff = plotfft(sign, fs)
-    if not np.sum(ff):
+
+    f, fmag = calc_fft(signal, fs)
+    if not np.sum(fmag):
         return 0
     else:
-        return np.dot(f,ff/np.sum(ff))
+        return np.dot(f, fmag / np.sum(fmag))
 
 
-def spectral_spread(sign, fs):
+@set_domain("domain", "spectral")
+def spectral_decrease(signal, fs):
+    """Represents the amount of decreasing of the spectra amplitude.
+
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which spectral decrease is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Spectral decrease
+
+    """
+
+    f, fmag = calc_fft(signal, fs)
+
+    fmag_band = fmag[1:]
+    len_fmag_band = np.arange(2, len(fmag) + 1)
+
+    # Sum of numerator
+    soma_num = np.sum((fmag_band - fmag[0]) / (len_fmag_band - 1), axis=0)
+
+    if not np.sum(fmag_band):
+        return 0
+    else:
+        # Sum of denominator
+        soma_den = 1 / np.sum(fmag_band)
+
+        # Spectral decrease computing
+        return soma_den * soma_num
+
+
+@set_domain("domain", "spectral")
+def spectral_kurtosis(signal, fs):
+    """Measures the flatness of a distribution around its mean value.
+
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which spectral kurtosis is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Spectral Kurtosis
+
+    """
+
+    f, fmag = calc_fft(signal, fs)
+    if not spectral_spread(signal, fs):
+        return 0
+    else:
+        spect_kurt = ((f - spectral_centroid(signal, fs)) ** 4) * (fmag / np.sum(fmag))
+        return np.sum(spect_kurt) / (spectral_spread(signal, fs) ** 4)
+
+
+@set_domain("domain", "spectral")
+def spectral_skewness(signal, fs):
+    """Measures the asymmetry of a distribution around its mean value.
+
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which spectral skewness is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Spectral Skewness
+
+    """
+
+    f, fmag = calc_fft(signal, fs)
+    spect_centr = spectral_centroid(signal, fs)
+
+    if not spectral_spread(signal, fs):
+        return 0
+    else:
+        skew = ((f - spect_centr) ** 3) * (fmag / np.sum(fmag))
+        return np.sum(skew) / (spectral_spread(signal, fs) ** 3)
+
+
+@set_domain("domain", "spectral")
+def spectral_spread(signal, fs):
     """Measures the spread of the spectrum around its mean value.
 
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
+
     Parameters
     ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which spectral spread is computed.
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    spread: float
-        spread
+    float
+        Spectral Spread
+
     """
-    f, ff = plotfft(sign, fs)
-    spect_centr = spectral_centroid(sign, fs)
-    if not np.sum(ff):
+
+    f, fmag = calc_fft(signal, fs)
+    spect_centroid = spectral_centroid(signal, fs)
+
+    if not np.sum(fmag):
         return 0
     else:
-        return np.dot(((f-spect_centr)**2), (ff / np.sum(ff)))
+        return np.dot(((f - spect_centroid) ** 2), (fmag / np.sum(fmag))) ** 0.5
 
 
-def spectral_skewness(sign, fs):
-    """Measures the asymmetry of a distribution around its mean value. Computed from the 3rd order moment.
+@set_domain("domain", "spectral")
+def spectral_slope(signal, fs):
+    """Computes the spectral slope.
 
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-    skeness: float
-        skeness
-    """
-    f, ff = plotfft(sign, fs)
-    spect_centr = spectral_centroid(sign, fs)
-    if not spectral_spread(sign, fs):
-        return 0
-    else:
-        skew = ((f - spect_centr) ** 3) * (ff / np.sum(ff))
-        return np.sum(skew) / (spectral_spread(sign, fs) ** (3 / 2))
+    Spectral slope is computed by finding constants m and b of the function aFFT = mf + b, obtained by linear regression
+    of the spectral amplitude.
 
-
-def spectral_kurtosis(sign, fs):
-    """Measures the flatness of a distribution around its mean value. Computed from the 4th order moment.
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
 
     Parameters
     ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which spectral slope is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    kurtosis: float
-        kurtosis
+    float
+        Spectral Slope
+
     """
-    f, ff = plotfft(sign, fs)
-    if not spectral_spread(sign, fs):
-        return 0
-    else:
-        spect_kurt = ((f - spectral_centroid(sign, fs)) ** 4) * (ff / np.sum(ff))
-        return np.sum(spect_kurt) / (spectral_spread(sign, fs)**2)
 
+    f, fmag = calc_fft(signal, fs)
 
-def spectral_slope(sign, fs):
-    """Computes the constants m and b of the function aFFT = mf + b, obtained by linear regression of the
-    spectral amplitude.
-
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-    m: float
-        slope
-    b: float
-        y-intercept
-    """
-    f, ff = plotfft(sign, fs)
-    if not(list(f)):
+    if not (list(f)) or (np.sum(fmag) == 0):
         return 0
     else:
         if not (len(f) * np.dot(f, f) - np.sum(f) ** 2):
             return 0
         else:
-            return (len(f) * np.dot(f, ff) - np.sum(f) * np.sum(ff)) / (len(f) * np.dot(f, f) - np.sum(f) ** 2)
+            num_ = (1 / np.sum(fmag)) * (len(f) * np.dot(f, fmag) - np.sum(f) * np.sum(fmag))
+            denom_ = (len(f) * np.dot(f, f) - np.sum(f) ** 2)
+            return num_ / denom_
 
 
-def spectral_decrease(sign, fs):
-    """Represents the amount of decraesing of the spectra amplitude.
+@set_domain("domain", "spectral")
+def spectral_variation(signal, fs):
+    """Computes the amount of variation of the spectrum along time.
 
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-        spectrak decrease
-    """
-    f, ff = plotfft(sign, fs)
+    Spectral variation is computed from the normalized cross-correlation between two consecutive amplitude spectra.
 
-    k = len(ff)
-    soma_num = 0
-    for a in range(2, k):
-        soma_num = soma_num + ((ff[a]-ff[1])/(a-1))
-
-    ff2 = ff[2:]
-    if not np.sum(ff2):
-        return 0
-    else:
-        soma_den = 1 / np.sum(ff2)
-        return soma_den * soma_num
-
-
-def spectral_roll_on(sign, fs):
-    """Compute the spectral roll-on of the signal, i.e., the frequency where 5% of the signal energy is contained
-    below of this value.
+    Description and formula in Article:
+    The Timbre Toolbox: Extracting audio descriptors from musicalsignals
+    Authors Peeters G., Giordano B., Misdariis P., McAdams S.
 
     Parameters
     ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which spectral variation is computed.
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    roll_off: float
-        spectral roll-on
-    """
-    output = 0
-    f, ff = plotfft(sign, fs)
-    cum_ff = np.cumsum(ff)
-    value = 0.05*(sum(ff))
-
-    for i in range(len(ff)):
-        if cum_ff[i] >= value:
-            output = f[i]
-            break
-    return output
-
-
-def spectral_roll_off(sign, fs):
-    """Compute the spectral roll-off of the signal, i.e., the frequency where 95% of the signal energy is contained
-    below of this value.
-
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-    roll_off: float
-        spectral roll-off
-    """
-    output = 0
-    f, ff = plotfft(sign, fs)
-    cum_ff = np.cumsum(ff)
-    value = 0.95*(sum(ff))
-
-    for i in range(len(ff)):
-        if cum_ff[i] >= value:
-            output = f[i]
-            break
-    return output
-
-
-def curve_distance(sign, fs):
-    """Euclidean distance of the signal's cumulative sum of the FFT elements to the respective linear regression.
-
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-    curve distance: float
-        curve distance
-    """
-    f, ff = plotfft(sign, fs)
-    cum_ff = np.cumsum(ff)
-    points_y = np.linspace(0, cum_ff[-1], len(cum_ff))
-
-    return np.sum(points_y-cum_ff)
-
-
-def spect_variation(sign, fs):
-    """Amount of variation of the spectrum along time. Computed from the normalized cross-correlation between two consecutive amplitude spectra.
-
-    Parameters
-    ----------
-    sign: ndarray
-        signal from which spectral slope is computed.
-    fs: int
-        sampling frequency of the signal
-    Returns
-    -------
-    variation: float
+    float
+        Spectral Variation
 
     """
-    f, ff = plotfft(sign, fs)
-    energy, freq = signal_energy(ff, f)
 
-    sum1 = 0
-    sum2 = 0
-    sum3 = 0
-    for a in range(len(energy)-1):
-        sum1 = sum1+(energy[a-1]*energy[a])
-        sum2 = sum2+(energy[a-1]**2)
-        sum3 = sum3+(energy[a]**2)
+    f, fmag = calc_fft(signal, fs)
+
+    sum1 = np.sum(np.array(fmag)[:-1] * np.array(fmag)[1:])
+    sum2 = np.sum(np.array(fmag)[1:] ** 2)
+    sum3 = np.sum(np.array(fmag)[:-1] ** 2)
 
     if not sum2 or not sum3:
         variation = 1
     else:
-        variation = 1-((sum1)/((sum2**0.5)*(sum3**0.5)))
+        variation = 1 - (sum1 / ((sum2 ** 0.5) * (sum3 ** 0.5)))
 
     return variation
 
 
-def variance(sign, FS):
-    """ Measures how far the numbers are spread out.
+@set_domain("domain", "spectral")
+def spectral_maxpeaks(signal, fs):
+    """Computes number of maximum spectral peaks of the signal.
 
     Parameters
     ----------
-    sig: ndarray
-        input from histogram is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Input from which the number of maximum spectral peaks is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    num_p: float
-        signal variance
+    float
+        Total number of maximum spectral peaks
 
     """
-    time = compute_time(sign, FS)
-    soma_den = 0
-    soma_num = 0
-    for z in range(0, len(sign)):
-        soma_num = soma_num + (time[z]*((sign[z]*np.mean(sign))**2))
-        soma_den = soma_den + time[z]
 
-    return soma_num/soma_den
+    f, fmag = calc_fft(signal, fs)
+    diff_sig = np.diff(fmag)
+
+    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
 
 
-def deviation(sign, FS):
-    """Temporal deviation.
+@set_domain("domain", "spectral")
+def spectral_roll_off(signal, fs):
+    """Computes the spectral roll-off of the signal.
+
+    The spectral roll-off corresponds to the frequency where 95% of the signal magnitude is contained
+    below of this value.
 
     Parameters
     ----------
-    sig: ndarray
-        input from histogram is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which spectral roll-off is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    deviation: float
-        temporal deviation
+    float
+        Spectral roll-off
 
     """
-    time = compute_time(sign, FS)
-    soma_den = 0
-    soma_num = 0
-    for z in range(0, len(sign)-1):
-        soma_num = soma_num+(time[z+1]*(sign[z+1]-sign[z]))
-        soma_den = soma_den+time[z+1]
 
-    return soma_num/soma_den
+    f, fmag = calc_fft(signal, fs)
+    cum_ff = np.cumsum(fmag)
+    value = 0.95 * (sum(fmag))
+
+    return f[np.where(cum_ff >= value)[0][0]]
 
 
-def linear_regression(sign):
-    """fits a liner equation to the observed data
+@set_domain("domain", "spectral")
+def spectral_roll_on(signal, fs):
+    """Computes the spectral roll-on of the signal.
+
+    The spectral roll-on corresponds to the frequency where 5% of the signal magnitude is contained
+    below of this value.
 
     Parameters
     ----------
-    sig: ndarray
-        input from histogram is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which spectral roll-on is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    num_p: float
-        slope
+    float
+        Spectral roll-on
 
     """
-    t = np.linspace(0, 5, len(sign))
 
-    return np.polyfit(t, sign, 1)[0]
+    f, fmag = calc_fft(signal, fs)
+    cum_ff = np.cumsum(fmag)
+    value = 0.05 * (sum(fmag))
+
+    return f[np.where(cum_ff >= value)[0][0]]
 
 
-def spectral_maxpeaks(sign, FS):
-    """Compute number of peaks along the specified axes.
+@set_domain("domain", "spectral")
+def human_range_energy(signal, fs):
+    """Computes the human range energy ratio.
+
+    The human range energy ratio is given by the ratio between the energy
+    in frequency 0.6-2.5Hz and the whole energy band.
 
     Parameters
     ----------
-    sig: ndarray
-        input from histogram is computed.
-    fs: int
-        sampling frequency of the signal
+    signal : nd-array
+        Signal from which human range energy ratio is computed
+    fs : int
+        Sampling frequency
+
     Returns
     -------
-    num_p: float
-        total number of peaks
+    float
+        Human range energy ratio
 
     """
-    f, ff = plotfft(sign, FS)
-    diff_sig = np.diff(ff)
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if (diff_sig[nd+1]<0 and diff_sig[nd]>0)])
+    f, fmag = calc_fft(signal, fs)
+
+    allenergy = np.sum(fmag ** 2)
+
+    if allenergy == 0:
+        # For handling the occurrence of Nan values
+        return 0.0
+
+    hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
+
+    ratio = hr_energy / allenergy
+
+    return ratio
+
+
+@set_domain("domain", "spectral")
+def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lifter=22):
+    """Computes the MEL cepstral coefficients.
+
+    It provides the information about the power in each frequency band.
+
+    Implementation details and description on:
+    https://www.kaggle.com/ilyamich/mfcc-implementation-and-tutorial
+    https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html#fnref:1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which MEL coefficients is computed
+    fs : int
+        Sampling frequency
+    pre_emphasis : float
+        Pre-emphasis coefficient for pre-emphasis filter application
+    nfft : int
+        Number of points of fft
+    nfilt : int
+        Number of filters
+    num_ceps: int
+        Number of cepstral coefficients
+    cep_lifter: int
+        Filter length
+
+    Returns
+    -------
+    nd-array
+        MEL cepstral coefficients
+
+    """
+
+    filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
+
+    mel_coeff = scipy.fftpack.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
+
+    mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
+
+    # liftering
+    ncoeff = len(mel_coeff)
+    n = np.arange(ncoeff)
+    lift = 1 + (cep_lifter / 2) * np.sin(np.pi * n / cep_lifter)  # cep_lifter = 22 from python_speech_features library
+
+    mel_coeff *= lift
+
+    return tuple(mel_coeff)
+
+
+@set_domain("domain", "spectral")
+def power_bandwidth(signal, fs):
+    """Computes power spectrum density bandwidth of the signal.
+
+    It corresponds to the width of the frequency band in which 95% of its power is located.
+
+    Description in article:
+    Power Spectrum and Bandwidth Ulf Henriksson, 2003 Translated by Mikael Olofsson, 2005
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the power bandwidth computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Occupied power in bandwidth
+
+    """
+
+    # Computing the power spectrum density
+    if np.std(signal) == 0:
+        freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
+    else:
+        freq, power = scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))
+
+    if np.sum(power) == 0:
+        return 0.0
+
+    # Computing the lower and upper limits of power bandwidth
+    cum_power = np.cumsum(power)
+    f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
+
+    cum_power_inv = np.cumsum(power[::-1])
+    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
+
+    # Returning the bandwidth in terms of frequency
+
+    return abs(f_upper - f_lower)
+
+
+@set_domain("domain", "spectral")
+def fft_mean_coeff(signal, fs, nfreq=256):
+    """Computes the mean value of each spectrogram frequency.
+
+    nfreq can not be higher than half signal length plus one.
+    When it does, it is automatically set to half signal length plus one.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which fft mean coefficients are computed
+    fs : int
+        Sampling frequency
+    nfreq : int
+        The number of frequencies
+
+    Returns
+    -------
+    nd-array
+        The mean value of each spectrogram frequency
+
+    """
+
+    if nfreq > len(signal) // 2 + 1:
+        nfreq = len(signal) // 2 + 1
+
+    fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
+
+    return tuple(fmag_mean)
+
+
+@set_domain("domain", "spectral")
+def lpcc(signal, n_coeff=12):
+    """Computes the linear prediction cepstral coefficients.
+
+    Implementation details and description in:
+    http://www.practicalcryptography.com/miscellaneous/machine-learning/tutorial-cepstrum-and-lpccs/
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from linear prediction cepstral coefficients are computed
+    n_coeff : int
+        Number of coefficients
+
+    Returns
+    -------
+    nd-array
+        Linear prediction cepstral coefficients
+
+    """
+
+    # 12-20 cepstral coefficients are sufficient for speech recognition
+    lpc_coeffs = lpc(signal, n_coeff)
+
+    if np.sum(lpc_coeffs) == 0:
+        return tuple(np.zeros(n_coeff))
+
+    # Power spectrum
+    powerspectrum = np.abs(np.fft.fft(lpc_coeffs)) ** 2
+    lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
+
+    return tuple(abs(lpcc_coeff))

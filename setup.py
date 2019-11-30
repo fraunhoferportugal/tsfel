@@ -4,20 +4,27 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open('requirements.txt', 'r') as f:
+    install_reqs = [
+        s for s in [
+            line.strip(' \n') for line in f
+        ] if not s.startswith('#') and s != ''
+    ]
+
 setuptools.setup(
     name="tsfel",
-    version="0.0.3",
+    version="0.0.4",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fraunhoferportugal/tsfel/",
-    package_data={'tsfel': ['utils/features.json', 'utils/client_secret.json']},
+    package_data={'tsfel': ['feature_extraction/features.json', 'utils/client_secret.json']},
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['scipy', 'pandas', 'matplotlib', 'numpy'],
+    install_requires=install_reqs
 )

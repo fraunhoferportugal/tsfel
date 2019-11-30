@@ -67,6 +67,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/descriptions/_generated/
 
 # PyBuilder
 target/
@@ -114,4 +115,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
-tests/test_get_features_result.csv
+notebooks/UCI HAR Dataset
+notebooks/__MACOSX
+notebooks/CorrelationReport.html
+notebooks/orange_input_test.csv
+notebooks/orange_input_train.csv
+notebooks/UCI HAR Dataset.zip
+
+
+

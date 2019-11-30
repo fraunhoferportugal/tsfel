@@ -1,6 +1,9 @@
+[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
-![py368 status](https://img.shields.io/badge/python3.6.8-supported-green.svg)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
+![PyPI](https://img.shields.io/pypi/v/tsfel)
+[![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/development/notebooks/TSFEL_HAR_Example.ipynb)
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
@@ -14,6 +17,7 @@ It does not requires installation as it relies on Google Colabs and a user inter
 Advanced users can take full potential of *TSFEL* by installing as a *python* package
 ```python
 pip install tsfel
+
 ```
 
 ## Includes a comprehensive number of features
@@ -26,5 +30,22 @@ pip install tsfel
 * **Unit tested**: we provide unit tests for each feature
 * **Easily extended**: adding new features is easy and we encourage you to contribute with your custom features
 
+## Get started
+The code below extracts all the available features on an example dataset file.
+
+```python
+import tsfel
+import pandas as pd
+
+# load dataset
+df = pd.read_csv('Dataset.txt')
+
+# Retrieves a pre-defined feature configuration file to extract all available features 
+cfg = tsfel.get_all_features()
+
+# Extract features
+X = tsfel.time_series_features_extractor(cfg, df) 
+```
+
 ## Acknowledgements
-We would like to acknowledge the financial support obtained from North Portugal Regional Operational Programme (NORTE 2020), Portugal 2020 and the European Regional Development Fund (ERDF) from European Union through the project Symbiotic technology for societal efficiency gains: Deus ex Machina (DEM), NORTE-01-0145-FEDER-000026.
+We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
