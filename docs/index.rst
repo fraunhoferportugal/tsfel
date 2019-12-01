@@ -25,7 +25,7 @@ Contents
 
    Get Started <descriptions/get_started>
    Feature List <descriptions/feature_list>
-   Contributing <descriptions/contributing>
+   Personalised Features <descriptions/personal>
    Module Reference <descriptions/modules>
    Authors <authors>
    Changelog <changelog>
@@ -54,7 +54,7 @@ The code below extracts all the available features on an example dataset.
     df = pd.read_csv('Dataset.txt')
 
     # Retrieves a pre-defined feature configuration file to extract all available features
-    cfg = tsfel.get_all_features()
+    cfg = tsfel.get_features_by_domain()
 
     # Extract features
     X = tsfel.time_series_features_extractor(cfg, df)
