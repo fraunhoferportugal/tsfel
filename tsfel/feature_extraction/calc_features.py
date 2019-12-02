@@ -163,14 +163,18 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
 
-    for wind_sig in signal_windows:
-        if isinstance(wind_sig, numbers.Real):
-            features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
-            feat_val = feat_val.append(features)
-            break
-        else:
-           features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
-           feat_val = feat_val.append(features)
+    if isinstance(signal_windows, pd.DataFrame):
+        features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+        feat_val = feat_val.append(features)
+    else:
+        for wind_sig in signal_windows:
+            if isinstance(wind_sig, numbers.Real):
+                features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+                feat_val = feat_val.append(features)
+                break
+            else:
+                features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+                feat_val = feat_val.append(features)
 
     if verbose == 1:
         print("*** Feature extraction finished ***")
@@ -251,7 +255,7 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                                 parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
 
                                 # raise a warning
-                                warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.")
+                                warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.", stacklevel=2)
                             else:
                                 raise SystemExit('No sampling frequency assigned.')
                         else:

@@ -102,6 +102,6 @@ def add_feature_json(features_path, json_path):
             print('Feature '+str(fname)+' was added.')
 
     if vset_domain is False:
-        warnings.warn('No features were added. Please declare @set_domain.')
+        warnings.warn('No features were added. Please declare @set_domain.', stacklevel=2)
 
 
