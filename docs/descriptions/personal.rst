@@ -5,7 +5,7 @@ Personalised features
 TSFEL provides a comprehensive set of features that can be applied in time series across several domains.
 
 We also provide flexibility for users who desire to add personalised features to those that are already available in the library.
-Personalised features are saved locally and users who want to share their implementations are welcomed to create a pull request. Contributions are more than welcome and greatly appreciated!
+Personalised features are saved locally and users who want to share their implementations can create a pull request. Contributions are more than welcome and greatly appreciated!
 
 1. Implement your feature
 -------------------------
@@ -38,33 +38,35 @@ An example of a feature implementation format is shown below.
 
         return feature
 
-The available domains are *Statistical*, *Spectral* and *Temporal*. Also, note that TSFEL uses the ``fs`` variable to represent the sampling frequency parameter. Use this notation to take full advantage of the library for features which require the sampling frequency.
+The available domains are *statistical*, *temporal* and *spectral*. Also, note that TSFEL uses the ``fs`` variable to represent the sampling frequency parameter. Use this notation to take full advantage of the library for features which require the sampling frequency.
 
 2. Add the new feature to features.json
 ---------------------------------------
 
-After implementing your feature, use ``add_feature_json`` function, from ``tsfel.add_personal_features``, to store your personal feature information. This method adds the personal features stored in ``personal_dir``.
+After implementing your feature, use the ``add_feature_json`` function from ``tsfel.add_personal_features`` to store your personal feature information. This method adds the metadata from previously implemented feature to a JSON file which is used as configurator in TSFEL.
+
+A JSON example file is available `here <https://github.com/fraunhoferportugal/tsfel/blob/development/tsfel/feature_extraction/features.json>`_.
 
 .. code:: python
 
     def add_feature_json(features_path, json_path):
-        """Adds new feature to features.json.
+    """Adds new feature to features.json.
 
-        Parameters
-        ----------
-        personal_dir: string
-            Personal Python module directory containing new features implementation.
+    Parameters
+    ----------
+    features_path: string
+        Personal Python module directory containing new features implementation.
 
-        json_dir: string
-            Personal .json file directory containing existing features from TSFEL.
-            New customised features will be added to file in this directory.
+    json_path: string
+        Personal .json file directory containing existing features from TSFEL.
+        New customised features will be added to file in this directory.
 
-        """
+    """
 
 3. Extract your feature
 -----------------------
 
-The newly implemented feature is ready to be extracted. You must pass as an argument the directory of the module where the implemented features in step 1 resides (``my_dir``). TSFEL will do the rest for you.
+The newly implemented feature is ready to be extracted. You must pass as an argument the path of the script where the implemented features in step 1 reside (``features_path``). TSFEL will do the rest for you.
 
 .. code:: python
 

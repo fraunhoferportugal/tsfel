@@ -1,5 +1,5 @@
 [![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
+[![license](https://img.shields.io/badge/License-BSD%203-brightgreen)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 ![PyPI](https://img.shields.io/pypi/v/tsfel)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
@@ -7,21 +7,20 @@
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
-This repository hosts the *TSFEL - Time Series Feature Extraction Library* python package. *TSFEL* assists researchers on exploratory feature extraction tasks on time series without requiring significant programming effort.
+This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers on exploratory feature extraction tasks on time series without requiring significant programming effort.
 
-Users can interact with *TSFEL* using two methods:
+Users can interact with TSFEL using two methods:
 ##### Online
 It does not requires installation as it relies on Google Colabs and a user interface provided by Google Sheets
 
 ##### Offline
-Advanced users can take full potential of *TSFEL* by installing as a *python* package
+Advanced users can take full potential of TSFEL by installing as a python package
 ```python
-pip install tsfel
-
+pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.4.zip
 ```
 
 ## Includes a comprehensive number of features
-*TSFEL* is optimized for time series and automatically extracts over 50 different features on the statistical, temporal and spectral domains.
+TSFEL is optimized for time series and **automatically extracts over 50 different features on the statistical, temporal and spectral domains.**
 
 ## Functionalities
 * **Intuitive, fast deployment and reproducible**: interactive UI for feature selection and customization
@@ -40,11 +39,11 @@ import pandas as pd
 # load dataset
 df = pd.read_csv('Dataset.txt')
 
-# Retrieves a pre-defined feature configuration file to extract all available features 
+# Retrieves a pre-defined feature configuration file to extract all available features
 cfg = tsfel.get_features_by_domain()
 
 # Extract features
-X = tsfel.time_series_features_extractor(cfg, df) 
+X = tsfel.time_series_features_extractor(cfg, df)
 ```
 
 ## Acknowledgements
