@@ -393,7 +393,7 @@ def hist(signal, nbins=10, r=1):
     signal : nd-array
         Input from histogram is computed
     nbins : int
-        The number of equal-width bins in the givel range
+        The number of equal-width bins in the given range
     r : float
         The lower(-r) and upper(r) range of the bins
 
@@ -1306,3 +1306,170 @@ def lpcc(signal, n_coeff=12):
     lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
 
     return tuple(abs(lpcc_coeff))
+
+
+@set_domain("domain", "spectral")
+def spectral_entropy(signal, fs):
+    """Computes the spectral entropy of the signal based on Fourier transform.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which spectral entropy is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        The normalized spectral entropy value
+
+    """
+    f, psd = scipy.signal.periodogram(signal, fs)
+
+    if psd.sum() == 0:
+        return 0.0
+
+    prob = np.divide(psd, psd.sum())
+
+    prob = prob[prob != 0]
+
+    return -np.multiply(prob, np.log2(prob)).sum() / np.log2(prob.size)
+
+
+@set_domain("domain", "spectral")
+def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT entropy of the signal.
+
+    Implementation details in:
+    https://dsp.stackexchange.com/questions/13055/how-to-calculate-cwt-shannon-entropy
+    B.F. Yan, A. Miyamoto, E. Bruhwiler, Wavelet transform-based modal parameter identification considering uncertainty
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    float
+        wavelet entropy
+
+    """
+    if np.sum(signal) == 0:
+        return 0.0
+
+    cwt = wavelet(signal, function, widths)
+    energy_scale = np.sum(np.abs(cwt), axis=1)
+    t_energy = np.sum(energy_scale)
+    prob = energy_scale/t_energy
+    w_entropy = -sum(prob*np.log(prob))
+
+    return w_entropy
+
+
+@set_domain("domain", "spectral")
+def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT absolute mean value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT absolute mean value
+
+    """
+
+    return tuple(abs(np.mean(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT std value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT std
+
+    """
+
+    return tuple((np.std(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT variance value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT variance
+
+    """
+
+    return tuple((np.var(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT energy of each wavelet scale.
+
+    Implementation details:
+    https://stackoverflow.com/questions/37659422/energy-for-1-d-wavelet-in-python
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT energy
+
+    """
+
+    cwt = wavelet(signal, function, widths)
+    energy = np.sqrt(np.sum(cwt**2, axis=1)/np.shape(cwt)[1])
+
+    return tuple(energy)
