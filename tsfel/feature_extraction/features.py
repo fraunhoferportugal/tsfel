@@ -1185,7 +1185,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fftpack.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
+    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
 
     mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
 

@@ -51,7 +51,7 @@ def calc_fft(signal, fs):
 
     """
 
-    fmag = abs(np.fft.fft(signal))
+    fmag = np.abs(np.fft.fft(signal))
     f = np.linspace(0, fs // 2, len(signal) // 2)
 
     return f[:len(signal) // 2].copy(), fmag[:len(signal) // 2].copy()
