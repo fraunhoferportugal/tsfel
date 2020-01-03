@@ -1325,12 +1325,17 @@ def spectral_entropy(signal, fs):
         The normalized spectral entropy value
 
     """
-    f, psd = scipy.signal.periodogram(signal, fs)
+    # Removing DC component
+    sig = signal-np.mean(signal)
 
-    if psd.sum() == 0:
+    f, fmag = calc_fft(sig, fs)
+
+    power = fmag**2
+
+    if power.sum() == 0:
         return 0.0
 
-    prob = np.divide(psd, psd.sum())
+    prob = np.divide(power, power.sum())
 
     prob = prob[prob != 0]
 

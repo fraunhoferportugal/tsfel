@@ -710,11 +710,11 @@ def test_spectral_entropy():
     np.testing.assert_equal(spectral_entropy(const1, Fs), 0.0)
     np.testing.assert_equal(spectral_entropy(constNeg, Fs), 0.0)
     np.testing.assert_equal(spectral_entropy(constF, Fs), 0.0)
-    np.testing.assert_equal(spectral_entropy(lin, Fs), 0.5881024983459412)
-    np.testing.assert_equal(spectral_entropy(lin0, Fs), 0.5647269341598912)
-    np.testing.assert_equal(spectral_entropy(wave, Fs), 1.5223415123909887e-29)
-    np.testing.assert_equal(spectral_entropy(offsetWave, Fs), 1.6751304789188756e-29)
-    np.testing.assert_equal(spectral_entropy(noiseWave, Fs), 0.030106308043884637)
+    np.testing.assert_equal(spectral_entropy(lin, Fs), 0.6006757398806453)
+    np.testing.assert_equal(spectral_entropy(lin0, Fs), 0.57319032538303)
+    np.testing.assert_equal(spectral_entropy(wave, Fs), 1.5228376718814352e-29)
+    np.testing.assert_equal(spectral_entropy(offsetWave, Fs), 1.783049297437309e-29)
+    np.testing.assert_equal(spectral_entropy(noiseWave, Fs), 0.030107186831275425)
 
 
 def test_wavelet_entropy():
