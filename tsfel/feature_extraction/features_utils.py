@@ -51,7 +51,7 @@ def calc_fft(signal, fs):
 
     """
 
-    fmag = abs(np.fft.fft(signal))
+    fmag = np.abs(np.fft.fft(signal))
     f = np.linspace(0, fs // 2, len(signal) // 2)
 
     return f[:len(signal) // 2].copy(), fmag[:len(signal) // 2].copy()
@@ -303,3 +303,35 @@ def gaussian(features):
     pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
 
     return np.array(pdf_gauss / np.sum(pdf_gauss))
+
+
+def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT (continuous wavelet transform) of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    nd-array
+        The result of the CWT along the time axis
+        matrix with size (len(widths),len(signal))
+
+    """
+
+    if isinstance(function, str):
+        function = eval(function)
+
+    if isinstance(widths, str):
+        widths = eval(widths)
+
+    cwt = scipy.signal.cwt(signal, function, widths)
+
+    return cwt
