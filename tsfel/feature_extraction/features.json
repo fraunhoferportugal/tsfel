@@ -340,6 +340,43 @@
       "parameters": "",
       "function": "tsfel.calc_var",
       "use": "yes"
+    },
+    "ECDF": {
+      "complexity": "linear",
+      "description": "Computes the values of ECDF (empirical cumulative distribution function) along the time axis.",
+      "function": "tsfel.ecdf",
+      "parameters": {
+        "d": 10
+      },
+      "use": "yes"
+    },
+    "ECDF Percentile": {
+      "complexity": "linear",
+      "description": "Determines the percentile value of the ECDF.",
+      "function": "tsfel.ecdf_percentile",
+      "parameters": {
+        "percentile": "[0.2, 0.8]"
+      },
+      "use": "yes"
+    },
+    "ECDF Slope": {
+      "complexity": "linear",
+      "description": "Computes the slope of the ECDF between two percentiles.",
+      "function": "tsfel.ecdf_slope",
+      "parameters": {
+        "p_end": 0.75,
+        "p_init": 0.5
+      },
+      "use": "yes"
+    },
+    "ECDF Percentile Count": {
+      "complexity": "linear",
+      "description": "Determines the cumulative sum of samples that are less than the percentile.",
+      "function": "tsfel.ecdf_percentile_count",
+      "parameters": {
+        "percentile": null
+      },
+      "use": "yes"
     }
   },
   "temporal": {

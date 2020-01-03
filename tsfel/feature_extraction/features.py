@@ -1,7 +1,5 @@
-import scipy
-import warnings
-import numpy as np
 import scipy.signal
+
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -636,6 +634,130 @@ def calc_var(signal):
     """
 
     return np.var(signal)
+
+
+@set_domain("domain", "statistical")
+def ecdf(signal, d=10):
+    """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    d: integer
+        Number of ECDF values to return
+
+    Returns
+    -------
+    float
+        The values of the ECDF along the time axis
+    """
+    if len(signal) <= d:
+        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)]))
+    else:
+        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])[:d])
+
+
+@set_domain("domain", "statistical")
+def ecdf_slope(signal, p_init=0.5, p_end=0.75):
+    """Computes the slope of the ECDF between two percentiles.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    p_init : float
+        Initial percentile
+    p_end : float
+        End percentile
+
+    Returns
+    -------
+    float
+        The slope of the ECDF between two percentiles
+    """
+    # check if signal is constant
+    if np.sum(np.diff(signal)) == 0:
+        return np.inf
+    else:
+        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
+        return (p_end - p_init) / (x_end - x_init)
+
+
+@set_domain("domain", "statistical")
+def ecdf_percentile(signal, percentile=None):
+    """Determines the percentile value of the ECDF.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    percentile: list
+        Percentile value to be computed
+
+    Returns
+    -------
+    float
+        The input value(s) of the ECDF
+    """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+    if type(percentile) in [float, int]:
+        percentile = [percentile]
+
+    # calculate ecdf
+    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+
+    if len(percentile) > 1:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return tuple(np.repeat(signal[0], len(percentile)))
+        else:
+            return tuple([np.sort(signal)[y <= p].max() for p in percentile])
+    else:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return signal[0]
+        else:
+            return np.sort(signal)[y <= percentile].max()
+
+
+@set_domain("domain", "statistical")
+def ecdf_percentile_count(signal, percentile=None):
+    """Determines the cumulative sum of samples that are less than the percentile.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    percentile: list
+        Percentile threshold
+
+    Returns
+    -------
+    float
+        The cumulative sum of samples
+    """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+    if type(percentile) in [float, int]:
+        percentile = [percentile]
+
+    # calculate ecdf
+    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+
+    if len(percentile) > 1:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return tuple(np.repeat(signal[0], len(percentile)))
+        else:
+            return tuple([np.sort(signal)[y <= p].shape[0] for p in percentile])
+    else:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return signal[0]
+        else:
+            return np.sort(signal)[y <= percentile].shape[0]
 
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #
@@ -1326,11 +1448,11 @@ def spectral_entropy(signal, fs):
 
     """
     # Removing DC component
-    sig = signal-np.mean(signal)
+    sig = signal - np.mean(signal)
 
     f, fmag = calc_fft(sig, fs)
 
-    power = fmag**2
+    power = fmag ** 2
 
     if power.sum() == 0:
         return 0.0
@@ -1372,8 +1494,8 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
     cwt = wavelet(signal, function, widths)
     energy_scale = np.sum(np.abs(cwt), axis=1)
     t_energy = np.sum(energy_scale)
-    prob = energy_scale/t_energy
-    w_entropy = -np.sum(prob*np.log(prob))
+    prob = energy_scale / t_energy
+    w_entropy = -np.sum(prob * np.log(prob))
 
     return w_entropy
 
@@ -1475,6 +1597,6 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
     """
 
     cwt = wavelet(signal, function, widths)
-    energy = np.sqrt(np.sum(cwt**2, axis=1)/np.shape(cwt)[1])
+    energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
