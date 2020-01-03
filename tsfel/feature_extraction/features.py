@@ -115,7 +115,7 @@ def mean_abs_diff(signal):
 
    """
 
-    return np.mean(abs(np.diff(signal)))
+    return np.mean(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -153,7 +153,7 @@ def median_abs_diff(signal):
 
    """
 
-    return np.median(abs(np.diff(signal)))
+    return np.median(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -213,7 +213,7 @@ def sum_abs_diff(signal):
 
    """
 
-    return np.sum(abs(np.diff(signal)))
+    return np.sum(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -375,10 +375,10 @@ def entropy(signal, prob='kde'):
     # Handling zero probability values
     p = p[np.where(p != 0)]
 
-    if sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+    if np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
         return 0.0
     else:
-        return - sum(p * np.log2(p)) / np.log2(len(signal))
+        return - np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -557,7 +557,7 @@ def mean_abs_deviation(signal):
 
     """
 
-    return np.mean(abs(signal - np.mean(signal, axis=0)), axis=0)
+    return np.mean(np.abs(signal - np.mean(signal, axis=0)), axis=0)
 
 
 @set_domain("domain", "statistical")
@@ -1080,7 +1080,7 @@ def spectral_roll_off(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.95 * (sum(fmag))
+    value = 0.95 * (np.sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1108,7 +1108,7 @@ def spectral_roll_on(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.05 * (sum(fmag))
+    value = 0.05 * (np.sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1142,7 +1142,7 @@ def human_range_energy(signal, fs):
         # For handling the occurrence of Nan values
         return 0.0
 
-    hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
+    hr_energy = np.sum(fmag[np.argmin(np.abs(0.6 - f)):np.argmin(np.abs(2.5 - f))] ** 2)
 
     ratio = hr_energy / allenergy
 
@@ -1236,11 +1236,11 @@ def power_bandwidth(signal, fs):
     f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
 
     cum_power_inv = np.cumsum(power[::-1])
-    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
+    f_upper = freq[np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
 
     # Returning the bandwidth in terms of frequency
 
-    return abs(f_upper - f_lower)
+    return np.abs(f_upper - f_lower)
 
 
 @set_domain("domain", "spectral")
@@ -1305,7 +1305,7 @@ def lpcc(signal, n_coeff=12):
     powerspectrum = np.abs(np.fft.fft(lpc_coeffs)) ** 2
     lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
 
-    return tuple(abs(lpcc_coeff))
+    return tuple(np.abs(lpcc_coeff))
 
 
 @set_domain("domain", "spectral")
@@ -1373,7 +1373,7 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
     energy_scale = np.sum(np.abs(cwt), axis=1)
     t_energy = np.sum(energy_scale)
     prob = energy_scale/t_energy
-    w_entropy = -sum(prob*np.log(prob))
+    w_entropy = -np.sum(prob*np.log(prob))
 
     return w_entropy
 
@@ -1399,7 +1399,7 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
 
     """
 
-    return tuple(abs(np.mean(wavelet(signal, function, widths), axis=1)))
+    return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
 
 
 @set_domain("domain", "spectral")
