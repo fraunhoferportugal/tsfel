@@ -26,7 +26,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     \**kwargs:
     See below:
         * *search_criteria* (``list``) --
-            List of file names to compute features. (Example: '/Accelerometer.txt')
+            List of file names to compute features. (Example: 'Accelerometer.txt')
             (default: ``None``)
 
         * *time_unit* (``float``) --

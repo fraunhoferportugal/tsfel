@@ -350,11 +350,11 @@ def test_pk_pk_distance():
     np.testing.assert_equal(pk_pk_distance(const1), 0.0)
     np.testing.assert_equal(pk_pk_distance(constNeg), 0.0)
     np.testing.assert_equal(pk_pk_distance(constF), 0.0)
-    np.testing.assert_equal(pk_pk_distance(lin), 19)
-    np.testing.assert_equal(pk_pk_distance(lin0), 20.0)
-    np.testing.assert_equal(pk_pk_distance(wave), 2.0)
-    np.testing.assert_equal(pk_pk_distance(offsetWave), 2.0)
-    np.testing.assert_equal(pk_pk_distance(noiseWave), 2.4800109800001993)
+    np.testing.assert_equal(pk_pk_distance(lin), 17.1)
+    np.testing.assert_equal(pk_pk_distance(lin0), 18.0)
+    np.testing.assert_equal(pk_pk_distance(wave), 1.9753766811902755)
+    np.testing.assert_equal(pk_pk_distance(offsetWave), 1.9753766811902755)
+    np.testing.assert_equal(pk_pk_distance(noiseWave), 2.0052536460296393)
 
 
 def test_slope():
@@ -374,11 +374,11 @@ def test_entropy():
     np.testing.assert_equal(entropy(const1), 0.0)
     np.testing.assert_equal(entropy(constNeg),0.0)
     np.testing.assert_equal(entropy(constF), 0.0)
-    np.testing.assert_equal(entropy(lin), 0.994983274605318)
-    np.testing.assert_equal(entropy(lin0), 0.994983274605318)
-    np.testing.assert_equal(entropy(wave), 0.9972021515128497)
-    np.testing.assert_equal(entropy(offsetWave), 0.99720215151285)
-    np.testing.assert_equal(entropy(noiseWave), 0.9957000733996481)
+    np.testing.assert_equal(entropy(lin), 0.9949832746053182)
+    np.testing.assert_equal(entropy(lin0), 0.9949832746053182)
+    np.testing.assert_equal(entropy(wave), 0.9972021515128485)
+    np.testing.assert_equal(entropy(offsetWave), 0.9972021515128485)
+    np.testing.assert_equal(entropy(noiseWave), 0.9957000733996463)
 
 
 # ################################################ SPECTRAL FEATURES ################################################# #

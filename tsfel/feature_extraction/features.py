@@ -1,7 +1,5 @@
-import scipy
-import warnings
-import numpy as np
 import scipy.signal
+
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -115,7 +113,7 @@ def mean_abs_diff(signal):
 
    """
 
-    return np.mean(abs(np.diff(signal)))
+    return np.mean(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -153,7 +151,7 @@ def median_abs_diff(signal):
 
    """
 
-    return np.median(abs(np.diff(signal)))
+    return np.median(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -213,7 +211,7 @@ def sum_abs_diff(signal):
 
    """
 
-    return np.sum(abs(np.diff(signal)))
+    return np.sum(np.abs(np.diff(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -375,10 +373,10 @@ def entropy(signal, prob='kde'):
     # Handling zero probability values
     p = p[np.where(p != 0)]
 
-    if sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+    if np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
         return 0.0
     else:
-        return - sum(p * np.log2(p)) / np.log2(len(signal))
+        return - np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -393,7 +391,7 @@ def hist(signal, nbins=10, r=1):
     signal : nd-array
         Input from histogram is computed
     nbins : int
-        The number of equal-width bins in the givel range
+        The number of equal-width bins in the given range
     r : float
         The lower(-r) and upper(r) range of the bins
 
@@ -557,7 +555,7 @@ def mean_abs_deviation(signal):
 
     """
 
-    return np.mean(abs(signal - np.mean(signal, axis=0)), axis=0)
+    return np.mean(np.abs(signal - np.mean(signal, axis=0)), axis=0)
 
 
 @set_domain("domain", "statistical")
@@ -636,6 +634,130 @@ def calc_var(signal):
     """
 
     return np.var(signal)
+
+
+@set_domain("domain", "statistical")
+def ecdf(signal, d=10):
+    """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    d: integer
+        Number of ECDF values to return
+
+    Returns
+    -------
+    float
+        The values of the ECDF along the time axis
+    """
+    if len(signal) <= d:
+        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)]))
+    else:
+        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])[:d])
+
+
+@set_domain("domain", "statistical")
+def ecdf_slope(signal, p_init=0.5, p_end=0.75):
+    """Computes the slope of the ECDF between two percentiles.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    p_init : float
+        Initial percentile
+    p_end : float
+        End percentile
+
+    Returns
+    -------
+    float
+        The slope of the ECDF between two percentiles
+    """
+    # check if signal is constant
+    if np.sum(np.diff(signal)) == 0:
+        return np.inf
+    else:
+        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
+        return (p_end - p_init) / (x_end - x_init)
+
+
+@set_domain("domain", "statistical")
+def ecdf_percentile(signal, percentile=None):
+    """Determines the percentile value of the ECDF.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    percentile: list
+        Percentile value to be computed
+
+    Returns
+    -------
+    float
+        The input value(s) of the ECDF
+    """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+    if type(percentile) in [float, int]:
+        percentile = [percentile]
+
+    # calculate ecdf
+    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+
+    if len(percentile) > 1:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return tuple(np.repeat(signal[0], len(percentile)))
+        else:
+            return tuple([np.sort(signal)[y <= p].max() for p in percentile])
+    else:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return signal[0]
+        else:
+            return np.sort(signal)[y <= percentile].max()
+
+
+@set_domain("domain", "statistical")
+def ecdf_percentile_count(signal, percentile=None):
+    """Determines the cumulative sum of samples that are less than the percentile.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    percentile: list
+        Percentile threshold
+
+    Returns
+    -------
+    float
+        The cumulative sum of samples
+    """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+    if type(percentile) in [float, int]:
+        percentile = [percentile]
+
+    # calculate ecdf
+    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+
+    if len(percentile) > 1:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return tuple(np.repeat(signal[0], len(percentile)))
+        else:
+            return tuple([np.sort(signal)[y <= p].shape[0] for p in percentile])
+    else:
+        # check if signal is constant
+        if np.sum(np.diff(signal)) == 0:
+            return signal[0]
+        else:
+            return np.sort(signal)[y <= percentile].shape[0]
 
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #
@@ -1080,7 +1202,7 @@ def spectral_roll_off(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.95 * (sum(fmag))
+    value = 0.95 * (np.sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1108,7 +1230,7 @@ def spectral_roll_on(signal, fs):
 
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
-    value = 0.05 * (sum(fmag))
+    value = 0.05 * (np.sum(fmag))
 
     return f[np.where(cum_ff >= value)[0][0]]
 
@@ -1142,7 +1264,7 @@ def human_range_energy(signal, fs):
         # For handling the occurrence of Nan values
         return 0.0
 
-    hr_energy = np.sum(fmag[np.argmin(abs(0.6 - f)):np.argmin(abs(2.5 - f))] ** 2)
+    hr_energy = np.sum(fmag[np.argmin(np.abs(0.6 - f)):np.argmin(np.abs(2.5 - f))] ** 2)
 
     ratio = hr_energy / allenergy
 
@@ -1185,7 +1307,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fftpack.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
+    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
 
     mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
 
@@ -1236,11 +1358,11 @@ def power_bandwidth(signal, fs):
     f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
 
     cum_power_inv = np.cumsum(power[::-1])
-    f_upper = freq[abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
+    f_upper = freq[np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
 
     # Returning the bandwidth in terms of frequency
 
-    return abs(f_upper - f_lower)
+    return np.abs(f_upper - f_lower)
 
 
 @set_domain("domain", "spectral")
@@ -1305,4 +1427,176 @@ def lpcc(signal, n_coeff=12):
     powerspectrum = np.abs(np.fft.fft(lpc_coeffs)) ** 2
     lpcc_coeff = np.fft.ifft(np.log(powerspectrum))
 
-    return tuple(abs(lpcc_coeff))
+    return tuple(np.abs(lpcc_coeff))
+
+
+@set_domain("domain", "spectral")
+def spectral_entropy(signal, fs):
+    """Computes the spectral entropy of the signal based on Fourier transform.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which spectral entropy is computed
+    fs : int
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        The normalized spectral entropy value
+
+    """
+    # Removing DC component
+    sig = signal - np.mean(signal)
+
+    f, fmag = calc_fft(sig, fs)
+
+    power = fmag ** 2
+
+    if power.sum() == 0:
+        return 0.0
+
+    prob = np.divide(power, power.sum())
+
+    prob = prob[prob != 0]
+
+    return -np.multiply(prob, np.log2(prob)).sum() / np.log2(prob.size)
+
+
+@set_domain("domain", "spectral")
+def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT entropy of the signal.
+
+    Implementation details in:
+    https://dsp.stackexchange.com/questions/13055/how-to-calculate-cwt-shannon-entropy
+    B.F. Yan, A. Miyamoto, E. Bruhwiler, Wavelet transform-based modal parameter identification considering uncertainty
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    float
+        wavelet entropy
+
+    """
+    if np.sum(signal) == 0:
+        return 0.0
+
+    cwt = wavelet(signal, function, widths)
+    energy_scale = np.sum(np.abs(cwt), axis=1)
+    t_energy = np.sum(energy_scale)
+    prob = energy_scale / t_energy
+    w_entropy = -np.sum(prob * np.log(prob))
+
+    return w_entropy
+
+
+@set_domain("domain", "spectral")
+def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT absolute mean value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT absolute mean value
+
+    """
+
+    return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT std value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT std
+
+    """
+
+    return tuple((np.std(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT variance value of each wavelet scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT variance
+
+    """
+
+    return tuple((np.var(wavelet(signal, function, widths), axis=1)))
+
+
+@set_domain("domain", "spectral")
+def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+    """Computes CWT energy of each wavelet scale.
+
+    Implementation details:
+    https://stackoverflow.com/questions/37659422/energy-for-1-d-wavelet-in-python
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which CWT is computed
+    function :  wavelet function
+        Default: scipy.signal.ricker
+    widths :  nd-array
+        Widths to use for transformation
+        Default: np.arange(1,10)
+
+    Returns
+    -------
+    tuple
+        CWT energy
+
+    """
+
+    cwt = wavelet(signal, function, widths)
+    energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
+
+    return tuple(energy)
