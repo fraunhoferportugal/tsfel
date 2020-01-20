@@ -355,7 +355,7 @@
       "description": "Determines the percentile value of the ECDF.",
       "function": "tsfel.ecdf_percentile",
       "parameters": {
-        "percentile": "[0.2, 0.8]"
+        "percentile": null
       },
       "use": "yes"
     },
