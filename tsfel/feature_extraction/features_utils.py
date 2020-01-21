@@ -335,3 +335,20 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     cwt = scipy.signal.cwt(signal, function, widths)
 
     return cwt
+
+
+def calc_ecdf(signal):
+    """Computes the ECDF of the signal.
+
+      Parameters
+      ----------
+      signal : nd-array
+          Input from which ECDF is computed
+      Returns
+      -------
+      nd-array
+        Sorted signal and computed ECDF.
+
+      """
+    return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
+

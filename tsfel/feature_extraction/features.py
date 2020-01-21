@@ -652,10 +652,11 @@ def ecdf(signal, d=10):
     float
         The values of the ECDF along the time axis
     """
+    _, y = calc_ecdf(signal)
     if len(signal) <= d:
-        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)]))
+        return tuple(y)
     else:
-        return tuple(np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])[:d])
+        return tuple(y[:d])
 
 
 @set_domain("domain", "statistical")
@@ -706,20 +707,20 @@ def ecdf_percentile(signal, percentile=None):
         percentile = [percentile]
 
     # calculate ecdf
-    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+    x, y = calc_ecdf(signal)
 
     if len(percentile) > 1:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
-            return tuple([np.sort(signal)[y <= p].max() for p in percentile])
+            return tuple([x[y <= p].max() for p in percentile])
     else:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
             return signal[0]
         else:
-            return np.sort(signal)[y <= percentile].max()
+            return x[y <= percentile].max()
 
 
 @set_domain("domain", "statistical")
@@ -744,20 +745,20 @@ def ecdf_percentile_count(signal, percentile=None):
         percentile = [percentile]
 
     # calculate ecdf
-    y = np.array([float((signal[signal <= i]).size) / signal.size for i in np.sort(signal)])
+    x, y = calc_ecdf(signal)
 
     if len(percentile) > 1:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
-            return tuple([np.sort(signal)[y <= p].shape[0] for p in percentile])
+            return tuple([x[y <= p].shape[0] for p in percentile])
     else:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
             return signal[0]
         else:
-            return np.sort(signal)[y <= percentile].shape[0]
+            return x[y <= percentile].shape[0]
 
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #

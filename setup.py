@@ -13,7 +13,7 @@ with open('requirements.txt', 'r') as f:
 
 setuptools.setup(
     name="tsfel",
-    version="0.1.0",
+    version="0.1.1-dev",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,
@@ -23,7 +23,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
     install_requires=install_reqs
