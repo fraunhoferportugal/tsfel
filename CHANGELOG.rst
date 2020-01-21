@@ -24,3 +24,8 @@ Version 0.1.1
     - Wavelet energy
 
 - Minor fixes for Google Colab
+
+Version 0.1.2
+=============
+
+- Bump to pypi 0.1.2
