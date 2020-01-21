@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/development/)
 [![license](https://img.shields.io/badge/License-BSD%203-brightgreen)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 ![PyPI](https://img.shields.io/pypi/v/tsfel)
@@ -16,11 +16,11 @@ It does not requires installation as it relies on Google Colabs and a user inter
 ##### Offline
 Advanced users can take full potential of TSFEL by installing as a python package
 ```python
-pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.0.4.zip
+pip install https://github.com/fraunhoferportugal/tsfel/archive/v0.1.1-dev.zip
 ```
 
 ## Includes a comprehensive number of features
-TSFEL is optimized for time series and **automatically extracts over 50 different features on the statistical, temporal and spectral domains.**
+TSFEL is optimized for time series and **automatically extracts over 60 different features on the statistical, temporal and spectral domains.**
 
 ## Functionalities
 * **Intuitive, fast deployment and reproducible**: interactive UI for feature selection and customization
