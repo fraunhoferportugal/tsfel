@@ -1,348 +1,254 @@
 {
   "spectral": {
     "FFT mean coefficient": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes the mean value of each spectrogram frequency.",
+      "function": "tsfel.fft_mean_coeff",
       "parameters": {
         "fs": 100,
         "nfreq": 256
       },
-      "function": "tsfel.fft_mean_coeff",
       "use": "yes"
     },
     "Fundamental frequency": {
       "complexity": "log",
       "description": "Computes the fundamental frequency.",
+      "function": "tsfel.fundamental_frequency",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.fundamental_frequency",
       "use": "yes"
     },
     "Human range energy": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the human range energy ratio given by the ratio between the energy in frequency 0.6-2.5Hz and the whole energy band.",
+      "function": "tsfel.human_range_energy",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.human_range_energy",
       "use": "yes"
     },
     "LPCC": {
       "complexity": "nlog",
       "description": "Computes the linear prediction cepstral coefficients.",
+      "function": "tsfel.lpcc",
       "parameters": {
         "n_coeff": 12
       },
-      "function": "tsfel.lpcc",
       "use": "yes"
     },
     "MFCC": {
       "complexity": "constant",
       "description": "Computes the MEL cepstral coefficients.",
+      "function": "tsfel.mfcc",
       "parameters": {
-        "fs": 100,
         "cep_lifter": 22,
+        "fs": 100,
         "nfft": 512,
         "nfilt": 40,
         "num_ceps": 12,
         "pre_emphasis": 0.97
       },
-      "function": "tsfel.mfcc",
       "use": "yes"
     },
     "Max power spectrum": {
       "complexity": "log",
       "description": "Computes the maximum power spectrum density.",
+      "function": "tsfel.max_power_spectrum",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.max_power_spectrum",
       "use": "yes"
     },
     "Maximum frequency": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the maximum frequency.",
+      "function": "tsfel.max_frequency",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.max_frequency",
       "use": "yes"
     },
     "Median frequency": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the median frequency.",
+      "function": "tsfel.median_frequency",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.median_frequency",
       "use": "yes"
     },
     "Power bandwidth": {
       "complexity": "log",
       "description": "Computes power spectrum density bandwidth of the signal.",
+      "function": "tsfel.power_bandwidth",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.power_bandwidth",
       "use": "yes"
     },
     "Spectral centroid": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the barycenter of the spectrum.",
+      "function": "tsfel.spectral_centroid",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_centroid",
       "use": "yes"
     },
     "Spectral decrease": {
       "complexity": "log",
       "description": "Computes the amount of decreasing of the spectra amplitude.",
+      "function": "tsfel.spectral_decrease",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_decrease",
       "use": "yes"
     },
     "Spectral distance": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the signal spectral distance.",
+      "function": "tsfel.spectral_distance",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_distance",
+      "use": "yes"
+    },
+    "Spectral entropy": {
+      "complexity": "linear",
+      "description": "Computes the spectral entropy of the signal based on Fourier transform.",
+      "function": "tsfel.spectral_entropy",
+      "parameters": {
+        "fs": 100
+      },
       "use": "yes"
     },
     "Spectral kurtosis": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the flatness of a distribution around its mean value.",
+      "function": "tsfel.spectral_kurtosis",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_kurtosis",
       "use": "yes"
     },
     "Spectral maximum peaks": {
       "complexity": "linear",
       "description": "Computes the number of maximum spectral peaks.",
+      "function": "tsfel.spectral_maxpeaks",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_maxpeaks",
       "use": "yes"
     },
     "Spectral roll-off": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the frequency where 95% of the signal magnitude is contained below of this value.",
+      "function": "tsfel.spectral_roll_off",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_roll_off",
       "use": "yes"
     },
     "Spectral roll-on": {
       "complexity": "log",
       "description": "Computes the frequency where 5% of the signal magnitude is contained below of this value.",
+      "function": "tsfel.spectral_roll_on",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_roll_on",
       "use": "yes"
     },
     "Spectral skewness": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the asymmetry of a distribution around its mean value.",
+      "function": "tsfel.spectral_skewness",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_skewness",
       "use": "yes"
     },
     "Spectral slope": {
-      "complexity": "constant",
+      "complexity": "linear",
       "description": "Computes the spectral slope, obtained by linear regression of the spectral amplitude.",
+      "function": "tsfel.spectral_slope",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_slope",
       "use": "yes"
     },
     "Spectral spread": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes the spread of the spectrum around its mean value.",
+      "function": "tsfel.spectral_spread",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_spread",
       "use": "yes"
     },
     "Spectral variation": {
       "complexity": "log",
       "description": "Computes the amount of variation of the spectrum along time.",
-      "parameters": {
-        "fs": 100
-      },
       "function": "tsfel.spectral_variation",
-      "use": "yes"
-    },
-    "Spectral entropy": {
-      "complexity": "constant",
-      "description": "Computes the spectral entropy of the signal based on Fourier transform.",
       "parameters": {
         "fs": 100
       },
-      "function": "tsfel.spectral_entropy",
-      "use": "yes"
-    },
-    "Wavelet entropy": {
-      "complexity": "log",
-      "description": "Computes CWT entropy of the signal.",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "function": "tsfel.wavelet_entropy",
       "use": "yes"
     },
     "Wavelet absolute mean": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes CWT absolute mean value of each wavelet scale.",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
       "function": "tsfel.wavelet_abs_mean",
-      "use": "yes"
-    },
-    "Wavelet standard deviation": {
-      "complexity": "log",
-      "description": "Computes CWT std value of each wavelet scale.",
       "parameters": {
         "function": "scipy.signal.ricker",
         "widths": "np.arange(1,10)"
       },
-      "function": "tsfel.wavelet_std",
-      "use": "yes"
-    },
-    "Wavelet variance": {
-      "complexity": "log",
-      "description": "Computes CWT variance value of each wavelet scale.",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "function": "tsfel.wavelet_var",
       "use": "yes"
     },
     "Wavelet energy": {
-      "complexity": "log",
+      "complexity": "linear",
       "description": "Computes CWT energy of each wavelet scale.",
+      "function": "tsfel.wavelet_energy",
       "parameters": {
         "function": "scipy.signal.ricker",
         "widths": "np.arange(1,10)"
       },
-      "function": "tsfel.wavelet_energy",
+      "use": "yes"
+    },
+    "Wavelet entropy": {
+      "complexity": "linear",
+      "description": "Computes CWT entropy of the signal.",
+      "function": "tsfel.wavelet_entropy",
+      "parameters": {
+        "function": "scipy.signal.ricker",
+        "widths": "np.arange(1,10)"
+      },
+      "use": "yes"
+    },
+    "Wavelet standard deviation": {
+      "complexity": "linear",
+      "description": "Computes CWT std value of each wavelet scale.",
+      "function": "tsfel.wavelet_std",
+      "parameters": {
+        "function": "scipy.signal.ricker",
+        "widths": "np.arange(1,10)"
+      },
+      "use": "yes"
+    },
+    "Wavelet variance": {
+      "complexity": "linear",
+      "description": "Computes CWT variance value of each wavelet scale.",
+      "function": "tsfel.wavelet_var",
+      "parameters": {
+        "function": "scipy.signal.ricker",
+        "widths": "np.arange(1,10)"
+      },
       "use": "yes"
     }
   },
   "statistical": {
-    "Histogram": {
-      "complexity": "constant",
-      "description": "Computes histogram of the signal.",
-      "parameters": {
-        "nbins": 10,
-        "r": 1
-      },
-      "function": "tsfel.hist",
-      "use": "yes"
-    },
-    "Interquartile range": {
-      "complexity": "constant",
-      "description": "Computes interquartile range of the signal.",
-      "parameters": "",
-      "function": "tsfel.interq_range",
-      "use": "yes"
-    },
-    "Kurtosis": {
-      "complexity": "constant",
-      "description": "Computes kurtosis of the signal.",
-      "parameters": "",
-      "function": "tsfel.kurtosis",
-      "use": "yes"
-    },
-    "Max": {
-      "complexity": "constant",
-      "description": "Computes the maximum value of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_max",
-      "use": "yes"
-    },
-    "Mean": {
-      "complexity": "constant",
-      "description": "Computes the mean value of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_mean",
-      "use": "yes"
-    },
-    "Mean absolute deviation": {
-      "complexity": "constant",
-      "description": "Computes mean absolute deviation of the signal.",
-      "parameters": "",
-      "function": "tsfel.mean_abs_deviation",
-      "use": "yes"
-    },
-    "Median": {
-      "complexity": "constant",
-      "description": "Computes median of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_median",
-      "use": "yes"
-    },
-    "Median absolute deviation": {
-      "complexity": "constant",
-      "description": "Computes median absolute deviation of the signal.",
-      "parameters": "",
-      "function": "tsfel.median_abs_deviation",
-      "use": "yes"
-    },
-    "Min": {
-      "complexity": "constant",
-      "description": "Computes the minimum value of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_min",
-      "use": "yes"
-    },
-    "Root mean square": {
-      "complexity": "constant",
-      "description": "Computes root mean square of the signal.",
-      "parameters": "",
-      "function": "tsfel.rms",
-      "use": "yes"
-    },
-    "Skewness": {
-      "complexity": "constant",
-      "description": "Computes skewness of the signal.",
-      "parameters": "",
-      "function": "tsfel.skewness",
-      "use": "yes"
-    },
-    "Standard deviation": {
-      "complexity": "constant",
-      "description": "Computes standard deviation of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_std",
-      "use": "yes"
-    },
-    "Variance": {
-      "complexity": "constant",
-      "description": "Computes variance of the signal.",
-      "parameters": "",
-      "function": "tsfel.calc_var",
-      "use": "yes"
-    },
     "ECDF": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the values of ECDF (empirical cumulative distribution function) along the time axis.",
       "function": "tsfel.ecdf",
       "parameters": {
@@ -351,7 +257,7 @@
       "use": "yes"
     },
     "ECDF Percentile": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Determines the percentile value of the ECDF.",
       "function": "tsfel.ecdf_percentile",
       "parameters": {
@@ -359,8 +265,17 @@
       },
       "use": "yes"
     },
+    "ECDF Percentile Count": {
+      "complexity": "log",
+      "description": "Determines the cumulative sum of samples that are less than the percentile.",
+      "function": "tsfel.ecdf_percentile_count",
+      "parameters": {
+        "percentile": null
+      },
+      "use": "yes"
+    },
     "ECDF Slope": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the slope of the ECDF between two percentiles.",
       "function": "tsfel.ecdf_slope",
       "parameters": {
@@ -369,142 +284,227 @@
       },
       "use": "yes"
     },
-    "ECDF Percentile Count": {
-      "complexity": "linear",
-      "description": "Determines the cumulative sum of samples that are less than the percentile.",
-      "function": "tsfel.ecdf_percentile_count",
+    "Histogram": {
+      "complexity": "constant",
+      "description": "Computes histogram of the signal.",
+      "function": "tsfel.hist",
       "parameters": {
-        "percentile": null
+        "nbins": 10,
+        "r": 1
       },
+      "use": "yes"
+    },
+    "Interquartile range": {
+      "complexity": "constant",
+      "description": "Computes interquartile range of the signal.",
+      "function": "tsfel.interq_range",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Kurtosis": {
+      "complexity": "constant",
+      "description": "Computes kurtosis of the signal.",
+      "function": "tsfel.kurtosis",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Max": {
+      "complexity": "constant",
+      "description": "Computes the maximum value of the signal.",
+      "function": "tsfel.calc_max",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Mean": {
+      "complexity": "constant",
+      "description": "Computes the mean value of the signal.",
+      "function": "tsfel.calc_mean",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Mean absolute deviation": {
+      "complexity": "constant",
+      "description": "Computes mean absolute deviation of the signal.",
+      "function": "tsfel.mean_abs_deviation",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Median": {
+      "complexity": "constant",
+      "description": "Computes median of the signal.",
+      "function": "tsfel.calc_median",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Median absolute deviation": {
+      "complexity": "constant",
+      "description": "Computes median absolute deviation of the signal.",
+      "function": "tsfel.median_abs_deviation",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Min": {
+      "complexity": "constant",
+      "description": "Computes the minimum value of the signal.",
+      "function": "tsfel.calc_min",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Root mean square": {
+      "complexity": "constant",
+      "description": "Computes root mean square of the signal.",
+      "function": "tsfel.rms",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Skewness": {
+      "complexity": "constant",
+      "description": "Computes skewness of the signal.",
+      "function": "tsfel.skewness",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Standard deviation": {
+      "complexity": "constant",
+      "description": "Computes standard deviation of the signal.",
+      "function": "tsfel.calc_std",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Variance": {
+      "complexity": "constant",
+      "description": "Computes variance of the signal.",
+      "function": "tsfel.calc_var",
+      "parameters": "",
       "use": "yes"
     }
   },
   "temporal": {
-    "Autocorrelation": {
-      "complexity": "constant",
-      "description": "Computes autocorrelation of the signal.",
+    "Absolute energy": {
+      "complexity": "log",
+      "description": "Computes the absolute energy of the signal.",
+      "function": "tsfel.abs_energy",
       "parameters": "",
-      "function": "tsfel.autocorr",
       "use": "yes"
     },
-    "Centroid": {
-      "complexity": "log",
-      "description": "Computes the centroid along the time axis.",
+    "Area under the curve": {
+      "complexity": "linear",
+      "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
+      "function": "tsfel.auc",
       "parameters": {
         "fs": 100
       },
+      "use": "yes"
+    },
+    "Autocorrelation": {
+      "complexity": "log",
+      "description": "Computes autocorrelation of the signal.",
+      "function": "tsfel.autocorr",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Centroid": {
+      "complexity": "linear",
+      "description": "Computes the centroid along the time axis.",
       "function": "tsfel.calc_centroid",
+      "parameters": {
+        "fs": 100
+      },
+      "use": "yes"
+    },
+    "Entropy": {
+      "complexity": "squared",
+      "description": "Computes the entropy of the signal using the Shannon Entropy.",
+      "function": "tsfel.entropy",
+      "parameters": {
+        "prob": "kde"
+      },
       "use": "yes"
     },
     "Maximum peaks": {
       "complexity": "linear",
       "description": "Computes number of maximum peaks of the signal.",
-      "parameters": "",
       "function": "tsfel.maxpeaks",
+      "parameters": "",
       "use": "yes"
     },
     "Mean absolute diff": {
       "complexity": "constant",
       "description": "Computes mean absolute differences of the signal.",
-      "parameters": "",
       "function": "tsfel.mean_abs_diff",
+      "parameters": "",
       "use": "yes"
     },
     "Mean diff": {
       "complexity": "constant",
       "description": "Computes mean of differences of the signal.",
-      "parameters": "",
       "function": "tsfel.mean_diff",
+      "parameters": "",
       "use": "yes"
     },
     "Median absolute diff": {
       "complexity": "constant",
       "description": "Computes median absolute differences of the signal.",
-      "parameters": "",
       "function": "tsfel.median_abs_diff",
+      "parameters": "",
       "use": "yes"
     },
     "Median diff": {
       "complexity": "constant",
       "description": "Computes median of differences of the signal.",
-      "parameters": "",
       "function": "tsfel.median_diff",
+      "parameters": "",
       "use": "yes"
     },
     "Minimum peaks": {
       "complexity": "linear",
       "description": "Computes number of minimum peaks of the signal.",
-      "parameters": "",
       "function": "tsfel.minpeaks",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Peak to peak distance": {
+      "complexity": "constant",
+      "description": "Computes the peak to peak distance.",
+      "function": "tsfel.pk_pk_distance",
+      "parameters": "",
       "use": "yes"
     },
     "Signal distance": {
       "complexity": "linear",
       "description": "Computes signal traveled distance.",
-      "parameters": "",
       "function": "tsfel.distance",
-      "use": "yes"
-    },
-    "Sum absolute diff": {
-      "complexity": "constant",
-      "description": "Computes sum of absolute differences of the signal.",
       "parameters": "",
-      "function": "tsfel.sum_abs_diff",
-      "use": "yes"
-    },
-    "Total energy": {
-      "complexity": "log",
-      "description": "Computes the total energy of the signal.",
-      "parameters": {
-        "fs": 100
-      },
-      "function": "tsfel.total_energy",
       "use": "yes"
     },
     "Slope": {
       "complexity": "log",
       "description": "Computes the slope of the signal by fitting a linear equation to the observed data.",
-      "parameters": "",
       "function": "tsfel.slope",
-      "use": "yes"
-    },
-    "Zero crossing rate": {
-      "complexity": "constant",
       "parameters": "",
-      "description": "Computes Zero-crossing rate of the signal.",
-      "function": "tsfel.zero_cross",
       "use": "yes"
     },
-    "Area under the curve": {
-      "complexity": "log",
+    "Sum absolute diff": {
+      "complexity": "constant",
+      "description": "Computes sum of absolute differences of the signal.",
+      "function": "tsfel.sum_abs_diff",
+      "parameters": "",
+      "use": "yes"
+    },
+    "Total energy": {
+      "complexity": "linear",
+      "description": "Computes the total energy of the signal.",
+      "function": "tsfel.total_energy",
       "parameters": {
         "fs": 100
       },
-      "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
-      "function": "tsfel.auc",
       "use": "yes"
     },
-    "Absolute energy": {
+    "Zero crossing rate": {
       "complexity": "log",
+      "description": "Computes Zero-crossing rate of the signal.",
+      "function": "tsfel.zero_cross",
       "parameters": "",
-      "description": "Computes the absolute energy of the signal.",
-      "function": "tsfel.abs_energy",
-      "use": "yes"
-    },
-    "Peak to peak distance": {
-      "complexity": "log",
-      "parameters": "",
-      "description": "Computes the peak to peak distance.",
-      "function": "tsfel.pk_pk_distance",
-      "use": "yes"
-    },
-    "Entropy": {
-      "complexity": "log",
-      "parameters": {
-        "prob": "kde"
-      },
-      "description": "Computes the entropy of the signal using the Shannon Entropy.",
-      "function": "tsfel.entropy",
       "use": "yes"
     }
   }
