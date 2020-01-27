@@ -190,24 +190,25 @@ def test_rms():
 
 
 def test_ecdf():
-    np.testing.assert_almost_equal(ecdf(const0), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
-    np.testing.assert_almost_equal(ecdf(const1), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
-    np.testing.assert_almost_equal(ecdf(constNeg), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
-    np.testing.assert_almost_equal(ecdf(constF), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+    np.testing.assert_almost_equal(ecdf(const0), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
+    np.testing.assert_almost_equal(ecdf(const1), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
+    np.testing.assert_almost_equal(ecdf(constNeg), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
+    np.testing.assert_almost_equal(ecdf(constF), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
     np.testing.assert_almost_equal(ecdf(lin), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
     np.testing.assert_almost_equal(ecdf(lin0), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
-    np.testing.assert_almost_equal(ecdf(wave), (0.005, 0.005, 0.005, 0.005, 0.005, 0.012, 0.012, 0.012, 0.012, 0.012))
-    np.testing.assert_almost_equal(ecdf(offsetWave), (0.005, 0.005, 0.005, 0.005, 0.005, 0.012, 0.012, 0.012, 0.012,
-                                                      0.012))
+    np.testing.assert_almost_equal(ecdf(wave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                                                0.01))
+    np.testing.assert_almost_equal(ecdf(offsetWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                                                      0.01))
     np.testing.assert_almost_equal(ecdf(noiseWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                                                      0.01))
 
 
 def test_ecdf_percentile():
-    np.testing.assert_almost_equal(ecdf_percentile(const0), 0)
-    np.testing.assert_almost_equal(ecdf_percentile(const1), 1)
-    np.testing.assert_almost_equal(ecdf_percentile(constNeg), -1)
-    np.testing.assert_almost_equal(ecdf_percentile(constF), 2.5)
+    np.testing.assert_almost_equal(ecdf_percentile(const0), (0, 0))
+    np.testing.assert_almost_equal(ecdf_percentile(const1), (1, 1))
+    np.testing.assert_almost_equal(ecdf_percentile(constNeg), (-1, -1))
+    np.testing.assert_almost_equal(ecdf_percentile(constF), (2.5, 2.5))
     np.testing.assert_almost_equal(ecdf_percentile(lin), (3, 15))
     np.testing.assert_almost_equal(ecdf_percentile(lin0), (-6.8421053, 5.7894737))
     np.testing.assert_almost_equal(ecdf_percentile(wave), (-0.809017, 0.809017))
@@ -235,7 +236,7 @@ def test_ecdf_percentile_count():
     np.testing.assert_almost_equal(ecdf_percentile_count(lin), (4, 16))
     np.testing.assert_almost_equal(ecdf_percentile_count(lin0), (4, 16))
     np.testing.assert_almost_equal(ecdf_percentile_count(wave), (200, 800))
-    np.testing.assert_almost_equal(ecdf_percentile_count(offsetWave), (199, 799))
+    np.testing.assert_almost_equal(ecdf_percentile_count(offsetWave), (200, 800))
     np.testing.assert_almost_equal(ecdf_percentile_count(noiseWave), (200, 800))
 
 
