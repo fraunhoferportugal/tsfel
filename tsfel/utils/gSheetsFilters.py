@@ -130,7 +130,7 @@ def extract_sheet(gsheet_name, **kwargs):
                                 param = ''
 
                     curve = feat_dict['complexity']
-                    curves_all = ['linear', 'log', 'square', 'nlog', 'constant']
+                    curves_all = ['linear', 'log', 'squared', 'nlog', 'constant']
                     complexity = compute_complexity(feat, domain,
                                                     path_json) if curve not in curves_all else 1 if curve in [
                         'constant', 'log'] else 2 if curve == 'linear' else 3
@@ -195,3 +195,4 @@ def extract_sheet(gsheet_name, **kwargs):
             print('Unknown domain at cell', int(ii + 5))
 
     return dict_features
+

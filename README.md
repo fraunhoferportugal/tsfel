@@ -46,5 +46,82 @@ cfg = tsfel.get_features_by_domain()
 X = tsfel.time_series_features_extractor(cfg, df)
 ```
 
+
+### Feature Extraction
+
+#### Spectral domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| FFT mean coefficient       |          1         |
+| Fundamental frequency      |          1         |
+| Human range energy         |          2         |
+| LPCC                       |          3         |
+| MFCC                       |          1         |
+| Max power spectrum         |          1         |
+| Maximum frequency          |          2         |
+| Median frequency           |          2         |
+| Power bandwidth            |          1         |
+| Spectral centroid          |          2         |
+| Spectral decrease          |          1         |
+| Spectral distance          |          2         |
+| Spectral kurtosis          |          2         |
+| Spectral maximum peaks     |          2         |
+| Spectral roll-off          |          2         |
+| Spectral roll-on           |          1         |
+| Spectral skewness          |          2         |
+| Spectral slope             |          2         |
+| Spectral spread            |          2         |
+| Spectral variation         |          1         |
+| Spectral entropy           |          2         |
+| Wavelet entropy            |          2         |
+| Wavelet absolute mean      |          2         |
+| Wavelet standard deviation |          2         |
+| Wavelet variance           |          2         |
+| Wavelet energy             |          2         |
+
+
+#### Statistical domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| ECDF                       |          1         |
+| ECDF Percentile            |          1         |
+| ECDF Percentile Count      |          1         |
+| ECDF Slope                 |          1         |
+| Histogram                  |          1         |
+| Interquartile range        |          1         |
+| Kurtosis                   |          1         |
+| Max                        |          1         |
+| Mean                       |          1         |
+| Mean absolute deviation    |          1         |
+| Median                     |          1         |
+| Median absolute deviation  |          1         |
+| Min                        |          1         |
+| Root mean square           |          1         |
+| Skewness                   |          1         |
+| Standard deviation         |          1         |
+| Variance                   |          1         |
+
+
+#### Temporal domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| Absolute energy            |          1         |
+| Area under the curve       |          2         |
+| Autocorrelation            |          1         |
+| Centroid                   |          2         |
+| Entropy                    |          3         |
+| Maximum peaks              |          2         |
+| Mean absolute diff         |          1         |
+| Mean diff                  |          1         |
+| Median absolute diff       |          1         |
+| Median diff                |          1         |
+| Minimum peaks              |          2         |
+| Peak to peak distance      |          1         |
+| Signal distance            |          2         |
+| Slope                      |          1         |
+| Sum absolute diff          |          1         |
+| Total energy               |          2         |
+| Zero crossing rate         |          1         |
+
 ## Acknowledgements
 We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
