@@ -27,9 +27,7 @@ def compute_time(signal, fs):
 
     """
 
-    time = range(len(signal))
-    time = [float(x) / fs for x in time]
-    return time
+    return np.arange(0, len(signal))/fs
 
 
 def calc_fft(signal, fs):
@@ -148,8 +146,8 @@ def autocorr_norm(signal):
 
     """
 
-    signal = signal - np.mean(signal)
-    r = np.correlate(signal, signal, mode='full')[-len(signal):]
+    signal = np.copy(signal - signal.mean())
+    r = scipy.signal.correlate(signal, signal)[-len(signal):]
 
     if np.sum(signal) == 0:
         return np.zeros(len(signal))
@@ -180,10 +178,11 @@ def create_symmetric_matrix(acf, n_coeff=12):
     """
 
     smatrix = np.empty((n_coeff, n_coeff))
+    xx = np.arange(n_coeff)
+    j = np.tile(xx, n_coeff)
+    i = np.repeat(xx, n_coeff)
+    smatrix[i, j] = acf[np.abs(i - j)]
 
-    for i in range(n_coeff):
-        for j in range(n_coeff):
-            smatrix[i, j] = acf[np.abs(i - j)]
     return smatrix
 
 
@@ -215,7 +214,7 @@ def lpc(signal, n_coeff=12):
         return tuple(np.zeros(n_coeff))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), r)
-    lpc_coeffs = lpc_coeffs / np.max(np.abs(lpc_coeffs))
+    lpc_coeffs = lpc_coeffs / (abs(lpc_coeffs).max())
 
     return tuple(lpc_coeffs)
 

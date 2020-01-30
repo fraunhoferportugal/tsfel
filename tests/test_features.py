@@ -426,11 +426,11 @@ def test_entropy():
     np.testing.assert_almost_equal(entropy(const1), 0.0)
     np.testing.assert_almost_equal(entropy(constNeg), 0.0)
     np.testing.assert_almost_equal(entropy(constF), 0.0)
-    np.testing.assert_almost_equal(entropy(lin), 0.994983274605318)
-    np.testing.assert_almost_equal(entropy(lin0), 0.994983274605318)
-    np.testing.assert_almost_equal(entropy(wave), 0.9972021515128497)
-    np.testing.assert_almost_equal(entropy(offsetWave), 0.99720215151285)
-    np.testing.assert_almost_equal(entropy(noiseWave), 0.9957000733996481)
+    np.testing.assert_almost_equal(entropy(lin), 1.0)
+    np.testing.assert_almost_equal(entropy(lin0), 1.0)
+    np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
+    np.testing.assert_almost_equal(entropy(offsetWave), 0.8890012261845581)
+    np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
 
 # ################################################ SPECTRAL FEATURES ################################################# #

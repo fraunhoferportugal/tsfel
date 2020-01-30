@@ -20,7 +20,7 @@
       "use": "yes"
     },
     "Human range energy": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the human range energy ratio given by the ratio between the energy in frequency 0.6-2.5Hz and the whole energy band.",
       "function": "tsfel.human_range_energy",
       "parameters": {
@@ -29,7 +29,7 @@
       "use": "yes"
     },
     "LPCC": {
-      "complexity": "nlog",
+      "complexity": "log",
       "description": "Computes the linear prediction cepstral coefficients.",
       "function": "tsfel.lpcc",
       "parameters": {
@@ -61,7 +61,7 @@
       "use": "yes"
     },
     "Maximum frequency": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the maximum frequency.",
       "function": "tsfel.max_frequency",
       "parameters": {
@@ -70,7 +70,7 @@
       "use": "yes"
     },
     "Median frequency": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the median frequency.",
       "function": "tsfel.median_frequency",
       "parameters": {
@@ -106,7 +106,7 @@
       "use": "yes"
     },
     "Spectral distance": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the signal spectral distance.",
       "function": "tsfel.spectral_distance",
       "parameters": {
@@ -115,7 +115,7 @@
       "use": "yes"
     },
     "Spectral entropy": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the spectral entropy of the signal based on Fourier transform.",
       "function": "tsfel.spectral_entropy",
       "parameters": {
@@ -133,7 +133,7 @@
       "use": "yes"
     },
     "Spectral maximum peaks": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the number of maximum spectral peaks.",
       "function": "tsfel.spectral_maxpeaks",
       "parameters": {
@@ -142,7 +142,7 @@
       "use": "yes"
     },
     "Spectral roll-off": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the frequency where 95% of the signal magnitude is contained below of this value.",
       "function": "tsfel.spectral_roll_off",
       "parameters": {
@@ -169,7 +169,7 @@
       "use": "yes"
     },
     "Spectral slope": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the spectral slope, obtained by linear regression of the spectral amplitude.",
       "function": "tsfel.spectral_slope",
       "parameters": {
@@ -285,7 +285,7 @@
       "use": "yes"
     },
     "Histogram": {
-      "complexity": "constant",
+      "complexity": "log",
       "description": "Computes histogram of the signal.",
       "function": "tsfel.hist",
       "parameters": {
@@ -323,7 +323,7 @@
       "use": "yes"
     },
     "Mean absolute deviation": {
-      "complexity": "constant",
+      "complexity": "log",
       "description": "Computes mean absolute deviation of the signal.",
       "function": "tsfel.mean_abs_deviation",
       "parameters": "",
@@ -388,7 +388,7 @@
       "use": "yes"
     },
     "Area under the curve": {
-      "complexity": "linear",
+      "complexity": "log",
       "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
       "function": "tsfel.auc",
       "parameters": {
@@ -397,14 +397,14 @@
       "use": "yes"
     },
     "Autocorrelation": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes autocorrelation of the signal.",
       "function": "tsfel.autocorr",
       "parameters": "",
       "use": "yes"
     },
     "Centroid": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes the centroid along the time axis.",
       "function": "tsfel.calc_centroid",
       "parameters": {
@@ -413,16 +413,16 @@
       "use": "yes"
     },
     "Entropy": {
-      "complexity": "squared",
+      "complexity": "log",
       "description": "Computes the entropy of the signal using the Shannon Entropy.",
       "function": "tsfel.entropy",
       "parameters": {
-        "prob": "kde"
+        "prob": "standard"
       },
       "use": "yes"
     },
     "Maximum peaks": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes number of maximum peaks of the signal.",
       "function": "tsfel.maxpeaks",
       "parameters": "",
@@ -457,7 +457,7 @@
       "use": "yes"
     },
     "Minimum peaks": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes number of minimum peaks of the signal.",
       "function": "tsfel.minpeaks",
       "parameters": "",
@@ -471,7 +471,7 @@
       "use": "yes"
     },
     "Signal distance": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes signal traveled distance.",
       "function": "tsfel.distance",
       "parameters": "",
@@ -492,7 +492,7 @@
       "use": "yes"
     },
     "Total energy": {
-      "complexity": "linear",
+      "complexity": "constant",
       "description": "Computes the total energy of the signal.",
       "function": "tsfel.total_energy",
       "parameters": {
@@ -501,7 +501,7 @@
       "use": "yes"
     },
     "Zero crossing rate": {
-      "complexity": "log",
+      "complexity": "constant",
       "description": "Computes Zero-crossing rate of the signal.",
       "function": "tsfel.zero_cross",
       "parameters": "",
