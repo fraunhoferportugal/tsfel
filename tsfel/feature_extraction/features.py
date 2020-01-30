@@ -30,7 +30,7 @@ def autocorr(signal):
 def calc_centroid(signal, fs):
     """Computes the centroid along the time axis.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -65,7 +65,7 @@ def calc_centroid(signal, fs):
 def minpeaks(signal):
     """Computes number of minimum peaks of the signal.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -78,15 +78,17 @@ def minpeaks(signal):
 
     """
     diff_sig = np.diff(signal)
+    array_signal = np.arange(len(diff_sig[:-1]))
+    min_peaks = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd] < 0) and (diff_sig[nd + 1] > 0))])
+    return len(min_peaks)
 
 
 @set_domain("domain", "temporal")
 def maxpeaks(signal):
     """Computes number of maximum peaks of the signal.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -101,7 +103,11 @@ def maxpeaks(signal):
     """
     diff_sig = np.diff(signal)
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
+    array_signal = np.arange(len(diff_sig[:-1]))
+
+    max_peaks = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+
+    return len(max_peaks)
 
 
 @set_domain("domain", "temporal")
@@ -121,7 +127,6 @@ def mean_abs_diff(signal):
        Mean absolute difference result
 
    """
-
     return np.mean(np.abs(np.diff(signal)))
 
 
@@ -142,7 +147,6 @@ def mean_diff(signal):
        Mean difference result
 
    """
-
     return np.mean(np.diff(signal))
 
 
@@ -163,7 +167,6 @@ def median_abs_diff(signal):
        Median absolute difference result
 
    """
-
     return np.median(np.abs(np.diff(signal)))
 
 
@@ -184,7 +187,6 @@ def median_diff(signal):
        Median difference result
 
    """
-
     return np.median(np.diff(signal))
 
 
@@ -195,7 +197,7 @@ def distance(signal):
     Calculates the total distance traveled by the signal
     using the hipotenusa between 2 datapoints.
 
-   Feature computational cost: 2
+   Feature computational cost: 1
 
     Parameters
     ----------
@@ -209,7 +211,7 @@ def distance(signal):
 
     """
     diff_sig = np.diff(signal)
-    return np.sum([np.sqrt(1 + df ** 2) for df in diff_sig])
+    return np.sum([np.sqrt(1 + diff_sig ** 2)])
 
 
 @set_domain("domain", "temporal")
@@ -229,7 +231,6 @@ def sum_abs_diff(signal):
        Sum absolute difference result
 
    """
-
     return np.sum(np.abs(np.diff(signal)))
 
 
@@ -253,7 +254,6 @@ def zero_cross(signal):
         Number of times that signal value cross the zero axis
 
     """
-
     return len(np.where(np.diff(np.sign(signal)))[0])
 
 
@@ -261,7 +261,7 @@ def zero_cross(signal):
 def total_energy(signal, fs):
     """Computes the total energy of the signal.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -276,7 +276,6 @@ def total_energy(signal, fs):
         Total energy
 
     """
-
     time = compute_time(signal, fs)
 
     return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
@@ -310,7 +309,7 @@ def slope(signal):
 def auc(signal, fs):
     """Computes the area under the curve of the signal computed with trapezoid rule.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -346,7 +345,6 @@ def abs_energy(signal):
         Absolute energy
 
     """
-
     return np.sum(signal ** 2)
 
 
@@ -367,19 +365,18 @@ def pk_pk_distance(signal):
         peak to peak distance
 
     """
-
     return np.abs(np.max(signal) - np.min(signal))
 
 
 @set_domain("domain", "temporal")
-def entropy(signal, prob='kde'):
+def entropy(signal, prob='standard'):
     """Computes the entropy of the signal using the Shannon Entropy.
 
     Description in Article:
     Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
     Authors: Crutchfield J. Feldman David
 
-    Feature computational cost: 3
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -395,7 +392,10 @@ def entropy(signal, prob='kde'):
 
     """
 
-    if prob == 'kde':
+    if prob == 'standard':
+        value, counts = np.unique(signal, return_counts=True)
+        p = counts / counts.sum()
+    elif prob == 'kde':
         p = kde(signal)
     elif prob == 'gauss':
         p = gaussian(signal)
@@ -436,7 +436,6 @@ def hist(signal, nbins=10, r=1):
         The values of the histogram
 
     """
-
     histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
 
     return tuple(histsig)
@@ -459,7 +458,6 @@ def interq_range(signal):
         Interquartile range result
 
     """
-
     return np.percentile(signal, 75) - np.percentile(signal, 25)
 
 
@@ -480,7 +478,6 @@ def kurtosis(signal):
         Kurtosis result
 
     """
-
     return scipy.stats.kurtosis(signal)
 
 
@@ -501,7 +498,6 @@ def skewness(signal):
         Skewness result
 
     """
-
     return scipy.stats.skew(signal)
 
 
@@ -522,7 +518,6 @@ def calc_max(signal):
         Maximum result
 
     """
-
     return np.max(signal)
 
 
@@ -543,7 +538,6 @@ def calc_min(signal):
         Minimum result
 
     """
-
     return np.min(signal)
 
 
@@ -564,7 +558,6 @@ def calc_mean(signal):
         Mean result
 
     """
-
     return np.mean(signal)
 
 
@@ -605,7 +598,6 @@ def mean_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-
     return np.mean(np.abs(signal - np.mean(signal, axis=0)), axis=0)
 
 
@@ -626,7 +618,6 @@ def median_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-
     return scipy.stats.median_absolute_deviation(signal, scale=1)
 
 
@@ -649,7 +640,6 @@ def rms(signal):
         Root mean square
 
     """
-
     return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
 
 
@@ -670,7 +660,6 @@ def calc_std(signal):
         Standard deviation result
 
     """
-
     return np.std(signal)
 
 
@@ -691,7 +680,6 @@ def calc_var(signal):
         Variance result
 
     """
-
     return np.var(signal)
 
 
@@ -841,7 +829,7 @@ def spectral_distance(signal, fs):
     Distance of the signal's cumulative sum of the FFT elements to
     the respective linear regression.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -856,7 +844,6 @@ def spectral_distance(signal, fs):
         spectral distance
 
     """
-
     f, fmag = calc_fft(signal, fs)
 
     cum_fmag = np.cumsum(fmag)
@@ -889,7 +876,6 @@ def fundamental_frequency(signal, fs):
        Predominant frequency of the signal
 
     """
-
     signal = signal - np.mean(signal)
     f, fmag = calc_fft(signal, fs)
 
@@ -932,7 +918,6 @@ def max_power_spectrum(signal, fs):
         Max value of the power spectrum density
 
     """
-
     if np.std(signal) == 0:
         return float(max(scipy.signal.welch(signal, int(fs), nperseg=len(signal))[1]))
     else:
@@ -957,7 +942,6 @@ def max_frequency(signal, fs):
     float
         0.95 of maximum frequency using cumsum
     """
-
     f, fmag = calc_fft(signal, fs)
     cum_fmag = np.cumsum(fmag)
 
@@ -973,7 +957,7 @@ def max_frequency(signal, fs):
 def median_frequency(signal, fs):
     """Computes median frequency of the signal.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -987,7 +971,6 @@ def median_frequency(signal, fs):
     f_median : int
        0.50 of maximum frequency using cumsum.
     """
-
     f, fmag = calc_fft(signal, fs)
     cum_fmag = np.cumsum(fmag)
     try:
@@ -1022,7 +1005,6 @@ def spectral_centroid(signal, fs):
         Centroid
 
     """
-
     f, fmag = calc_fft(signal, fs)
     if not np.sum(fmag):
         return 0
@@ -1053,7 +1035,6 @@ def spectral_decrease(signal, fs):
         Spectral decrease
 
     """
-
     f, fmag = calc_fft(signal, fs)
 
     fmag_band = fmag[1:]
@@ -1095,7 +1076,6 @@ def spectral_kurtosis(signal, fs):
         Spectral Kurtosis
 
     """
-
     f, fmag = calc_fft(signal, fs)
     if not spectral_spread(signal, fs):
         return 0
@@ -1127,7 +1107,6 @@ def spectral_skewness(signal, fs):
         Spectral Skewness
 
     """
-
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
 
@@ -1161,7 +1140,6 @@ def spectral_spread(signal, fs):
         Spectral Spread
 
     """
-
     f, fmag = calc_fft(signal, fs)
     spect_centroid = spectral_centroid(signal, fs)
 
@@ -1182,7 +1160,7 @@ def spectral_slope(signal, fs):
     The Timbre Toolbox: Extracting audio descriptors from musicalsignals
     Authors Peeters G., Giordano B., Misdariis P., McAdams S.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -1197,18 +1175,22 @@ def spectral_slope(signal, fs):
         Spectral Slope
 
     """
-
     f, fmag = calc_fft(signal, fs)
+    sum_fmag = fmag.sum()
+    dot_ff = (f*f).sum()
+    sum_f = f.sum()
+    len_f = len(f)
 
-    if not (list(f)) or (np.sum(fmag) == 0):
+    if not ([f]) or (sum_fmag == 0):
         return 0
     else:
-        if not (len(f) * np.dot(f, f) - np.sum(f) ** 2):
+        if not (len_f * dot_ff - sum_f ** 2):
             return 0
         else:
-            num_ = (1 / np.sum(fmag)) * (len(f) * np.dot(f, fmag) - np.sum(f) * np.sum(fmag))
-            denom_ = (len(f) * np.dot(f, f) - np.sum(f) ** 2)
+            num_ = (1 / sum_fmag) * (len_f * np.sum(f*fmag) - sum_f * sum_fmag)
+            denom_ = (len_f * dot_ff - sum_f ** 2)
             return num_ / denom_
+
 
 
 @set_domain("domain", "spectral")
@@ -1236,7 +1218,6 @@ def spectral_variation(signal, fs):
         Spectral Variation
 
     """
-
     f, fmag = calc_fft(signal, fs)
 
     sum1 = np.sum(np.array(fmag)[:-1] * np.array(fmag)[1:])
@@ -1255,7 +1236,7 @@ def spectral_variation(signal, fs):
 def spectral_maxpeaks(signal, fs):
     """Computes number of maximum spectral peaks of the signal.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -1270,12 +1251,14 @@ def spectral_maxpeaks(signal, fs):
         Total number of maximum spectral peaks
 
     """
-
     f, fmag = calc_fft(signal, fs)
     diff_sig = np.diff(fmag)
 
-    return np.sum([1 for nd in range(len(diff_sig[:-1])) if ((diff_sig[nd + 1] < 0) and (diff_sig[nd] > 0))])
+    array_signal = np.arange(len(diff_sig[:-1]))
 
+    max_s_peaks = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+
+    return len(max_s_peaks)
 
 @set_domain("domain", "spectral")
 def spectral_roll_off(signal, fs):
@@ -1284,7 +1267,7 @@ def spectral_roll_off(signal, fs):
     The spectral roll-off corresponds to the frequency where 95% of the signal magnitude is contained
     below of this value.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -1299,7 +1282,6 @@ def spectral_roll_off(signal, fs):
         Spectral roll-off
 
     """
-
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
     value = 0.95 * (np.sum(fmag))
@@ -1329,7 +1311,6 @@ def spectral_roll_on(signal, fs):
         Spectral roll-on
 
     """
-
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
     value = 0.05 * (np.sum(fmag))
@@ -1359,7 +1340,6 @@ def human_range_energy(signal, fs):
         Human range energy ratio
 
     """
-
     f, fmag = calc_fft(signal, fs)
 
     allenergy = np.sum(fmag ** 2)
@@ -1410,7 +1390,6 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
         MEL cepstral coefficients
 
     """
-
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
     mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
@@ -1451,7 +1430,6 @@ def power_bandwidth(signal, fs):
         Occupied power in bandwidth
 
     """
-
     # Computing the power spectrum density
     if np.std(signal) == 0:
         freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
@@ -1497,7 +1475,6 @@ def fft_mean_coeff(signal, fs, nfreq=256):
         The mean value of each spectrogram frequency
 
     """
-    signal = np.array(signal)
     if nfreq > len(signal) // 2 + 1:
         nfreq = len(signal) // 2 + 1
 
@@ -1513,7 +1490,7 @@ def lpcc(signal, n_coeff=12):
     Implementation details and description in:
     http://www.practicalcryptography.com/miscellaneous/machine-learning/tutorial-cepstrum-and-lpccs/
 
-    Feature computational cost: 3
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -1528,7 +1505,6 @@ def lpcc(signal, n_coeff=12):
         Linear prediction cepstral coefficients
 
     """
-
     # 12-20 cepstral coefficients are sufficient for speech recognition
     lpc_coeffs = lpc(signal, n_coeff)
 
@@ -1546,7 +1522,7 @@ def lpcc(signal, n_coeff=12):
 def spectral_entropy(signal, fs):
     """Computes the spectral entropy of the signal based on Fourier transform.
 
-    Feature computational cost: 2
+    Feature computational cost: 1
 
     Parameters
     ----------
@@ -1638,7 +1614,6 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
         CWT absolute mean value
 
     """
-
     return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
 
 
@@ -1664,7 +1639,6 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
         CWT std
 
     """
-
     return tuple((np.std(wavelet(signal, function, widths), axis=1)))
 
 
@@ -1690,7 +1664,6 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
         CWT variance
 
     """
-
     return tuple((np.var(wavelet(signal, function, widths), axis=1)))
 
 
@@ -1719,9 +1692,7 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
         CWT energy
 
     """
-
     cwt = wavelet(signal, function, widths)
     energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
-
