@@ -3,10 +3,12 @@ Changelog
 =========
 
 
-Version 0.1.0
+Version 0.1.3
 =============
 
-- Release of TSFEL with documentation.
+- Bug fixes on computational complexity calculation (`#15 <https://github.com/fraunhoferportugal/tsfel/pull/15>`_)
+
+
 
 Version 0.1.1
 =============
@@ -24,3 +26,9 @@ Version 0.1.1
     - Wavelet energy
 
 - Minor fixes for Google Colab
+
+
+Version 0.1.0
+=============
+
+- Release of TSFEL with documentation
