@@ -8,6 +8,10 @@ import importlib
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from tqdm import tqdm as load_bar
+from tqdm import tqdm_notebook as load_bar_notebook
+import multiprocessing as mp
+from functools import partial
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -116,6 +120,34 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         print('Features files saved in: ', output_directory)
 
 
+def calc_features(wind_sig, dict_features, fs, **kwargs):
+    """Extraction of time series features.
+
+    Parameters
+    ----------
+    wind_sig: list
+        Input from which features are computed, window
+    dict_features : dict
+        Dictionary with features
+    fs : int or None
+        Sampling frequency
+    \**kwargs:
+        * *features_path* (``string``) --
+            Directory of script with personal features
+
+    Returns
+    -------
+    DataFrame
+        Extracted features
+
+    """
+
+    features_path = kwargs.get('features_path', None)
+    feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+    feat_val.reset_index(drop=True)
+    return feat_val
+
+
 def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, verbose=1, **kwargs):
     """Extraction of time series features.
 
@@ -159,23 +191,32 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
 
-    feat_val = pd.DataFrame()
     if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
 
-    for wind_sig in signal_windows:
-        if isinstance(wind_sig, numbers.Real):
-            features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
-            feat_val = feat_val.append(features)
-            break
+    if get_ipython().__class__.__name__ == 'TerminalInteractiveShell':
+        bar = load_bar
+    elif get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
+        bar = load_bar_notebook
+
+    if isinstance(signal_windows, pd.DataFrame):
+        features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+    else:
+        if isinstance(signal_windows[0], numbers.Real):
+            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+            feat_val.reset_index(drop=True)
+            return feat_val
         else:
-           features = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
-           feat_val = feat_val.append(features)
+            values = bar(signal_windows)
+            pool = mp.Pool(mp.cpu_count())
+            features = pool.map(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), values)
+            features = pd.concat(features, axis=0)
+            pool.close()
 
     if verbose == 1:
         print("*** Feature extraction finished ***")
 
-    return feat_val.reset_index(drop=True)
+    return features.reset_index(drop=True)
 
 
 def calc_window_features(dict_features, signal_window, fs, **kwargs):
@@ -286,9 +327,9 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
 
                     # Function returns more than one element
                     if type(eval_result) == tuple:
+                        if np.isnan(eval_result[0]):
+                            eval_result = np.zeros(len(eval_result))
                         for rr in range(len(eval_result)):
-                            if np.isnan(eval_result[0]):
-                                eval_result = np.zeros(len(eval_result))
                             feature_results += [eval_result[rr]]
                             feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
                     else:
