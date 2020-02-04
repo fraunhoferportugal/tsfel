@@ -206,7 +206,8 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
 
         i = 0
         for feat in features:
-            printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
+            if verbose == 1:
+                printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
             features_final = features_final.append(feat)
             i += 1
 
