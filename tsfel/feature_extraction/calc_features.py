@@ -194,24 +194,28 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
 
-    if isinstance(signal_windows[0], numbers.Real):
-        feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
-        feat_val.reset_index(drop=True)
-        return feat_val
+    features_final = pd.DataFrame()
+
+    if isinstance(signal_windows, pd.DataFrame):
+        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
     else:
-        features_final = pd.DataFrame()
+        if isinstance(signal_windows[0], numbers.Real):
+            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+            feat_val.reset_index(drop=True)
+            return feat_val
+        else:
 
-        pool = mp.Pool(mp.cpu_count())
-        features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
+            pool = mp.Pool(mp.cpu_count())
+            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
 
-        i = 0
-        for feat in features:
-            if verbose == 1:
-                printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
-            features_final = features_final.append(feat)
-            i += 1
+            i = 0
+            for feat in features:
+                if verbose == 1:
+                    printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
+                features_final = features_final.append(feat)
+                i += 1
 
-        pool.close()
+            pool.close()
 
     if verbose == 1:
         print("\n"+"*** Feature extraction finished ***")
