@@ -8,10 +8,9 @@ import importlib
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from tqdm import tqdm as load_bar
-from tqdm import tqdm_notebook as load_bar_notebook
 import multiprocessing as mp
 from functools import partial
+from tsfel.feature_extraction.features_settings import printprogressbar
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -145,6 +144,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     features_path = kwargs.get('features_path', None)
     feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
     feat_val.reset_index(drop=True)
+
     return feat_val
 
 
@@ -194,29 +194,28 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
 
-    if get_ipython().__class__.__name__ == 'TerminalInteractiveShell':
-        bar = load_bar
-    elif get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
-        bar = load_bar_notebook
-
-    if isinstance(signal_windows, pd.DataFrame):
-        features = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+    if isinstance(signal_windows[0], numbers.Real):
+        feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+        feat_val.reset_index(drop=True)
+        return feat_val
     else:
-        if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
-            feat_val.reset_index(drop=True)
-            return feat_val
-        else:
-            values = bar(signal_windows)
-            pool = mp.Pool(mp.cpu_count())
-            features = pool.map(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), values)
-            features = pd.concat(features, axis=0)
-            pool.close()
+        features_final = pd.DataFrame()
+
+        pool = mp.Pool(mp.cpu_count())
+        features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
+
+        i = 0
+        for feat in features:
+            printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
+            features_final = features_final.append(feat)
+            i += 1
+
+        pool.close()
 
     if verbose == 1:
-        print("*** Feature extraction finished ***")
+        print("\n"+"*** Feature extraction finished ***")
 
-    return features.reset_index(drop=True)
+    return features_final.reset_index(drop=True)
 
 
 def calc_window_features(dict_features, signal_window, fs, **kwargs):
