@@ -1,8 +1,6 @@
 from tsfel.feature_extraction.features import *
 from numpy.testing import run_module_suite
 
-from tsfel.feature_extraction.features import *
-
 # Implementing signals for testing features
 
 const0 = np.zeros(20)
