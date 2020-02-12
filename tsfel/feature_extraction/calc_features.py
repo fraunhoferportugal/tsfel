@@ -10,7 +10,7 @@ import pandas as pd
 from pathlib import Path
 import multiprocessing as mp
 from functools import partial
-from tsfel.feature_extraction.features_settings import printprogressbar
+from tsfel.utils.progress_bar import printprogressbar
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -208,12 +208,10 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
             pool = mp.Pool(mp.cpu_count())
             features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
 
-            i = 0
-            for feat in features:
+            for i, feat in enumerate(features):
                 if verbose == 1:
                     printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
                 features_final = features_final.append(feat)
-                i += 1
 
             pool.close()
 
