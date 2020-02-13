@@ -1,5 +1,7 @@
+from IPython.display import HTML
 
-def printprogressbar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printend="\r"):
+
+def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printend="\r"):
     """Call in a loop to create terminal progress bar.
 
     Parameters
@@ -29,3 +31,20 @@ def printprogressbar(iteration, total, prefix='', suffix='', decimals=1, length=
     # Print New Line on Complete
     if iteration == total:
         print()
+
+
+def progress_bar_notebook(value, max_value=100):
+    result = int((value/max_value)*100)
+    return HTML("""
+              <p>
+                  Progress: {result}% Complete
+              <p/>            
+              <progress
+                  value='{value}'
+                  max='{max_value}',
+                  style='width: 25%',
+              >
+                  {value}
+              </progress>
+
+    """.format(value=value, max_value=max_value, result=result))

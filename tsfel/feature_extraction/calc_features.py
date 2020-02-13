@@ -10,7 +10,7 @@ import pandas as pd
 from pathlib import Path
 import multiprocessing as mp
 from functools import partial
-from tsfel.utils.progress_bar import printprogressbar
+from tsfel.utils.progress_bar import progress_bar_terminal, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -206,11 +206,16 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         else:
 
             pool = mp.Pool(mp.cpu_count())
-            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
-
+            features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
+            if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
+                out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
             for i, feat in enumerate(features):
                 if verbose == 1:
-                    printprogressbar(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete', length=50)
+                    if get_ipython().__class__.__name__ == 'TerminalInteractiveShell':
+                        progress_bar_terminal(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete',
+                                              length=50)
+                    elif (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
+                        out.update(progress_bar_notebook(i + 1, len(signal_windows)))
                 features_final = features_final.append(feat)
 
             pool.close()
