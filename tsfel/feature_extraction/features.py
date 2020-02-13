@@ -879,20 +879,15 @@ def fundamental_frequency(signal, fs):
     signal = signal - np.mean(signal)
     f, fmag = calc_fft(signal, fs)
 
-    # Condition for offset removal, since the offset generates a peak at frequency zero
-    try:
-        # With 0.1 the offset frequency is discarded
-        cond = np.where(f > 0.1)[0][0]
-    except IndexError:
-        cond = 0
-
     # Finding big peaks, not considering noise peaks with low amplitude
-    bp = scipy.signal.find_peaks(fmag[cond:], threshold=10)[0]
+
+    bp = scipy.signal.find_peaks(fmag, height=max(fmag)*0.3)[0]
+
+    # # Condition for offset removal, since the offset generates a peak at frequency zero
+    bp = bp[bp != 0]
     if not list(bp):
         f0 = 0
     else:
-        # add cond for correcting the indices position
-        bp = bp + cond
         # f0 is the minimum big peak frequency
         f0 = f[min(bp)]
 
