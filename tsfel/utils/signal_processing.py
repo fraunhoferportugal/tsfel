@@ -23,7 +23,10 @@ def signal_window_spliter(signal, window_size, overlap):
     """
 
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
+    if len(signal) % window_size == 0:
+        return [signal[i:i + window_size] for i in range(0, len(signal), step)]
+    else:
+        return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
 
 
 def merge_time_series(data, fs_resample, time_unit):
