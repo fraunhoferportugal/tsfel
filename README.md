@@ -46,8 +46,7 @@ cfg = tsfel.get_features_by_domain()
 X = tsfel.time_series_features_extractor(cfg, df)
 ```
 
-
-### Feature Extraction
+## Available features
 
 #### Spectral domain
 | Features                   | Computational Cost |
@@ -122,6 +121,11 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Sum absolute diff          |          1         |
 | Total energy               |          1         |
 | Zero crossing rate         |          1         |
+
+## Citing
+When using TSFEL please cite the following publication:
+
+Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
 
 ## Acknowledgements
 We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
