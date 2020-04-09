@@ -323,7 +323,6 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                 # Name of each column to be concatenate with feature name
                 if not isinstance(signal_window, pd.DataFrame):
                     signal_window = pd.DataFrame(data=signal_window)
-                    #AQUI
                 header_names = signal_window.columns.values
 
                 for ax in range(len(header_names)):
