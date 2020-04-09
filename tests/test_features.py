@@ -373,14 +373,14 @@ def test_autocorr():
 
 def test_auc():
     np.testing.assert_almost_equal(auc(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(auc(const1, Fs), 9.518999999999998)
-    np.testing.assert_almost_equal(auc(constNeg, Fs), -9.518999999999998)
-    np.testing.assert_almost_equal(auc(constF, Fs), 23.797500000000003)
-    np.testing.assert_almost_equal(auc(lin, Fs), 95.171)
-    np.testing.assert_almost_equal(auc(lin0, Fs), 4.989999999999997)
-    np.testing.assert_almost_equal(auc(wave, Fs), 3.1410759074645966e-05)
-    np.testing.assert_almost_equal(auc(offsetWave, Fs), 1000.998031410759)
-    np.testing.assert_almost_equal(auc(noiseWave, Fs), -0.7958996038449087)
+    np.testing.assert_almost_equal(auc(const1, Fs), 0.019)
+    np.testing.assert_almost_equal(auc(constNeg, Fs), 0.019)
+    np.testing.assert_almost_equal(auc(constF, Fs), 0.0475)
+    np.testing.assert_almost_equal(auc(lin, Fs), 0.18050000000000002)
+    np.testing.assert_almost_equal(auc(lin0, Fs), 0.09473684210526315)
+    np.testing.assert_almost_equal(auc(wave, Fs), 0.6365517062491768)
+    np.testing.assert_almost_equal(auc(offsetWave, Fs), 1.998015705379539)
+    np.testing.assert_almost_equal(auc(noiseWave, Fs), 0.6375702578824347)
 
 
 def test_abs_energy():
