@@ -46,5 +46,86 @@ cfg = tsfel.get_features_by_domain()
 X = tsfel.time_series_features_extractor(cfg, df)
 ```
 
+## Available features
+
+#### Spectral domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| FFT mean coefficient       |          1         |
+| Fundamental frequency      |          1         |
+| Human range energy         |          2         |
+| LPCC                       |          1         |
+| MFCC                       |          1         |
+| Max power spectrum         |          1         |
+| Maximum frequency          |          1         |
+| Median frequency           |          1         |
+| Power bandwidth            |          1         |
+| Spectral centroid          |          2         |
+| Spectral decrease          |          1         |
+| Spectral distance          |          1         |
+| Spectral kurtosis          |          2         |
+| Spectral maximum peaks     |          1         |
+| Spectral roll-off          |          1         |
+| Spectral roll-on           |          1         |
+| Spectral skewness          |          2         |
+| Spectral slope             |          1         |
+| Spectral spread            |          2         |
+| Spectral variation         |          1         |
+| Spectral entropy           |          1         |
+| Wavelet entropy            |          2         |
+| Wavelet absolute mean      |          2         |
+| Wavelet standard deviation |          2         |
+| Wavelet variance           |          2         |
+| Wavelet energy             |          2         |
+
+
+#### Statistical domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| ECDF                       |          1         |
+| ECDF Percentile            |          1         |
+| ECDF Percentile Count      |          1         |
+| ECDF Slope                 |          1         |
+| Histogram                  |          1         |
+| Interquartile range        |          1         |
+| Kurtosis                   |          1         |
+| Max                        |          1         |
+| Mean                       |          1         |
+| Mean absolute deviation    |          1         |
+| Median                     |          1         |
+| Median absolute deviation  |          1         |
+| Min                        |          1         |
+| Root mean square           |          1         |
+| Skewness                   |          1         |
+| Standard deviation         |          1         |
+| Variance                   |          1         |
+
+
+#### Temporal domain
+| Features                   | Computational Cost |
+|----------------------------|:------------------:|
+| Absolute energy            |          1         |
+| Area under the curve       |          1         |
+| Autocorrelation            |          1         |
+| Centroid                   |          1         |
+| Entropy                    |          1         |
+| Maximum peaks              |          1         |
+| Mean absolute diff         |          1         |
+| Mean diff                  |          1         |
+| Median absolute diff       |          1         |
+| Median diff                |          1         |
+| Minimum peaks              |          1         |
+| Peak to peak distance      |          1         |
+| Signal distance            |          1         |
+| Slope                      |          1         |
+| Sum absolute diff          |          1         |
+| Total energy               |          1         |
+| Zero crossing rate         |          1         |
+
+## Citing
+When using TSFEL please cite the following publication:
+
+Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
+
 ## Acknowledgements
 We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
