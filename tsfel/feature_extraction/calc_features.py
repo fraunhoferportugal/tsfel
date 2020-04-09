@@ -317,6 +317,9 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                 else:
                     parameters_total = ''
 
+                # To handle object type signals
+                signal_window = signal_window.astype(float)
+
                 # Name of each column to be concatenate with feature name
                 if not isinstance(signal_window, pd.DataFrame):
                     signal_window = pd.DataFrame(data=signal_window)

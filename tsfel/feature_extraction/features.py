@@ -325,7 +325,7 @@ def auc(signal, fs):
     """
     t = compute_time(signal, fs)
 
-    return np.sum(np.diff(t) * signal[:-1] + signal[1:] / 2)
+    return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
 
 
 @set_domain("domain", "temporal")
