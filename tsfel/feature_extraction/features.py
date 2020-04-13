@@ -1,4 +1,5 @@
 import scipy.signal
+import warnings
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -393,6 +394,7 @@ def entropy(signal, prob='standard'):
     """
 
     if prob == 'standard':
+        warnings.warn('No probability function assigned.', stacklevel=2)
         value, counts = np.unique(signal, return_counts=True)
         p = counts / counts.sum()
     elif prob == 'kde':
