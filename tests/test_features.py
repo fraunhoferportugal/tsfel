@@ -426,8 +426,8 @@ def test_entropy():
     np.testing.assert_almost_equal(entropy(constF), 0.0)
     np.testing.assert_almost_equal(entropy(lin), 1.0)
     np.testing.assert_almost_equal(entropy(lin0), 1.0)
-    np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
-    np.testing.assert_almost_equal(entropy(offsetWave), 0.8890012261845581)
+    np.testing.assert_almost_equal(entropy(wave), 0.9614247210342574)
+    np.testing.assert_almost_equal(entropy(offsetWave), 0.8889870065861776)
     np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
 
@@ -525,7 +525,7 @@ def test_spectral_skewness():
     np.testing.assert_almost_equal(spectral_skewness(constF, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(lin, Fs), 1.5090650071326563, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(lin0, Fs), 0.8140329168647044, decimal=5)
-    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10643315.707158063, decimal=1)
+    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10619425.569946475, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(offsetWave, Fs), 1.5000000137542306, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(noiseWave, Fs), 0.4126776686583098, decimal=1)
 
@@ -537,7 +537,7 @@ def test_spectral_kurtosis():
     np.testing.assert_almost_equal(spectral_kurtosis(constF, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(lin, Fs), 4.209140226148914, decimal=0)
     np.testing.assert_almost_equal(spectral_kurtosis(lin0, Fs), 2.4060168768515413, decimal=5)
-    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 120959227206031.11, decimal=1)
+    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 120424005505777.19, decimal=1)
     np.testing.assert_almost_equal(spectral_kurtosis(offsetWave, Fs), 3.2500028252333513, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(noiseWave, Fs), 1.7251592171239667, decimal=5)
 
@@ -621,8 +621,8 @@ def test_spectral_maxpeaks():
     np.testing.assert_almost_equal(spectral_maxpeaks(constF, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_maxpeaks(lin, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_maxpeaks(lin0, Fs), 1.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_maxpeaks(wave, Fs), 155, decimal=0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 158, decimal=1)
+    np.testing.assert_almost_equal(spectral_maxpeaks(wave, Fs), 157, decimal=0)
+    np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 161, decimal=1)
     np.testing.assert_almost_equal(spectral_maxpeaks(noiseWave, Fs), 172.0, decimal=1)
 
 
@@ -758,7 +758,8 @@ def test_lpcc():
                                                       1.241991615337501e-06, 3.0910069449505212e-06,
                                                       1.241991615337501e-06, 2.3552147454092374e-05,
                                                       0.0003496693583308415, 0.005192252575236202, 0.10193422882503231))
-    np.testing.assert_almost_equal(lpcc(noiseWave), (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    np.testing.assert_almost_equal(lpcc(noiseWave), (0.8015941, 0.8588615, 0.2444705, 0.0801553, 0.0581305, 0.0350708,
+                                                     0.282081, 0.0350708, 0.0581305, 0.0801553, 0.2444705, 0.8588615))
 
 
 def test_spectral_entropy():
