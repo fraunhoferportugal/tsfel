@@ -1,17 +1,20 @@
-import os
-import sys
 import glob
-import numbers
-import pathlib
-import warnings
 import importlib
+import multiprocessing as mp
+import numbers
+import os
+import pathlib
+import sys
+import warnings
+from functools import partial
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
-import multiprocessing as mp
-from functools import partial
+
 from IPython import get_ipython
 from IPython.display import display
+
 from tsfel.utils.progress_bar import progress_bar_terminal, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
@@ -229,8 +232,10 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
             return feat_val
         else:
             pool = mp.Pool(mp.cpu_count())
+
             features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs,
                                                    features_path=features_path, header_names=names), signal_windows)
+
             if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
                 out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
             for i, feat in enumerate(features):
