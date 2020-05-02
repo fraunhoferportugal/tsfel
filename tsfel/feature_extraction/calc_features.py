@@ -12,6 +12,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from IPython import get_ipython
+from IPython.display import display
+
 from tsfel.utils.progress_bar import progress_bar_terminal, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
@@ -58,6 +61,10 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         * *output_directory* (``String``) --
             Output directory
             (default: ``'output_directory', str(Path.home()) + '/tsfel_output'``)
+        * *features_path* (``string``) --
+            Directory of script with personal features
+        * *header_names* (``list or array``) --
+            Names of each column window
 
     Returns
     -------
@@ -73,6 +80,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     pre_process = kwargs.get('pre_process', None)
     output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
     features_path = kwargs.get('features_path', None)
+    names = kwargs.get('header_names', None)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory+os.sep
@@ -110,9 +118,10 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         windows = signal_window_spliter(data_new, window_size, overlap)
 
         if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, features_path=features_path)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, features_path=features_path,
+                                                      header_names=names)
         else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, header_names=names)
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
@@ -135,6 +144,8 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     \**kwargs:
         * *features_path* (``string``) --
             Directory of script with personal features
+         * *header_names* (``list or array``) --
+            Names of each column window
 
     Returns
     -------
@@ -144,7 +155,8 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     """
 
     features_path = kwargs.get('features_path', None)
-    feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path)
+    names = kwargs.get('header_names', None)
+    feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path, header_names=names)
     feat_val.reset_index(drop=True)
 
     # Assuring the same feature extraction order
@@ -181,6 +193,8 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
 
         * *features_path* (``string``) --
             Directory of script with personal features
+        * *header_names* (``list or array``) --
+            Names of each column window
 
     Returns
     -------
@@ -188,13 +202,19 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Extracted features
 
     """
-
     if verbose == 1:
         print("*** Feature extraction started ***")
 
     window_size = kwargs.get('window_size', 100)
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
+    names = kwargs.get('header_names', None)
+
+    if fs is None:
+        warnings.warn('Using default sampling frequency set in configuration file.', stacklevel=2)
+
+    if names is not None:
+        names = list(names)
 
     if window_spliter:
         signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
@@ -202,28 +222,33 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     features_final = pd.DataFrame()
 
     if isinstance(signal_windows, pd.DataFrame):
-        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+                                              header_names=names)
     else:
         if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path)
+            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+                                            header_names=names)
             feat_val.reset_index(drop=True)
             return feat_val
         else:
-
             pool = mp.Pool(mp.cpu_count())
-            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs, features_path=features_path), signal_windows)
+
+            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs,
+                                                   features_path=features_path, header_names=names), signal_windows)
+
             if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
                 out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
             for i, feat in enumerate(features):
                 if verbose == 1:
-                    if get_ipython().__class__.__name__ == 'TerminalInteractiveShell':
+                    if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
+                        out.update(progress_bar_notebook(i + 1, len(signal_windows)))
+                    else:
                         progress_bar_terminal(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete',
                                               length=50)
-                    elif (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
-                        out.update(progress_bar_notebook(i + 1, len(signal_windows)))
                 features_final = features_final.append(feat)
 
             pool.close()
+            pool.join()
 
     if verbose == 1:
         print("\n"+"*** Feature extraction finished ***")
@@ -246,6 +271,8 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
     See below:
         * *features_path* (``string``) --
             Directory of script with personal features
+        * *header_names* (``list or array``) --
+            Names of each column window
 
     Returns
     -------
@@ -256,6 +283,7 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
     """
 
     features_path = kwargs.get('features_path', None)
+    names = kwargs.get('header_names', None)
 
     # Execute imports
     exec("import tsfel")
@@ -302,11 +330,8 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                             # Check if features dict has default sampling frequency value
                             if type(param['fs']) is int or type(param['fs']) is float:
                                 parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
-
-                                # raise a warning
-                                warnings.warn('Using default sampling frequency: '+str(param['fs'])+" Hz.")
                             else:
-                                raise SystemExit('No sampling frequency assigned.')
+                                raise Exception('No sampling frequency assigned.')
                         else:
                             parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
                                                 if key not in 'fs']
@@ -328,7 +353,14 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                 # Name of each column to be concatenate with feature name
                 if not isinstance(signal_window, pd.DataFrame):
                     signal_window = pd.DataFrame(data=signal_window)
-                header_names = signal_window.columns.values
+
+                if names is not None:
+                    if len(names) != len(list(signal_window.columns.values)):
+                        raise Exception('header_names dimension does not match input columns.')
+                    else:
+                        header_names = names
+                else:
+                    header_names = signal_window.columns.values
 
                 for ax in range(len(header_names)):
                     window = signal_window.iloc[:, ax]
