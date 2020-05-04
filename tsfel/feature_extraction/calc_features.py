@@ -15,7 +15,7 @@ import pandas as pd
 from IPython import get_ipython
 from IPython.display import display
 
-from tsfel.utils.progress_bar import progress_bar_terminal, progress_bar_notebook
+from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
 
 
@@ -118,10 +118,11 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         windows = signal_window_spliter(data_new, window_size, overlap)
 
         if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, features_path=features_path,
-                                                      header_names=names)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+                                                      features_path=features_path, header_names=names)
         else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0, header_names=names)
+            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+                                                      header_names=names)
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
@@ -159,10 +160,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path, header_names=names)
     feat_val.reset_index(drop=True)
 
-    # Assuring the same feature extraction order
-    cols = feat_val.columns.tolist()
-    cols.sort()
-    return feat_val[cols]
+    return feat_val
 
 
 def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, verbose=1, **kwargs):
@@ -210,6 +208,19 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
 
+    # Choosing default of n_jobs by operating system
+    if sys.platform[:-2] == 'win':
+        n_jobs_default = None
+    else:
+        n_jobs_default = -1
+
+    # Choosing default of n_jobs by python interface
+    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell' or \
+            get_ipython().__class__.__name__ != 'Shell':
+        n_jobs_default = -1
+
+    n_jobs = kwargs.get('n_jobs', n_jobs_default)
+
     if fs is None:
         warnings.warn('Using default sampling frequency set in configuration file.', stacklevel=2)
 
@@ -231,28 +242,47 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
             feat_val.reset_index(drop=True)
             return feat_val
         else:
-            pool = mp.Pool(mp.cpu_count())
-
-            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs,
-                                                   features_path=features_path, header_names=names), signal_windows)
-
-            if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
+            # Starting the display of progress bar for notebooks interfaces
+            if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
+                    get_ipython().__class__.__name__ == 'Shell'):
                 out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
-            for i, feat in enumerate(features):
-                if verbose == 1:
-                    if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
-                        out.update(progress_bar_notebook(i + 1, len(signal_windows)))
-                    else:
-                        progress_bar_terminal(i + 1, len(signal_windows), prefix='Progress:', suffix='Complete',
-                                              length=50)
-                features_final = features_final.append(feat)
+            else:
+                out = None
 
-            pool.close()
-            pool.join()
+            if isinstance(n_jobs, int):
+                # Multiprocessing use
+                if n_jobs == -1:
+                    cpu_count = mp.cpu_count()
+                else:
+                    cpu_count = n_jobs
+
+                pool = mp.Pool(cpu_count)
+                features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs,
+                                             features_path=features_path, header_names=names), signal_windows)
+                for i, feat in enumerate(features):
+                    if verbose == 1:
+                        display_progress_bar(i, signal_windows, out)
+                    features_final = features_final.append(feat)
+
+                pool.close()
+                pool.join()
+
+            elif n_jobs is None:
+                # Without multiprocessing
+                for i, feat in enumerate(signal_windows):
+                    features_final = features_final.append(
+                        calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
+                    if verbose == 1:
+                        display_progress_bar(i, signal_windows, out)
+            else:
+                raise SystemExit('n_jobs value is not valid. '
+                                 'Choose an integer value or None for no multiprocessing.')
 
     if verbose == 1:
         print("\n"+"*** Feature extraction finished ***")
 
+    # Assuring the same feature extraction order
+    features_final = features_final.reindex(sorted(features_final.columns), axis=1)
     return features_final.reset_index(drop=True)
 
 
