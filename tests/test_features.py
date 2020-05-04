@@ -251,28 +251,28 @@ def test_distance():
     np.testing.assert_almost_equal(distance(noiseWave), 1007.8711901383033, decimal=5)
 
 
-def test_minpeaks():
-    np.testing.assert_almost_equal(minpeaks(const0), 0.0)
-    np.testing.assert_almost_equal(minpeaks(const1), 0.0)
-    np.testing.assert_almost_equal(minpeaks(constNeg), 0.0)
-    np.testing.assert_almost_equal(minpeaks(constF), 0.0)
-    np.testing.assert_almost_equal(minpeaks(lin), 0.0)
-    np.testing.assert_almost_equal(minpeaks(lin0), 0.0, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(wave), 5, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(offsetWave), 5, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(noiseWave), 323, decimal=5)
+def test_negative_turning():
+    np.testing.assert_almost_equal(negative_turning(const0), 0.0)
+    np.testing.assert_almost_equal(negative_turning(const1), 0.0)
+    np.testing.assert_almost_equal(negative_turning(constNeg), 0.0)
+    np.testing.assert_almost_equal(negative_turning(constF), 0.0)
+    np.testing.assert_almost_equal(negative_turning(lin), 0.0)
+    np.testing.assert_almost_equal(negative_turning(lin0), 0.0, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(wave), 5, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(offsetWave), 5, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(noiseWave), 323, decimal=5)
 
 
-def test_maxpeaks():
-    np.testing.assert_almost_equal(maxpeaks(const0), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(const1), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(constNeg), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(constF), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(lin), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(lin0), 0.0, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(wave), 5, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(offsetWave), 5, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(noiseWave), 322, decimal=5)
+def test_positive_turning():
+    np.testing.assert_almost_equal(positive_turning(const0), 0.0)
+    np.testing.assert_almost_equal(positive_turning(const1), 0.0)
+    np.testing.assert_almost_equal(positive_turning(constNeg), 0.0)
+    np.testing.assert_almost_equal(positive_turning(constF), 0.0)
+    np.testing.assert_almost_equal(positive_turning(lin), 0.0)
+    np.testing.assert_almost_equal(positive_turning(lin0), 0.0, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(wave), 5, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(offsetWave), 5, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(noiseWave), 322, decimal=5)
 
 
 def test_centroid():
@@ -614,16 +614,16 @@ def test_spect_variation():
     np.testing.assert_almost_equal(spectral_variation(noiseWave, Fs), 0.9775968083533805, decimal=5)
 
 
-def test_spectral_maxpeaks():
-    np.testing.assert_almost_equal(spectral_maxpeaks(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(const1, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(constNeg, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(lin, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(lin0, Fs), 1.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_maxpeaks(wave, Fs), 157, decimal=0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 161, decimal=1)
-    np.testing.assert_almost_equal(spectral_maxpeaks(noiseWave, Fs), 172.0, decimal=1)
+def test_spectral_positive_turning():
+    np.testing.assert_almost_equal(spectral_positive_turning(const0, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(const1, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(constNeg, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(constF, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(lin, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(lin0, Fs), 1.0, decimal=5)
+    np.testing.assert_almost_equal(spectral_positive_turning(wave, Fs), 157, decimal=0)
+    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 161, decimal=1)
+    np.testing.assert_almost_equal(spectral_positive_turning(noiseWave, Fs), 172.0, decimal=1)
 
 
 def test_human_range_energy():
