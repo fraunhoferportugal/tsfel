@@ -233,8 +233,8 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         else:
             pool = mp.Pool(mp.cpu_count())
 
-            features = pool.imap_unordered(partial(calc_features, dict_features=dict_features, fs=fs,
-                                                   features_path=features_path, header_names=names), signal_windows)
+            features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs,
+                                         features_path=features_path, header_names=names), signal_windows)
 
             if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (get_ipython().__class__.__name__ == 'Shell'):
                 out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
