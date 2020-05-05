@@ -2,7 +2,7 @@ from IPython.display import HTML
 from IPython import get_ipython
 
 
-def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printend="\r"):
+def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=0, length=100, fill='█', printend="\r"):
     """Call in a loop to create terminal progress bar.
 
     Parameters

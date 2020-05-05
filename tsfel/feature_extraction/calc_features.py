@@ -216,7 +216,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
 
     # Choosing default of n_jobs by python interface
     if get_ipython().__class__.__name__ == 'ZMQInteractiveShell' or \
-            get_ipython().__class__.__name__ != 'Shell':
+            get_ipython().__class__.__name__ == 'Shell':
         n_jobs_default = -1
 
     n_jobs = kwargs.get('n_jobs', n_jobs_default)
