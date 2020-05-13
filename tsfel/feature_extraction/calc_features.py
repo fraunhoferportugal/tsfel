@@ -245,6 +245,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
             # Starting the display of progress bar for notebooks interfaces
             if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
                     get_ipython().__class__.__name__ == 'Shell'):
+
                 out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
             else:
                 out = None
