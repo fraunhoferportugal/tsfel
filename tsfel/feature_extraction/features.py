@@ -62,52 +62,52 @@ def calc_centroid(signal, fs):
 
 
 @set_domain("domain", "temporal")
-def minpeaks(signal):
-    """Computes number of minimum peaks of the signal.
+def negative_turning(signal):
+    """Computes number of negative turning points of the signal.
 
     Feature computational cost: 1
 
     Parameters
     ----------
     signal : nd-array
-        Input from which minimum number of peaks is counted
+        Input from which minimum number of negative turning points are counted
     Returns
     -------
     float
-        Minimum number of peaks
+        Number of negative turning points
 
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    min_peaks = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
+    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
 
-    return len(min_peaks)
+    return len(negative_turning_pts)
 
 
 @set_domain("domain", "temporal")
-def maxpeaks(signal):
-    """Computes number of maximum peaks of the signal.
+def positive_turning(signal):
+    """Computes number of positive turning points of the signal.
 
     Feature computational cost: 1
 
     Parameters
     ----------
     signal : nd-array
-        Input from which maximum number of peaks is counted
+        Input from which  positive turning points are counted
 
     Returns
     -------
     float
-        Maximum number of peaks
+        Number of positive turning points
 
     """
     diff_sig = np.diff(signal)
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    max_peaks = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
 
-    return len(max_peaks)
+    return len(positive_turning_pts)
 
 
 @set_domain("domain", "temporal")
@@ -1228,22 +1228,22 @@ def spectral_variation(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def spectral_maxpeaks(signal, fs):
-    """Computes number of maximum spectral peaks of the signal.
+def spectral_positive_turning(signal, fs):
+    """Computes number of positive turning points of the fft magnitude signal.
 
     Feature computational cost: 1
 
     Parameters
     ----------
     signal : nd-array
-        Input from which the number of maximum spectral peaks is computed
+        Input from which the number of positive turning points of the fft magnitude are computed
     fs : int
         Sampling frequency
 
     Returns
     -------
     float
-        Total number of maximum spectral peaks
+        Number of positive turning points
 
     """
     f, fmag = calc_fft(signal, fs)
@@ -1251,9 +1251,10 @@ def spectral_maxpeaks(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    max_s_peaks = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
 
-    return len(max_s_peaks)
+    return len(positive_turning_pts)
+
 
 @set_domain("domain", "spectral")
 def spectral_roll_off(signal, fs):
