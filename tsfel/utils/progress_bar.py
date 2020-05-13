@@ -1,7 +1,8 @@
 from IPython.display import HTML
+from IPython import get_ipython
 
 
-def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printend="\r"):
+def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=0, length=100, fill='█', printend="\r"):
     """Call in a loop to create terminal progress bar.
 
     Parameters
@@ -33,8 +34,22 @@ def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=1, le
         print()
 
 
-def progress_bar_notebook(value, max_value=100):
-    result = int((value/max_value)*100)
+def progress_bar_notebook(iteration, total=100):
+    """ Progress bar for notebooks.
+
+    Parameters
+    ----------
+    iteration: int
+        current iteration
+    total: int
+        total iterations
+
+    Returns
+    -------
+        Progress bar for notebooks
+
+    """
+    result = int((iteration/total)*100)
     return HTML("""
               <p>
                   Progress: {result}% Complete
@@ -47,4 +62,26 @@ def progress_bar_notebook(value, max_value=100):
                   {value}
               </progress>
 
-    """.format(value=value, max_value=max_value, result=result))
+    """.format(value=iteration, max_value=total, result=result))
+
+
+def display_progress_bar(iteration, total, out):
+    """ Displays progress bar according to python interface.
+
+    Parameters
+    ----------
+    iteration: int
+        current iteration
+    total: int
+        total iterations
+    out: progress bar notebook output
+
+    """
+
+    if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
+            get_ipython().__class__.__name__ == 'Shell') and out is not None:
+        out.update(progress_bar_notebook(iteration + 1, len(total)))
+    else:
+        progress_bar_terminal(iteration + 1, len(total), prefix='Progress:', suffix='Complete',
+                              length=50)
+    return
