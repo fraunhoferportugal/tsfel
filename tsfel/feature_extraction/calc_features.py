@@ -82,6 +82,19 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
 
+    # Choosing default of n_jobs by operating system
+    if sys.platform[:-2] == 'win':
+        n_jobs_default = None
+    else:
+        n_jobs_default = -1
+
+    # Choosing default of n_jobs by python interface
+    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell' or \
+            get_ipython().__class__.__name__ == 'Shell':
+        n_jobs_default = -1
+
+    n_jobs = kwargs.get('n_jobs', n_jobs_default)
+
     if main_directory[-1] != os.sep:
         main_directory = main_directory+os.sep
 
@@ -119,10 +132,10 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
         if features_path:
             features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      features_path=features_path, header_names=names)
+                                                      features_path=features_path, header_names=names, n_jobs=n_jobs)
         else:
             features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      header_names=names)
+                                                      header_names=names, n_jobs=n_jobs)
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
