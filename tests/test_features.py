@@ -431,6 +431,18 @@ def test_entropy():
     np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
 
+def test_neighbourhood_peaks():
+    np.testing.assert_almost_equal(neighbourhood_peaks(const0), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(const1), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(constNeg), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(constF), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(lin), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(lin0), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(wave), 5.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(offsetWave), 5.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(noiseWave), 14.0)
+
+
 # ################################################ SPECTRAL FEATURES ################################################# #
 def test_max_fre():
     np.testing.assert_almost_equal(max_frequency(const0, Fs), 0.0)

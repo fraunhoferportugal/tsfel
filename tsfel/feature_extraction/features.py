@@ -412,6 +412,34 @@ def entropy(signal, prob='standard'):
         return - np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
+@set_domain("domain", "temporal")
+def neighbourhood_peaks(signal, n=10):
+    """Computes the number of peaks from a defined neighbourhood of the signal.
+
+    Reference: Christ, M., Braun, N., Neuffer, J. and Kempa-Liehr A.W. (2018). Time Series FeatuRe Extraction on basis
+     of Scalable Hypothesis tests (tsfresh -- A Python package). Neurocomputing 307 (2018) 72-77
+
+    Parameters
+    ----------
+    signal : nd-array
+         Input from which the number of neighbourhood peaks is computed
+    n :  int
+        Number of peak's neighbours to the left and to the right
+
+    Returns
+    -------
+    int
+        The number of peaks from a defined neighbourhood of the signal
+    """
+    signal = np.array(signal)
+    subsequence = signal[n:-n]
+    # initial iteration
+    peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
+    for i in range(2, n + 1):
+        peaks &= (subsequence > np.roll(signal, i)[n:-n])
+        peaks &= (subsequence > np.roll(signal, -i)[n:-n])
+    return np.sum(peaks)
+
 # ############################################ STATISTICAL DOMAIN #################################################### #
 
 
