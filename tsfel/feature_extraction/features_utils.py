@@ -208,6 +208,11 @@ def lpc(signal, n_coeff=12):
 
     # Calculate LPC with Yule-Walker
     acf = autocorr_norm(signal)
+
+    # Assuring that works for all type of input lengths
+    if len(acf) < n_coeff:
+        n_coeff = len(acf)-1
+
     r = -acf[1:n_coeff + 1].T
     smatrix = create_symmetric_matrix(acf, n_coeff)
     if np.sum(smatrix) == 0:
