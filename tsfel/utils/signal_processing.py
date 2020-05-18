@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-def signal_window_spliter(signal, window_size, overlap):
+def signal_window_splitter(signal, window_size, overlap):
     """Splits the signal into windows
 
     Parameters
