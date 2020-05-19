@@ -137,6 +137,11 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
             features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
                                                       header_names=names, n_jobs=n_jobs)
 
+        fl = '/'.join(fl.split(os.sep))
+        invalid_char = '<>:"\|?* '
+        for char in invalid_char:
+            fl = fl.replace(char, '')
+
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
         features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
