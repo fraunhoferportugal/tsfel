@@ -406,7 +406,10 @@ def entropy(signal, prob='standard'):
     # Handling zero probability values
     p = p[np.where(p != 0)]
 
-    if np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+    # If probability all in one value, there is no entropy
+    if np.log2(len(signal)) == 1:
+        return 0.0
+    elif np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
         return 0.0
     else:
         return - np.sum(p * np.log2(p)) / np.log2(len(signal))
@@ -1505,7 +1508,7 @@ def lpcc(signal, n_coeff=12):
     lpc_coeffs = lpc(signal, n_coeff)
 
     if np.sum(lpc_coeffs) == 0:
-        return tuple(np.zeros(n_coeff))
+        return tuple(np.zeros(len(lpc_coeffs)))
 
     # Power spectrum
     powerspectrum = np.abs(np.fft.fft(lpc_coeffs)) ** 2
@@ -1546,6 +1549,10 @@ def spectral_entropy(signal, fs):
     prob = np.divide(power, power.sum())
 
     prob = prob[prob != 0]
+
+    # If probability all in one value, there is no entropy
+    if prob.size == 1:
+        return 0.0
 
     return -np.multiply(prob, np.log2(prob)).sum() / np.log2(prob.size)
 
