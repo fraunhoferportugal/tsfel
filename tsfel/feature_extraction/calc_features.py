@@ -16,7 +16,7 @@ from IPython import get_ipython
 from IPython.display import display
 
 from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
-from tsfel.utils.signal_processing import merge_time_series, signal_window_spliter
+from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
@@ -128,7 +128,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
         data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
 
-        windows = signal_window_spliter(data_new, window_size, overlap)
+        windows = signal_window_splitter(data_new, window_size, overlap)
 
         if features_path:
             features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
@@ -181,7 +181,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     return feat_val
 
 
-def time_series_features_extractor(dict_features, signal_windows, fs=None, window_spliter=False, verbose=1, **kwargs):
+def time_series_features_extractor(dict_features, signal_windows, fs=None, verbose=1, **kwargs):
     """Extraction of time series features.
 
     Parameters
@@ -192,8 +192,6 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
         Input from which features are computed, window
     fs : int or None
         Sampling frequency
-    window_spliter: bool
-        If True computes the signal windows
     verbose : int
         Level of function communication
         (0 or 1 (Default))
@@ -221,7 +219,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     if verbose == 1:
         print("*** Feature extraction started ***")
 
-    window_size = kwargs.get('window_size', 100)
+    window_size = kwargs.get('window_size', None)
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
@@ -245,8 +243,8 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, windo
     if names is not None:
         names = list(names)
 
-    if window_spliter:
-        signal_windows = signal_window_spliter(signal_windows, window_size, overlap)
+    if window_size is not None:
+        signal_windows = signal_window_splitter(signal_windows, window_size, overlap)
 
     features_final = pd.DataFrame()
 
