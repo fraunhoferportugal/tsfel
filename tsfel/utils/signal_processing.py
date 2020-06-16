@@ -3,18 +3,18 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-def signal_window_splitter(signal, window_size, overlap):
+def signal_window_splitter(signal, window_size, overlap=0):
     """Splits the signal into windows
 
     Parameters
     ----------
     signal : nd-array or pandas DataFrame
         input signal
-    window_size :
+    window_size : int
         number of points of window size
-    overlap :
+    overlap : float
         percentage of overlap, value between 0 and 1
-
+        Default: 0
     Returns
     -------
     list
