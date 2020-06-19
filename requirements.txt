@@ -31,3 +31,6 @@ scipy >= 1.4.0
 
 # setup.py: 1
 setuptools >= 41.0.1
+
+# Testing ipython dependency
+ipython >= 7.12.0
