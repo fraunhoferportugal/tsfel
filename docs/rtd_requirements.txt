@@ -1,3 +1,4 @@
+ipython
 Sphinx==1.8.5
 sphinx_rtd_theme>=0.2.4
 -r ../requirements.txt
