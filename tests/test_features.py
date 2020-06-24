@@ -1,8 +1,7 @@
 from tsfel.feature_extraction.features import *
 from numpy.testing import run_module_suite
 
-from tsfel.feature_extraction.features import *
-
+# Unit testing for Linux OS
 # Implementing signals for testing features
 
 const0 = np.zeros(20)
@@ -196,15 +195,19 @@ def test_ecdf():
     np.testing.assert_almost_equal(ecdf(constF), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
     np.testing.assert_almost_equal(ecdf(lin), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
     np.testing.assert_almost_equal(ecdf(lin0), (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5))
-    np.testing.assert_almost_equal(ecdf(wave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,0.01))
-    np.testing.assert_almost_equal(ecdf(offsetWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,0.01))
-    np.testing.assert_almost_equal(ecdf(noiseWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01))
+    np.testing.assert_almost_equal(ecdf(wave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                                                0.01))
+    np.testing.assert_almost_equal(ecdf(offsetWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                                                      0.01))
+    np.testing.assert_almost_equal(ecdf(noiseWave), (0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                                                     0.01))
+
 
 def test_ecdf_percentile():
-    np.testing.assert_almost_equal(ecdf_percentile(const0), 0)
-    np.testing.assert_almost_equal(ecdf_percentile(const1), 1)
-    np.testing.assert_almost_equal(ecdf_percentile(constNeg), -1)
-    np.testing.assert_almost_equal(ecdf_percentile(constF), 2.5)
+    np.testing.assert_almost_equal(ecdf_percentile(const0), (0, 0))
+    np.testing.assert_almost_equal(ecdf_percentile(const1), (1, 1))
+    np.testing.assert_almost_equal(ecdf_percentile(constNeg), (-1, -1))
+    np.testing.assert_almost_equal(ecdf_percentile(constF), (2.5, 2.5))
     np.testing.assert_almost_equal(ecdf_percentile(lin), (3, 15))
     np.testing.assert_almost_equal(ecdf_percentile(lin0), (-6.8421053, 5.7894737))
     np.testing.assert_almost_equal(ecdf_percentile(wave), (-0.809017, 0.809017))
@@ -249,28 +252,28 @@ def test_distance():
     np.testing.assert_almost_equal(distance(noiseWave), 1007.8711901383033, decimal=5)
 
 
-def test_minpeaks():
-    np.testing.assert_almost_equal(minpeaks(const0), 0.0)
-    np.testing.assert_almost_equal(minpeaks(const1), 0.0)
-    np.testing.assert_almost_equal(minpeaks(constNeg), 0.0)
-    np.testing.assert_almost_equal(minpeaks(constF), 0.0)
-    np.testing.assert_almost_equal(minpeaks(lin), 0.0)
-    np.testing.assert_almost_equal(minpeaks(lin0), 0.0, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(wave), 5, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(offsetWave), 5, decimal=5)
-    np.testing.assert_almost_equal(minpeaks(noiseWave), 323, decimal=5)
+def test_negative_turning():
+    np.testing.assert_almost_equal(negative_turning(const0), 0.0)
+    np.testing.assert_almost_equal(negative_turning(const1), 0.0)
+    np.testing.assert_almost_equal(negative_turning(constNeg), 0.0)
+    np.testing.assert_almost_equal(negative_turning(constF), 0.0)
+    np.testing.assert_almost_equal(negative_turning(lin), 0.0)
+    np.testing.assert_almost_equal(negative_turning(lin0), 0.0, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(wave), 5, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(offsetWave), 5, decimal=5)
+    np.testing.assert_almost_equal(negative_turning(noiseWave), 323, decimal=5)
 
 
-def test_maxpeaks():
-    np.testing.assert_almost_equal(maxpeaks(const0), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(const1), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(constNeg), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(constF), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(lin), 0.0)
-    np.testing.assert_almost_equal(maxpeaks(lin0), 0.0, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(wave), 5, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(offsetWave), 5, decimal=5)
-    np.testing.assert_almost_equal(maxpeaks(noiseWave), 322, decimal=5)
+def test_positive_turning():
+    np.testing.assert_almost_equal(positive_turning(const0), 0.0)
+    np.testing.assert_almost_equal(positive_turning(const1), 0.0)
+    np.testing.assert_almost_equal(positive_turning(constNeg), 0.0)
+    np.testing.assert_almost_equal(positive_turning(constF), 0.0)
+    np.testing.assert_almost_equal(positive_turning(lin), 0.0)
+    np.testing.assert_almost_equal(positive_turning(lin0), 0.0, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(wave), 5, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(offsetWave), 5, decimal=5)
+    np.testing.assert_almost_equal(positive_turning(noiseWave), 322, decimal=5)
 
 
 def test_centroid():
@@ -371,14 +374,14 @@ def test_autocorr():
 
 def test_auc():
     np.testing.assert_almost_equal(auc(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(auc(const1, Fs), 9.518999999999998)
-    np.testing.assert_almost_equal(auc(constNeg, Fs), -9.518999999999998)
-    np.testing.assert_almost_equal(auc(constF, Fs), 23.797500000000003)
-    np.testing.assert_almost_equal(auc(lin, Fs), 95.171)
-    np.testing.assert_almost_equal(auc(lin0, Fs), 4.989999999999997)
-    np.testing.assert_almost_equal(auc(wave, Fs), 3.1410759074645966e-05)
-    np.testing.assert_almost_equal(auc(offsetWave, Fs), 1000.998031410759)
-    np.testing.assert_almost_equal(auc(noiseWave, Fs), -0.7958996038449087)
+    np.testing.assert_almost_equal(auc(const1, Fs), 0.019)
+    np.testing.assert_almost_equal(auc(constNeg, Fs), 0.019)
+    np.testing.assert_almost_equal(auc(constF, Fs), 0.0475)
+    np.testing.assert_almost_equal(auc(lin, Fs), 0.18050000000000002)
+    np.testing.assert_almost_equal(auc(lin0, Fs), 0.09473684210526315)
+    np.testing.assert_almost_equal(auc(wave, Fs), 0.6365517062491768)
+    np.testing.assert_almost_equal(auc(offsetWave, Fs), 1.998015705379539)
+    np.testing.assert_almost_equal(auc(noiseWave, Fs), 0.6375702578824347)
 
 
 def test_abs_energy():
@@ -422,11 +425,23 @@ def test_entropy():
     np.testing.assert_almost_equal(entropy(const1), 0.0)
     np.testing.assert_almost_equal(entropy(constNeg), 0.0)
     np.testing.assert_almost_equal(entropy(constF), 0.0)
-    np.testing.assert_almost_equal(entropy(lin), 0.994983274605318)
-    np.testing.assert_almost_equal(entropy(lin0), 0.994983274605318)
-    np.testing.assert_almost_equal(entropy(wave), 0.9972021515128497)
-    np.testing.assert_almost_equal(entropy(offsetWave), 0.99720215151285)
-    np.testing.assert_almost_equal(entropy(noiseWave), 0.9957000733996481)
+    np.testing.assert_almost_equal(entropy(lin), 1.0)
+    np.testing.assert_almost_equal(entropy(lin0), 1.0)
+    np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
+    np.testing.assert_almost_equal(entropy(offsetWave), 0.8890012261845581)
+    np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
+
+
+def test_neighbourhood_peaks():
+    np.testing.assert_almost_equal(neighbourhood_peaks(const0), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(const1), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(constNeg), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(constF), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(lin), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(lin0), 0.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(wave), 5.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(offsetWave), 5.0)
+    np.testing.assert_almost_equal(neighbourhood_peaks(noiseWave), 14.0)
 
 
 # ################################################ SPECTRAL FEATURES ################################################# #
@@ -461,8 +476,8 @@ def test_fund_fre():
     np.testing.assert_almost_equal(fundamental_frequency(const1, 1), 0.0)
     np.testing.assert_almost_equal(fundamental_frequency(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(fundamental_frequency(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(fundamental_frequency(lin, Fs), 0.0)
-    np.testing.assert_almost_equal(fundamental_frequency(lin0, Fs), 0.0, decimal=5)
+    np.testing.assert_almost_equal(fundamental_frequency(lin, Fs), 55.55555555555556)
+    np.testing.assert_almost_equal(fundamental_frequency(lin0, Fs), 55.55555555555556, decimal=5)
     np.testing.assert_almost_equal(fundamental_frequency(wave, Fs), 5.0100200400801596, decimal=1)
     np.testing.assert_almost_equal(fundamental_frequency(offsetWave, Fs), 5.0100200400801596, decimal=1)
     np.testing.assert_almost_equal(fundamental_frequency(noiseWave, Fs), 5.0100200400801596, decimal=1)
@@ -612,16 +627,16 @@ def test_spect_variation():
     np.testing.assert_almost_equal(spectral_variation(noiseWave, Fs), 0.9775968083533805, decimal=5)
 
 
-def test_spectral_maxpeaks():
-    np.testing.assert_almost_equal(spectral_maxpeaks(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(const1, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(constNeg, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(lin, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(lin0, Fs), 1.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_maxpeaks(wave, Fs), 155, decimal=0)
-    np.testing.assert_almost_equal(spectral_maxpeaks(offsetWave, Fs), 158, decimal=1)
-    np.testing.assert_almost_equal(spectral_maxpeaks(noiseWave, Fs), 172.0, decimal=1)
+def test_spectral_positive_turning():
+    np.testing.assert_almost_equal(spectral_positive_turning(const0, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(const1, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(constNeg, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(constF, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(lin, Fs), 0.0)
+    np.testing.assert_almost_equal(spectral_positive_turning(lin0, Fs), 1.0, decimal=5)
+    np.testing.assert_almost_equal(spectral_positive_turning(wave, Fs), 155, decimal=0)
+    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 158, decimal=1)
+    np.testing.assert_almost_equal(spectral_positive_turning(noiseWave, Fs), 172.0, decimal=1)
 
 
 def test_human_range_energy():
@@ -883,7 +898,7 @@ def test_wavelet_var():
                                     0.04785478232114257, 0.08278684255548469, 0.1385827670669169))
 
 
-def test_wavelet_entropy():
+def test_wavelet_energy():
     np.testing.assert_almost_equal(wavelet_energy(const0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     np.testing.assert_almost_equal(wavelet_energy(const1), (0.19477199643643478, 0.3710037269882903, 0.56674875884399,
                                                             0.9053485723747671, 1.3961009484422982, 1.8724279756816202,

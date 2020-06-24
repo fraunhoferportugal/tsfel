@@ -1,8 +1,11 @@
 import ast
-import tsfel
+import warnings
+
 import gspread
 import numpy as np
 from oauth2client.service_account import ServiceAccountCredentials
+
+import tsfel
 from tsfel.feature_extraction.features_settings import load_json
 from tsfel.utils.calculate_complexity import compute_complexity
 
@@ -130,7 +133,7 @@ def extract_sheet(gsheet_name, **kwargs):
                                 param = ''
 
                     curve = feat_dict['complexity']
-                    curves_all = ['linear', 'log', 'square', 'nlog', 'constant']
+                    curves_all = ['linear', 'log', 'squared', 'nlog', 'constant']
                     complexity = compute_complexity(feat, domain,
                                                     path_json) if curve not in curves_all else 1 if curve in [
                         'constant', 'log'] else 2 if curve == 'linear' else 3
@@ -167,7 +170,13 @@ def extract_sheet(gsheet_name, **kwargs):
     # Parameters and fs
     gs_param_list = sheet.col_values(6)[4:]
     gs_fs_list = sheet.col_values(5)[4:]
-    gs_fs = int(sheet.cell(4, 9).value)
+    # Check for invalid fs parameter
+    try:
+        gs_fs = int(sheet.cell(4, 9).value)
+    except ValueError:
+        warnings.warn('Invalid sampling frequency. Setting a default 100Hz sampling frequency.')
+        gs_fs = 100
+        sheet.update_cell(4, 9, str(gs_fs))
 
     # Fix for empty cells in parameters column
     if len(gs_param_list) < len(list_of_features):
@@ -182,13 +191,32 @@ def extract_sheet(gsheet_name, **kwargs):
                 dict_features[domain][feature]['use'] = 'yes'
                 # Check features parameters from Google sheet
                 if gs_param_list[ii] != '':
-                    param_sheet = ast.literal_eval(gs_param_list[ii])
-                    # update dic of features based on Google sheet
-                    dict_features[domain][feature]['parameters'] = param_sheet
+                    if dict_features[domain][feature]['parameters'] == '' or ('fs' in list(
+                            dict(dict_features[domain][feature]['parameters'])) and len(list(
+                            dict(dict_features[domain][feature]['parameters']))) == 1):
+                        warnings.warn('The ' + feature + ' feature does not require parameters.')
+                    else:
+                        try:
+                            param_sheet = ast.literal_eval(gs_param_list[ii])
+                            if not isinstance(param_sheet, dict):
+                                warnings.warn('Invalid parameter format. Using the following parameters for ' + feature + ' feature: '
+                                              + str(dict_features[domain][feature]['parameters']))
+                            else:
+                                # update dic of features based on Google sheet
+                                dict_features[domain][feature]['parameters'] = param_sheet
+                        except ValueError:
+                            warnings.warn('Invalid parameter format. Using the following parameters for ' + feature + ' feature: '
+                                          + str(dict_features[domain][feature]['parameters']))
+                elif dict_features[domain][feature]['parameters'] != '' and ('fs' not in list(
+                        dict(dict_features[domain][feature]['parameters'])) or len(list(
+                        dict(dict_features[domain][feature]['parameters']))) != 1):
+                    warnings.warn('Using the following parameters for ' + feature + ' feature: '
+                                  + str(dict_features[domain][feature]['parameters']))
                 # Check features that use sampling frequency parameter
                 if gs_fs_list[ii] != 'no':
                     # update dict of features based on Google sheet fs
                     dict_features[domain][feature]['parameters']['fs'] = gs_fs
+
             else:
                 dict_features[domain][feature]['use'] = 'no'
         except KeyError:

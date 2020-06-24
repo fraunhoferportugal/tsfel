@@ -3,18 +3,18 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-def signal_window_spliter(signal, window_size, overlap):
+def signal_window_splitter(signal, window_size, overlap=0):
     """Splits the signal into windows
 
     Parameters
     ----------
     signal : nd-array or pandas DataFrame
         input signal
-    window_size :
+    window_size : int
         number of points of window size
-    overlap :
+    overlap : float
         percentage of overlap, value between 0 and 1
-
+        Default: 0
     Returns
     -------
     list
@@ -23,7 +23,10 @@ def signal_window_spliter(signal, window_size, overlap):
     """
 
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
+    if len(signal) % window_size == 0:
+        return [signal[i:i + window_size] for i in range(0, len(signal), step)]
+    else:
+        return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
 
 
 def merge_time_series(data, fs_resample, time_unit):
@@ -61,8 +64,8 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlation_report(features, threshold=0.95):
-    """Performs a correlation report and removes highly correlated features.
+def correlated_features(features, threshold=0.95):
+    """Compute pairwise correlation of features using pearson method
 
     Parameters
     ----------
@@ -73,22 +76,13 @@ def correlation_report(features, threshold=0.95):
     Returns
     -------
     DataFrame
-        Uncorrelated features
+        correlated features names
 
     """
     corr_matrix = features.corr()
+    # Select upper triangle of correlation matrix
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+    # Find index and column name of features with correlation greater than 0.95
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
 
-    inp = str(input('Do you wish to remove correlated features? Enter y/n: '))
-
-    if inp == 'y':
-        # Select upper triangle of correlation matrix
-        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
-        # Find index and column name of features with correlation greater than 0.95
-        to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
-
-        if len(to_drop) == 0:
-            print('No features to remove')
-        for rej in to_drop:
-            print('Removing ' + str(rej))
-            features = features.drop(rej, axis=1)
-    return features
+    return to_drop

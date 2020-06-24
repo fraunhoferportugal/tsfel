@@ -350,6 +350,22 @@
             "parameters": "",
             "use": "yes"
         },
+        "New Feature": {
+            "complexity": "constant",
+            "description": "Computes a new feature.",
+            "function": "new_feature",
+            "parameters": "",
+            "use": "yes"
+        },
+        "New Feature with parameter": {
+            "complexity": "constant",
+            "description": "Computes a new feature with parameter.",
+            "function": "new_feature_with_parameter",
+            "parameters": {
+                "weight": 0.5
+            },
+            "use": "yes"
+        },
         "Root mean square": {
             "complexity": "constant",
             "description": "Computes root mean square of the signal.",
@@ -376,6 +392,22 @@
             "description": "Computes variance of the signal.",
             "function": "tsfel.calc_var",
             "parameters": "",
+            "use": "yes"
+        },
+        "new_feature": {
+            "complexity": "constant",
+            "description": "Computes a new feature",
+            "function": "new_feature",
+            "parameters": "",
+            "use": "yes"
+        },
+        "new_feature_with_parameter": {
+            "complexity": "constant",
+            "description": "A new feature",
+            "function": "new_feature_with_parameter",
+            "parameters": {
+                "weight": 0.5
+            },
             "use": "yes"
         }
     },
@@ -454,15 +486,6 @@
             "description": "Computes number of negative turning points of the signal.",
             "function": "tsfel.negative_turning",
             "parameters": "",
-            "use": "yes"
-        },
-        "Neighbourhood peaks": {
-            "complexity": "constant",
-            "description": "Computes the number of peaks from a defined neighbourhood of the signal.",
-            "function": "tsfel.neighbourhood_peaks",
-            "parameters": {
-                "n": 10
-            },
             "use": "yes"
         },
         "Peak to peak distance": {
