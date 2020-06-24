@@ -1,3 +1,4 @@
+import os
 import json
 import glob
 import tsfel
@@ -13,12 +14,12 @@ def pre_process(sensor_data):
 
 
 # DATASET DIR
-main_directory = r"tests_tools\test_dataset/"
+main_directory = "tests_tools" + os.sep + "test_dataset" + os.sep
 
 # JSON DIR
-tsfel_path_json = tsfel.__path__[0] + '/feature_extraction/features.json'
-personal_path_json = 'tests_tools/test_features.json'
-personal_features_path = r"tests_tools\test_personal_features.py"
+tsfel_path_json = tsfel.__path__[0] + os.sep + 'feature_extraction' + os.sep + 'features.json'
+personal_path_json = 'tests_tools' + os.sep + 'test_features.json'
+personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
 
 # DEFAULT PARAM for testing
 time_unit = 1e9  # seconds
@@ -26,7 +27,7 @@ resample_rate = 30  # resample sampling frequency
 window_size = 100  # number of points
 overlap = 0  # varies between 0 and 1
 search_criteria = ['Accelerometer.txt', 'Gyroscope.txt']
-output_directory = str(Path.home()) + '/Documents/tsfel_output'
+output_directory = str(Path.home()) + os.sep + 'Documents' + os.sep + 'tsfel_output' + os.sep
 sensor_data = {}
 key = 'Accelerometer'
 
@@ -61,5 +62,3 @@ data = tsfel.dataset_features_extractor(main_directory, settings1, search_criter
                                         pre_process=pre_process, output_directory=output_directory,
                                         features_path=personal_features_path)
 print('-----------------------------------OK-----------------------------------')
-
-
