@@ -246,6 +246,9 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     if window_size is not None:
         signal_windows = signal_window_splitter(signal_windows, window_size, overlap)
 
+    if len(signal_windows) == 0:
+        raise SystemExit('Empty signal windows. Please check window size input parameter.')
+    
     features_final = pd.DataFrame()
 
     if isinstance(signal_windows, pd.DataFrame):
