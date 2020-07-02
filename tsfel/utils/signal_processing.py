@@ -23,7 +23,7 @@ def signal_window_splitter(signal, window_size, overlap=0):
     """
 
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    if len(signal) % window_size == 0:
+    if len(signal) % window_size == 0 and overlap == 0:
         return [signal[i:i + window_size] for i in range(0, len(signal), step)]
     else:
         return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
