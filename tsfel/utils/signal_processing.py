@@ -23,10 +23,7 @@ def signal_window_splitter(signal, window_size, overlap=0):
     """
 
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    if len(signal) % window_size == 0:
-        return [signal[i:i + window_size] for i in range(0, len(signal) - step, step)]
-    else:
-        return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
+    return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
 
 
 def merge_time_series(data, fs_resample, time_unit):
