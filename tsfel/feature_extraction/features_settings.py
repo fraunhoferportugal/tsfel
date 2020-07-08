@@ -52,6 +52,33 @@ def get_features_by_domain(domain=None, json_path=None):
         return {domain: dict_features[domain]}
 
 
+def get_number_features(dict_features):
+    """Count the total number of features based on input parameters of each feature
 
+    Parameters
+    ----------
+    dict_features : dict
+        Dictionary with features settings
 
+    Returns
+    -------
+    int
+        Feature vector size
+    """
+    number_features = 0
+    for domain in dict_features:
+        for feat in cfg[domain]:
+            if cfg[domain][feat]["use"] == "no":
+                continue
+            n_feat = cfg[domain][feat]["n_features"]
 
+            if isinstance(n_feat, int):
+                number_features += n_feat
+            else:
+                n_feat_param = cfg[domain][feat]["parameters"][n_feat]
+                if isinstance(n_feat_param, int):
+                    number_features += n_feat_param
+                else:
+                    number_features += eval("len("+n_feat_param+")")
+
+    return number_features

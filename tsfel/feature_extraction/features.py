@@ -770,8 +770,8 @@ def ecdf_slope(signal, p_init=0.5, p_end=0.75):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile(signal, percentile=None):
-    """Computes the percentile value of the ECDF.
+def ecdf_percentile(signal, percentile=[0.2, 0.8]):
+    """Computes the percentile values of the ECDF.
 
     Feature computational cost: 1
 
@@ -788,8 +788,8 @@ def ecdf_percentile(signal, percentile=None):
         The input value(s) of the ECDF
     """
     signal = np.array(signal)
-    if percentile is None:
-        percentile = [0.2, 0.8]
+    if isinstance(percentile, str):
+        percentile = eval(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -811,7 +811,7 @@ def ecdf_percentile(signal, percentile=None):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile_count(signal, percentile=None):
+def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
     """Computes the cumulative sum of samples that are less than the percentile.
 
     Feature computational cost: 1
@@ -829,8 +829,8 @@ def ecdf_percentile_count(signal, percentile=None):
         The cumulative sum of samples
     """
     signal = np.array(signal)
-    if percentile is None:
-        percentile = [0.2, 0.8]
+    if isinstance(percentile, str):
+        percentile = eval(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
