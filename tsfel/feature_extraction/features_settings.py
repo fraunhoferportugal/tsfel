@@ -1,5 +1,6 @@
 import json
 import tsfel
+import numpy as np
 
 
 def load_json(json_path):
@@ -67,15 +68,15 @@ def get_number_features(dict_features):
     """
     number_features = 0
     for domain in dict_features:
-        for feat in cfg[domain]:
-            if cfg[domain][feat]["use"] == "no":
+        for feat in dict_features[domain]:
+            if dict_features[domain][feat]["use"] == "no":
                 continue
-            n_feat = cfg[domain][feat]["n_features"]
+            n_feat = dict_features[domain][feat]["n_features"]
 
             if isinstance(n_feat, int):
                 number_features += n_feat
             else:
-                n_feat_param = cfg[domain][feat]["parameters"][n_feat]
+                n_feat_param = dict_features[domain][feat]["parameters"][n_feat]
                 if isinstance(n_feat_param, int):
                     number_features += n_feat_param
                 else:
