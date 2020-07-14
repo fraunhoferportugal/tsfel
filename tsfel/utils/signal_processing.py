@@ -26,7 +26,7 @@ def signal_window_splitter(signal, window_size, overlap=0):
     if step == 0:
         raise SystemExit('Invalid overlap. '
                          'Choose a lower overlap value.')
-    if len(signal) % window_size == 0 and overlap == 0 and step != 0:
+    if len(signal) % window_size == 0 and overlap == 0:
         return [signal[i:i + window_size] for i in range(0, len(signal), step)]
     else:
         return [signal[i:i + window_size] for i in range(0, len(signal) - step, step)]
