@@ -412,48 +412,25 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                 else:
                     header_names = signal_window.columns.values
 
-                # if hasattr(signal_window, 'loc'):
-                #     window = signal_window.values
-                # else:
-                #     window = signal_window
 
-                # execf = func_total[0] + '(window'
-                # if parameters_total != '':
-                #     execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
-                # execf += ')'
-                # eval_result = eval(execf, locals())
+                window = signal_window.values.T
 
-                # for ax in range(len(header_names)):
-                #     # Function returns more than one element
-                #     if type(eval_result[ax]) == tuple:
-                #         if np.isnan(eval_result[ax][0]):
-                #             eval_result[ax] = np.zeros(len(eval_result[ax]))
-                #         for rr in range(len(eval_result[ax])):
-                #             feature_results += [eval_result[ax][rr]]
-                #             feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
-                #     else:
-                #         feature_results += [eval_result[ax]]
-                #         feature_names += [str(header_names[ax]) + '_' + func_names[0]]
+                execf = func_total[0] + '(window'
+                if parameters_total != '':
+                    execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
+                execf += ')'
+                eval_result = eval(execf, locals())
 
                 for ax in range(len(header_names)):
-                    window = signal_window.iloc[:, ax]
-                    execf = func_total[0] + '(window'
-
-                    if parameters_total != '':
-                        execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
-
-                    execf += ')'
-                    eval_result = eval(execf, locals())
-
                     # Function returns more than one element
-                    if type(eval_result) == tuple:
-                        if np.isnan(eval_result[0]):
-                            eval_result = np.zeros(len(eval_result))
-                        for rr in range(len(eval_result)):
-                            feature_results += [eval_result[rr]]
+                    if len(eval_result[ax].shape) > 0:
+                        if np.isnan(eval_result[ax][0]):
+                            eval_result[ax] = np.zeros(len(eval_result[ax]))
+                        for rr in range(len(eval_result[ax])):
+                            feature_results += [eval_result[ax][rr]]
                             feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
                     else:
-                        feature_results += [eval_result]
+                        feature_results += [eval_result[ax]]
                         feature_names += [str(header_names[ax]) + '_' + func_names[0]]
 
     features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
