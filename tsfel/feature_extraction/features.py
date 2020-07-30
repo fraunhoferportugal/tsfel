@@ -210,7 +210,7 @@ def distance(signal):
         Signal distance
 
     """
-    diff_sig = np.diff(signal)
+    diff_sig = np.diff(signal).astype(float)
     return np.sum([np.sqrt(1 + diff_sig ** 2)])
 
 
