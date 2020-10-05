@@ -13,7 +13,7 @@ def signal_window_splitter(signal, window_size, overlap=0):
     window_size : int
         number of points of window size
     overlap : float
-        percentage of overlap, value between 0 and 1 (exclusive)
+        percentage of overlap, value between 0 and 1
         Default: 0
     Returns
     -------
@@ -23,13 +23,10 @@ def signal_window_splitter(signal, window_size, overlap=0):
     """
 
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    if step == 0:
-        raise SystemExit('Invalid overlap. '
-                         'Choose a lower overlap value.')
     if len(signal) % window_size == 0 and overlap == 0:
         return [signal[i:i + window_size] for i in range(0, len(signal), step)]
     else:
-        return [signal[i:i + window_size] for i in range(0, len(signal) - window_size + 1, step)]
+        return [signal[i:i + window_size] for i in range(0, len(signal) - window_size, step)]
 
 
 def merge_time_series(data, fs_resample, time_unit):

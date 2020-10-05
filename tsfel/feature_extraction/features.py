@@ -79,7 +79,7 @@ def negative_turning(signal):
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
+    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
 
     return len(negative_turning_pts)
 
@@ -105,7 +105,7 @@ def positive_turning(signal):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
@@ -443,6 +443,7 @@ def neighbourhood_peaks(signal, n=10):
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
 
+
 # ############################################ STATISTICAL DOMAIN #################################################### #
 
 
@@ -742,7 +743,7 @@ def ecdf(signal, d=10):
 @set_domain("domain", "statistical")
 def ecdf_slope(signal, p_init=0.5, p_end=0.75):
     """Computes the slope of the ECDF between two percentiles.
-    Possibility to return infinity values.
+    Possibility to return infinity and nan values.
 
     Feature computational cost: 1
 
@@ -766,7 +767,7 @@ def ecdf_slope(signal, p_init=0.5, p_end=0.75):
         return np.inf
     else:
         x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
-        return (p_end - p_init) / (x_end - x_init)
+        return (p_end - p_init) / (x_end - x_init) if (x_end - x_init) != 0 else np.nan
 
 
 @set_domain("domain", "statistical")
@@ -912,7 +913,7 @@ def fundamental_frequency(signal, fs):
 
     # Finding big peaks, not considering noise peaks with low amplitude
 
-    bp = scipy.signal.find_peaks(fmag, height=max(fmag)*0.3)[0]
+    bp = scipy.signal.find_peaks(fmag, height=max(fmag) * 0.3)[0]
 
     # # Condition for offset removal, since the offset generates a peak at frequency zero
     bp = bp[bp != 0]
@@ -1203,7 +1204,7 @@ def spectral_slope(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     sum_fmag = fmag.sum()
-    dot_ff = (f*f).sum()
+    dot_ff = (f * f).sum()
     sum_f = f.sum()
     len_f = len(f)
 
@@ -1213,10 +1214,9 @@ def spectral_slope(signal, fs):
         if not (len_f * dot_ff - sum_f ** 2):
             return 0
         else:
-            num_ = (1 / sum_fmag) * (len_f * np.sum(f*fmag) - sum_f * sum_fmag)
+            num_ = (1 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
             denom_ = (len_f * dot_ff - sum_f ** 2)
             return num_ / denom_
-
 
 
 @set_domain("domain", "spectral")
@@ -1282,7 +1282,7 @@ def spectral_positive_turning(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
