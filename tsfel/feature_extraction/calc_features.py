@@ -281,7 +281,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                                              features_path=features_path, header_names=names), signal_windows)
                 for i, feat in enumerate(features):
                     if verbose == 1:
-                        display_progress_bar(i, signal_windows, out)
+                        display_progress_bar(i, len(signal_windows), out)
                     features_final = features_final.append(feat)
 
                 pool.close()
@@ -293,7 +293,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                     features_final = features_final.append(
                         calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
                     if verbose == 1:
-                        display_progress_bar(i, signal_windows, out)
+                        display_progress_bar(i, len(signal_windows), out)
             else:
                 raise SystemExit('n_jobs value is not valid. '
                                  'Choose an integer value or None for no multiprocessing.')

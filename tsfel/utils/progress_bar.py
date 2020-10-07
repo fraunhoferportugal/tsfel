@@ -53,7 +53,7 @@ def progress_bar_notebook(iteration, total=100):
     return HTML("""
               <p>
                   Progress: {result}% Complete
-              <p/>            
+              <p/>
               <progress
                   value='{value}'
                   max='{max_value}',
@@ -80,8 +80,8 @@ def display_progress_bar(iteration, total, out):
 
     if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
             get_ipython().__class__.__name__ == 'Shell') and out is not None:
-        out.update(progress_bar_notebook(iteration + 1, len(total)))
+        out.update(progress_bar_notebook(iteration + 1, total))
     else:
-        progress_bar_terminal(iteration + 1, len(total), prefix='Progress:', suffix='Complete',
+        progress_bar_terminal(iteration + 1, total, prefix='Progress:', suffix='Complete',
                               length=50)
     return
