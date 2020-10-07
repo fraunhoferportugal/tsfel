@@ -1,6 +1,6 @@
 import scipy
 import numpy as np
-
+from decorator import decorator
 
 def set_domain(key, value):
     def decorate_func(func):
@@ -9,10 +9,20 @@ def set_domain(key, value):
 
     return decorate_func
 
+@decorator
+def vectorize(fn, signal, *args, **kwargs):
+    res = np.array([fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])])
+    if res.size == np.prod(signal.shape[:-1]):
+        return res.reshape(signal.shape[:-1])
+    else:
+        return res.reshape((*signal.shape[:-1], -1))
 
-def vectorized(fn, X, **fnArgs):
-    res = np.array([fn(ts, **fnArgs) for ts in X.reshape(-1, X.shape[-1])])
-    return res.reshape(X.shape[:-1]) if res.size == np.prod(X.shape[:-1]) else res.reshape((*X.shape[:-1], -1))
+def vectorized(fn, signal, *args, **kwargs):
+    res = np.array([fn(ts, *args, **kwargs) for ts in X.reshape(-1, X.shape[-1])])
+    if res.size == np.prod(X.shape[:-1]):
+        return res.reshape(X.shape[:-1])
+    else:
+        return res.reshape((*X.shape[:-1], -1))
 
 def matchLastDimByRepeat(values, wts):
     return np.repeat(np.expand_dims(values, axis=-1), np.ma.size(wts, axis=-1), axis=-1)
@@ -335,7 +345,7 @@ def gaussian(features):
     return np.where(std_value == 0, 0.0, \
                    np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
 
-def __entropy(p):
+def entropy_vectorized(p):
     normTerm = np.log2(np.count_nonzero(p, axis=-1))
 
     # this is the vectorized form of the if sum == 0 case used by tsfel
