@@ -338,7 +338,6 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
 
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
-    names = kwargs.get('header_names', None)
 
     domain = dict_features.keys()
 

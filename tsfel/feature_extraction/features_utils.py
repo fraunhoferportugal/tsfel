@@ -283,40 +283,30 @@ def create_xx(features):
             .transpose(np.append(np.arange(1, features.ndim), 0))
 
 def kde(features):
-    pass
     """Computes the probability density function of the input signal using a Gaussian KDE (Kernel Density Estimate)
+
     Parameters
     ----------
     features : nd-array
         Input from which probability density function is computed
+
     Returns
     -------
     nd-array
         probability density values
+
     """
     features_ = np.copy(features)
-    xx = create_xx(features)
+    xx = create_xx(features_)
 
-    min_f = np.expand_dims(np.min(features, axis=-1), axis=-1)
-    # TODO: the original implementation did not use the abs here like it did in the create_xx, should be further investigated, might be an error
-    max_f = np.expand_dims(np.max(features, axis=-1), axis=-1)
-    noise = np.random.standard_normal(features.shape) * 0.0001
-    features_ = np.where(min_f != max_f, features, features + noise)
+    if min(features_) == max(features_):
+        noise = np.random.randn(len(features_)) * 0.0001
+        features_ = np.copy(features_ + noise)
 
-    # essentially:
-    # 1. flatten the whole thing
-    # 2. then run the original part on each flat instance
-    # 3. reshape to original shape
+    kernel = scipy.stats.gaussian_kde(features_, bw_method='silverman')
 
-    # usually i wouldn't bother, but this part is needed for the otherwise more efficient gaussian param estimation
+    return np.array(kernel(xx) / np.sum(kernel(xx)))
 
-    flat = features_.reshape(-1, features_.shape[-1])
-    flat_xx = xx.reshape(-1, xx.shape[-1])
-    res = np.array([scipy.stats.gaussian_kde(z[0], bw_method='silverman')(z[1]) for z in zip(flat, flat_xx)])
-
-    kernel = res.reshape(features_.shape[:-1]) if res.size == np.prod(features_.shape[:-1]) else res.reshape((*features_.shape[:-1], -1))
-
-    return np.array(kernel / np.expand_dims(np.sum(kernel, axis=-1), axis=-1))
 
 def gaussian(features):
     """Computes the probability density function of the input signal using a Gaussian function

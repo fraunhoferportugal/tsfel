@@ -416,40 +416,6 @@ def entropy(signal, prob='standard'):
         return - np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
-# @set_domain("domain", "temporal")
-# def entropy(signal, prob='gauss'):
-#     """Computes the entropy of the signal using the Shannon Entropy.
-
-#     Description in Article:
-#     Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
-#     Authors: Crutchfield J. Feldman David
-
-#     Feature computational cost: 1
-
-#     Parameters
-#     ----------
-#     signal : nd-array
-#         Input from which entropy is computed
-#     prob : string
-#         Probability function (kde or gaussian functions are available)
-
-#     Returns
-#     -------
-#     float
-#         The normalized entropy value
-
-#     """
-
-#     if prob == 'gauss':
-#         p = gaussian(signal)
-#     elif prob == 'kde':
-#         p = kde(signal)
-#     else:
-#         raise Exception("Unknown prob estimator", prob)
-
-#     return entropy_vectorized(p)
-
-
 @set_domain("domain", "temporal")
 @vectorize
 def neighbourhood_peaks(signal, n=10):
