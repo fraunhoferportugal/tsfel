@@ -17,12 +17,6 @@ def vectorize(fn, signal, *args, **kwargs):
     else:
         return res.reshape((*signal.shape[:-1], -1))
 
-def vectorized(fn, signal, *args, **kwargs):
-    res = np.array([fn(ts, *args, **kwargs) for ts in X.reshape(-1, X.shape[-1])])
-    if res.size == np.prod(X.shape[:-1]):
-        return res.reshape(X.shape[:-1])
-    else:
-        return res.reshape((*X.shape[:-1], -1))
 
 def matchLastDimByRepeat(values, wts):
     return np.repeat(np.expand_dims(values, axis=-1), np.ma.size(wts, axis=-1), axis=-1)
@@ -55,7 +49,7 @@ def compute_time(signal, fs):
     return lastDimToMatchShape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1./fs), signal)
 
 
-def divideWithZero(a, b, out=np.zeros_like):
+def devide_keep_zero(a, b, out=np.zeros_like):
     return np.divide(a, b, out=out(b), where=b != 0)
 
 

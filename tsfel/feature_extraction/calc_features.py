@@ -210,6 +210,9 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
         * *header_names* (``list or array``) --
             Names of each column window
 
+        * *batch_size* (``int``) --
+            Number of windows to calculate at the same time
+
     Returns
     -------
     DataFrame
@@ -223,6 +226,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
+    batch_size = kwargs.get('batch_size', 100)
 
     # Choosing default of n_jobs by operating system
     if sys.platform[:-2] == 'win':
@@ -252,11 +256,11 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     features_final = pd.DataFrame()
 
     if isinstance(signal_windows, pd.DataFrame):
-        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+        features_final = calc_window_features(signal_windows, dict_features, fs, features_path=features_path,
                                               header_names=names)
     else:
         if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+            feat_val = calc_window_features(signal_windows, dict_features, fs, features_path=features_path,
                                             header_names=names)
             feat_val.reset_index(drop=True)
             return feat_val
@@ -269,6 +273,8 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             else:
                 out = None
 
+            batches = [signal_windows[i:i+batch_size] for i in range(0, len(signal_windows), batch_size)]
+
             if isinstance(n_jobs, int):
                 # Multiprocessing use
                 if n_jobs == -1:
@@ -277,23 +283,21 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                     cpu_count = n_jobs
 
                 pool = mp.Pool(cpu_count)
-                features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs,
-                                             features_path=features_path, header_names=names), signal_windows)
+                features = pool.imap(partial(calc_window_features, dict_features=dict_features, fs=fs, features_path=features_path, header_names=names), batches)
                 for i, feat in enumerate(features):
                     if verbose == 1:
-                        display_progress_bar(i, len(signal_windows), out)
+                        display_progress_bar(i, len(batches), out)
                     features_final = features_final.append(feat)
 
                 pool.close()
                 pool.join()
 
             elif n_jobs is None:
-                # Without multiprocessing
-                for i, feat in enumerate(signal_windows):
+                for i, feat in enumerate(batches):
                     features_final = features_final.append(
-                        calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
+                        calc_window_features(feat, dict_features, fs, features_path=features_path, header_names=names))
                     if verbose == 1:
-                        display_progress_bar(i, len(signal_windows), out)
+                        display_progress_bar(i, len(batches), out)
             else:
                 raise SystemExit('n_jobs value is not valid. '
                                  'Choose an integer value or None for no multiprocessing.')
@@ -306,7 +310,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     return features_final.reset_index(drop=True)
 
 
-def calc_window_features(dict_features, signal_window, fs, **kwargs):
+def calc_window_features(signal_window, dict_features, fs, **kwargs):
     """This function computes features matrix for one window.
 
     Parameters
@@ -334,9 +338,8 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
 
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
+    names = kwargs.get('header_names', None)
 
-    # Execute imports
-    exec("import tsfel")
     domain = dict_features.keys()
 
     if features_path:
@@ -346,12 +349,12 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
         exec("from " + features_path.split(os.sep)[-1][:-3]+" import *")
 
     # Create global arrays
-    func_total = []
-    func_names = []
-    imports_total = []
-    parameters_total = []
     feature_results = []
     feature_names = []
+
+    batch_size = None
+    if type(signal_window) == list: # assume list means we are using batching for now
+        batch_size = len(signal_window)
 
     for _type in domain:
         domain_feats = dict_features[_type].keys()
@@ -360,66 +363,57 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
 
             # Only returns used functions
             if dict_features[_type][feat]['use'] == 'yes':
-
-                # Read Function Name (generic name)
-                func_names = [feat]
-
                 # Read Function (real name of function)
-                func_total = [dict_features[_type][feat]['function']]
+                func_total = dict_features[_type][feat]['function']
+
+                if func_total.find('tsfel.') == 0:
+                    func_total = func_total.replace('tsfel.', '')
+                    exec('from tsfel import ' + func_total)
 
                 # Check for parameters
+                parameters_total = {}
+
                 if dict_features[_type][feat]['parameters'] != '':
-                    param = dict_features[_type][feat]['parameters']
+                    parameters_total = dict_features[_type][feat]['parameters']
 
                     # Check assert fs parameter:
-                    if 'fs' in param:
+                    if 'fs' in parameters_total:
 
                         # Select which fs to use
                         if fs is None:
-
                             # Check if features dict has default sampling frequency value
-                            if type(param['fs']) is int or type(param['fs']) is float:
-                                parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
-                            else:
+                            if not (type(parameters_total['fs']) is int or type(parameters_total['fs']) is float):
                                 raise Exception('No sampling frequency assigned.')
                         else:
-                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
-                                                if key not in 'fs']
-                            parameters_total += ['fs =' + str(fs)]
+                            parameters_total['fs'] = fs
 
-                    # feature has no fs parameter
-                    else:
-                        parameters_total = []
-                        for key, value in param.items():
-                            if type(value) is str:
-                                value = '"'+value+'"'
-                            parameters_total.append([str(key) + '=' + str(value)])
+
+                # Name of each column to be concatenate with feature name
+                if isinstance(signal_window, pd.DataFrame):
+                    header_names = signal_window.columns.values
+                    signal_window = signal_window.values
                 else:
-                    parameters_total = ''
+                    signal_window = np.array(signal_window)
+                    if len(signal_window.shape) == 1:
+                        signal_window = np.array([signal_window])
+                    header_names = np.arange(signal_window.shape[-1])
+
+                if names is not None:
+                    if len(names) != len(list(header_names)):
+                        raise Exception('header_names dimension does not match input columns.')
+                    else:
+                        header_names = names
 
                 # To handle object type signals
                 signal_window = np.array(signal_window).astype(float)
 
-                # Name of each column to be concatenate with feature name
-                if not isinstance(signal_window, pd.DataFrame):
-                    signal_window = pd.DataFrame(data=signal_window)
+                # Needed because the vectorization always uses the last axis, no matter the data depth
+                window = np.swapaxes(signal_window, -1, -2)
 
-                if names is not None:
-                    if len(names) != len(list(signal_window.columns.values)):
-                        raise Exception('header_names dimension does not match input columns.')
-                    else:
-                        header_names = names
-                else:
-                    header_names = signal_window.columns.values
+                eval_result = locals()[func_total](window, **parameters_total)
 
-
-                window = signal_window.values.T
-
-                execf = func_total[0] + '(window'
-                if parameters_total != '':
-                    execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
-                execf += ')'
-                eval_result = eval(execf, locals())
+                if batch_size is not None:
+                    eval_result = np.concatenate(eval_result, axis=0)
 
                 for ax in range(len(header_names)):
                     # Function returns more than one element
@@ -428,10 +422,10 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
                             eval_result[ax] = np.zeros(len(eval_result[ax]))
                         for rr in range(len(eval_result[ax])):
                             feature_results += [eval_result[ax][rr]]
-                            feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
+                            feature_names += [str(header_names[ax]) + '_' + feat + '_' + str(rr)]
                     else:
                         feature_results += [eval_result[ax]]
-                        feature_names += [str(header_names[ax]) + '_' + func_names[0]]
+                        feature_names += [str(header_names[ax]) + '_' + feat]
 
     features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
                             columns=np.array(feature_names))

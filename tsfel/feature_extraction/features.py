@@ -53,7 +53,7 @@ def calc_centroid(signal, fs):
 
     t_energy = np.sum(time * energy, axis=-1)
     energy_sum = np.array(np.sum(energy, axis=-1), dtype = float)
-    return divideWithZero(t_energy, energy_sum)
+    return devide_keep_zero(t_energy, energy_sum)
 
 
 @set_domain("domain", "temporal")
@@ -1095,7 +1095,7 @@ def spectral_centroid(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
-    return np.sum(f * divideWithZero(fmag, summedFmag), axis=-1)
+    return np.sum(f * devide_keep_zero(fmag, summedFmag), axis=-1)
 
 
 @set_domain("domain", "spectral")
@@ -1130,7 +1130,7 @@ def spectral_decrease(signal, fs):
     soma_num = np.sum(
         (fmag_band - matchLastDimByRepeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
 
-    return divideWithZero(1, np.sum(fmag_band, axis=-1)) * soma_num
+    return devide_keep_zero(1, np.sum(fmag_band, axis=-1)) * soma_num
 
 
 @set_domain("domain", "spectral")
@@ -1162,7 +1162,7 @@ def spectral_kurtosis(signal, fs):
     summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
 
     spect_kurt = ((f - matchLastDimByRepeat(spect_centr, f)) ** 4) * (fmag / summedFmag)
-    return divideWithZero(np.sum(spect_kurt, axis=-1), spread ** 4)
+    return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread ** 4)
 
 
 @set_domain("domain", "spectral")
@@ -1193,7 +1193,7 @@ def spectral_skewness(signal, fs):
     summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
 
     skew = ((f - matchLastDimByRepeat(spect_centr, f)) ** 3) * (fmag / summedFmag)
-    return divideWithZero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
+    return devide_keep_zero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
 
 
 @set_domain("domain", "spectral")
@@ -1223,7 +1223,7 @@ def spectral_spread(signal, fs):
     spect_centroid = spectral_centroid(signal, fs)
     helper = (f - matchLastDimByRepeat(spect_centroid, f)) ** 2
     summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
-    return np.sum(helper * divideWithZero(fmag, summedFmag), axis=-1) ** 0.5
+    return np.sum(helper * devide_keep_zero(fmag, summedFmag), axis=-1) ** 0.5
 
 
 @set_domain("domain", "spectral")
@@ -1253,9 +1253,9 @@ def spectral_slope(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    num_ = divideWithZero(1, np.sum(fmag, axis=-1)) * (np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1))
+    num_ = devide_keep_zero(1, np.sum(fmag, axis=-1)) * (np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1))
     denom_ = np.ma.size(f, axis=-1) * np.sum(f * f, axis=-1) - np.sum(f, axis=-1) ** 2
-    return divideWithZero(num_, denom_)
+    return devide_keep_zero(num_, denom_)
 
 
 
@@ -1290,7 +1290,7 @@ def spectral_variation(signal, fs):
     sum2 = np.sum(fmag[..., 1:] ** 2, axis=-1)
     sum3 = np.sum(fmag[...,:-1] ** 2, axis=-1)
 
-    return 1 - divideWithZero(sum1, ((sum2 ** 0.5) * (sum3 ** 0.5)))
+    return 1 - devide_keep_zero(sum1, ((sum2 ** 0.5) * (sum3 ** 0.5)))
 
 
 @set_domain("domain", "spectral")
@@ -1412,7 +1412,7 @@ def human_range_energy(signal, fs):
     hr_energy = np.sum(fmag[..., np.argmin(
         np.abs(0.6 - f[..., :])):np.argmin(np.abs(2.5 - f[..., :]))] ** 2, axis=-1)
 
-    return divideWithZero(hr_energy, allenergy)
+    return devide_keep_zero(hr_energy, allenergy)
 
 
 @set_domain("domain", "spectral")
