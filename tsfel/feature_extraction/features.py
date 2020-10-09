@@ -345,7 +345,7 @@ def abs_energy(signal):
         Absolute energy
 
     """
-    return np.sum(abs(signal) ** 2)
+    return np.sum(np.abs(signal) ** 2)
 
 
 @set_domain("domain", "temporal")
