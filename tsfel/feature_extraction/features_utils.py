@@ -146,13 +146,14 @@ def autocorr_norm(signal):
 
     """
 
+    variance = np.var(signal)
     signal = np.copy(signal - signal.mean())
     r = scipy.signal.correlate(signal, signal)[-len(signal):]
 
     if (signal == 0).all():
         return np.zeros(len(signal))
 
-    acf = r / (np.var(signal) * (np.arange(len(signal), 0, -1)))
+    acf = r / variance / len(signal)
 
     return acf
 
