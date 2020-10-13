@@ -38,7 +38,7 @@ def add_feature_json(features_path, json_path):
     # Check if @set_domain was declared on features module
     vset_domain = False
 
-    for fname, f in locals()['pymodule'].__dict__.items():
+    for fname, f in list(locals()['pymodule'].__dict__.items()):
 
         if getattr(f, "domain", None) is not None:
 
