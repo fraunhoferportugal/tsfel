@@ -6,6 +6,7 @@ from tsfel.feature_extraction.features_utils import *
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "inertial")
 def autocorr(signal):
     """Computes autocorrelation of the signal.
 
@@ -62,6 +63,7 @@ def calc_centroid(signal, fs):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "emg")
 def negative_turning(signal):
     """Computes number of negative turning points of the signal.
 
@@ -85,6 +87,7 @@ def negative_turning(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "emg")
 def positive_turning(signal):
     """Computes number of positive turning points of the signal.
 
@@ -235,6 +238,7 @@ def sum_abs_diff(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", ["audio", "emg"])
 def zero_cross(signal):
     """Computes Zero-crossing rate of the signal.
 
@@ -258,6 +262,7 @@ def zero_cross(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "audio")
 def total_energy(signal, fs):
     """Computes the total energy of the signal.
 
@@ -329,6 +334,7 @@ def auc(signal, fs):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "audio")
 def abs_energy(signal):
     """Computes the absolute energy of the signal.
 
@@ -369,6 +375,7 @@ def pk_pk_distance(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "eeg")
 def entropy(signal, prob='standard'):
     """Computes the entropy of the signal using the Shannon Entropy.
 
@@ -574,6 +581,7 @@ def calc_min(signal):
 
 
 @set_domain("domain", "statistical")
+@set_domain("tag", "inertial")
 def calc_mean(signal):
     """Computes mean value of the signal.
 
@@ -654,6 +662,7 @@ def median_abs_deviation(signal):
 
 
 @set_domain("domain", "statistical")
+@set_domain("tag", ["inertial", "emg"])
 def rms(signal):
     """Computes root mean square of the signal.
 
@@ -1010,6 +1019,7 @@ def median_frequency(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def spectral_centroid(signal, fs):
     """Barycenter of the spectrum.
 
@@ -1288,6 +1298,7 @@ def spectral_positive_turning(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def spectral_roll_off(signal, fs):
     """Computes the spectral roll-off of the signal.
 
@@ -1346,6 +1357,7 @@ def spectral_roll_on(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "inertial")
 def human_range_energy(signal, fs):
     """Computes the human range energy ratio.
 
@@ -1383,6 +1395,7 @@ def human_range_energy(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", ["audio", "emg"])
 def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lifter=22):
     """Computes the MEL cepstral coefficients.
 
@@ -1511,6 +1524,7 @@ def fft_mean_coeff(signal, fs, nfreq=256):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def lpcc(signal, n_coeff=12):
     """Computes the linear prediction cepstral coefficients.
 
@@ -1546,6 +1560,7 @@ def lpcc(signal, n_coeff=12):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def spectral_entropy(signal, fs):
     """Computes the spectral entropy of the signal based on Fourier transform.
 
@@ -1586,6 +1601,7 @@ def spectral_entropy(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT entropy of the signal.
 
@@ -1624,6 +1640,7 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", ["eeg", "ecg"])
 def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT absolute mean value of each wavelet scale.
 
@@ -1649,6 +1666,7 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
 
 
 @set_domain("domain", "spectral")
+@set_domain("domain", "eeg")
 def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT std value of each wavelet scale.
 
@@ -1674,6 +1692,7 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT variance value of each wavelet scale.
 
@@ -1699,6 +1718,7 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT energy of each wavelet scale.
 

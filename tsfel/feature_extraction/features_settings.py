@@ -76,7 +76,6 @@ def get_features_by_tag(tag=None, json_path=None):
         if tag not in ["audio", "inertial", "ecg", "eeg", "emg", None]:
             raise SystemExit(
                 "No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.")
-
     features_tag = {}
     dict_features = load_json(json_path)
     if tag is None:
@@ -87,13 +86,17 @@ def get_features_by_tag(tag=None, json_path=None):
             for feat in dict_features[domain]:
                 if dict_features[domain][feat]["use"] == "no":
                     continue
-                js_tag = dict_features[domain][feat]["tag"]
-                if isinstance(js_tag, list):
-                    if any([tag in js_t for js_t in js_tag]):
+                # Check if tag is defined
+                try:
+                    js_tag = dict_features[domain][feat]["tag"]
+                    if isinstance(js_tag, list):
+                        if any([tag in js_t for js_t in js_tag]):
+                            features_tag[domain].update({feat: dict_features[domain][feat]})
+                    elif js_tag == tag:
                         features_tag[domain].update({feat: dict_features[domain][feat]})
-                elif js_tag == tag:
-                    features_tag[domain].update({feat: dict_features[domain][feat]})
-        # to remove empty dicts
+                except KeyError:
+                    continue
+        # To remove empty dicts
         return dict([[d, features_tag[d]] for d in list(features_tag.keys()) if bool(features_tag[d])])
 
 
