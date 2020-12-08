@@ -117,6 +117,7 @@ def compute_complexity(feature, domain, json_path, **kwargs):
     fs = 100
     wave = np.sin(2 * np.pi * f * x / fs)
 
+    # TODO: this does not represent the time for vectorized functions 
     for ti in t:
         for _ in range(20):
 

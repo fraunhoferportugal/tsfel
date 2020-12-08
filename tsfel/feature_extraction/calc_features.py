@@ -210,9 +210,6 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
         * *header_names* (``list or array``) --
             Names of each column window
 
-        * *batch_size* (``int``) --
-            Number of windows to calculate at the same time
-
     Returns
     -------
     DataFrame
@@ -226,7 +223,6 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
-    batch_size = kwargs.get('batch_size', 100)
 
     # Choosing default of n_jobs by operating system
     if sys.platform[:-2] == 'win':
@@ -273,8 +269,6 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             else:
                 out = None
 
-            batches = [signal_windows[i:i+batch_size] for i in range(0, len(signal_windows), batch_size)]
-
             if isinstance(n_jobs, int):
                 # Multiprocessing use
                 if n_jobs == -1:
@@ -283,21 +277,21 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                     cpu_count = n_jobs
 
                 pool = mp.Pool(cpu_count)
-                features = pool.imap(partial(calc_window_features, dict_features=dict_features, fs=fs, features_path=features_path, header_names=names), batches)
+                features = pool.imap(partial(calc_window_features, dict_features=dict_features, fs=fs, features_path=features_path, header_names=names), signal_windows)
                 for i, feat in enumerate(features):
                     if verbose == 1:
-                        display_progress_bar(i, len(batches), out)
+                        display_progress_bar(i, len(signal_windows), out)
                     features_final = features_final.append(feat)
 
                 pool.close()
                 pool.join()
 
             elif n_jobs is None:
-                for i, feat in enumerate(batches):
+                for i, feat in enumerate(signal_windows):
                     features_final = features_final.append(
                         calc_window_features(feat, dict_features, fs, features_path=features_path, header_names=names))
                     if verbose == 1:
-                        display_progress_bar(i, len(batches), out)
+                        display_progress_bar(i, len(signal_windows), out)
             else:
                 raise SystemExit('n_jobs value is not valid. '
                                  'Choose an integer value or None for no multiprocessing.')
@@ -339,6 +333,8 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
 
+    # Execute imports
+    exec("from tsfel import *")
     domain = dict_features.keys()
 
     if features_path:
@@ -350,10 +346,6 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
     # Create global arrays
     feature_results = []
     feature_names = []
-
-    batch_size = None
-    if type(signal_window) == list: # assume list means we are using batching for now
-        batch_size = len(signal_window)
 
     for _type in domain:
         domain_feats = dict_features[_type].keys()
@@ -367,7 +359,6 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
 
                 if func_total.find('tsfel.') == 0:
                     func_total = func_total.replace('tsfel.', '')
-                    exec('from tsfel import ' + func_total)
 
                 # Check for parameters
                 parameters_total = {}
@@ -385,7 +376,6 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
                                 raise Exception('No sampling frequency assigned.')
                         else:
                             parameters_total['fs'] = fs
-
 
                 # Name of each column to be concatenate with feature name
                 if isinstance(signal_window, pd.DataFrame):
@@ -409,10 +399,9 @@ def calc_window_features(signal_window, dict_features, fs, **kwargs):
                 # Needed because the vectorization always uses the last axis, no matter the data depth
                 window = np.swapaxes(signal_window, -1, -2)
 
+                # python expressions in google sheets is broken with this version as the eval was removed (also no objects as strings ie no {foo: '[0.2, 0.8]'})
+                # TODO: please consider removing that functionality for security reasons 
                 eval_result = locals()[func_total](window, **parameters_total)
-
-                if batch_size is not None:
-                    eval_result = np.concatenate(eval_result, axis=0)
 
                 for ax in range(len(header_names)):
                     # Function returns more than one element
