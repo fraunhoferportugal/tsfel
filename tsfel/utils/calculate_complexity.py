@@ -115,7 +115,7 @@ def compute_complexity(feature, domain, json_path, **kwargs):
     f = 0.05
     x = np.arange(0, t[-1] + 1, 1)
     fs = 100
-    wave = np.sin(2 * np.pi * f * x / fs)
+    wave = np.expand_dims(np.sin(2 * np.pi * f * x / fs), axis=-1)
 
     for ti in t:
         for _ in range(20):

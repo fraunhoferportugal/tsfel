@@ -1,8 +1,9 @@
-from tsfel.feature_extraction.features_utils import set_domain
+from tsfel.feature_extraction.features_utils import set_domain, vectorize
 import numpy as np
 
 
 @set_domain("domain", "statistical")
+@vectorize
 def new_feature(signal):
     """Computes a new feature
     Parameters
@@ -19,6 +20,7 @@ def new_feature(signal):
 
 
 @set_domain("domain", "statistical")
+@vectorize
 def new_feature_with_parameter(signal, weight=0.5):
     """A new feature
     Parameters

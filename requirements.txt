@@ -33,3 +33,6 @@ scipy >= 1.4.1
 # tsfel/__init__.py: 2
 # tsfel/setup.py: 1
 setuptools >= 47.1.1
+
+# tsfel/feature_extraction/features_utils.py: 3
+decorator >= 4.4.2
