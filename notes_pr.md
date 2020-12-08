@@ -5,12 +5,15 @@ TL;DR:
 - added vectorization decorator for custom and un-vectorizable features
 - removed eval from feature calculation -> this breaks python code in gsheets
 - breaking changes for custom features and people who use the features directly
-- 
 
 TODOs before considering merging the PR:
 1. There are several breaking changes -> consider version
 2. Discuss if and how the vectorization potential across windows could be used (batching, multiprocessing changes etc)
 3. The eval removal is optional -> this could be removed if the code injection from gsheets is required
+4. calc_feature parameter order -> also optional
+5. calculating the complexity will not represent vectorized functions well
+6. Choose zerocorss feature version (see below)
+7. Check Tests (zerocross, + four tests that iirc also fail in the current version of the library)
 
 
 ## Vectorized Features
@@ -52,4 +55,5 @@ Cons:
     2. parameters with lists should not be strings anymore - ie no {foo: '[0.2, 0.8]'}, but {foo: [0.2, 0.8]})  
 
 
-
+## Zero crossings feature
+The current libary implementation counts the number of times the signals value is equal to zero. The vectorized function requires a change of sign as the tsfel library did in an earlier version. One version should be chosen.

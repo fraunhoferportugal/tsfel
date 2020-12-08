@@ -252,11 +252,11 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     features_final = pd.DataFrame()
 
     if isinstance(signal_windows, pd.DataFrame):
-        features_final = calc_window_features(signal_windows, dict_features, fs, features_path=features_path,
+        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
                                               header_names=names)
     else:
         if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(signal_windows, dict_features, fs, features_path=features_path,
+            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
                                             header_names=names)
             feat_val.reset_index(drop=True)
             return feat_val
@@ -277,7 +277,9 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                     cpu_count = n_jobs
 
                 pool = mp.Pool(cpu_count)
-                features = pool.imap(partial(calc_window_features, dict_features=dict_features, fs=fs, features_path=features_path, header_names=names), signal_windows)
+                features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs, 
+                                            features_path=features_path, header_names=names), signal_windows)
+
                 for i, feat in enumerate(features):
                     if verbose == 1:
                         display_progress_bar(i, len(signal_windows), out)
@@ -289,7 +291,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             elif n_jobs is None:
                 for i, feat in enumerate(signal_windows):
                     features_final = features_final.append(
-                        calc_window_features(feat, dict_features, fs, features_path=features_path, header_names=names))
+                        calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
                     if verbose == 1:
                         display_progress_bar(i, len(signal_windows), out)
             else:
@@ -304,7 +306,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     return features_final.reset_index(drop=True)
 
 
-def calc_window_features(signal_window, dict_features, fs, **kwargs):
+def calc_window_features(dict_features, signal_window, fs, **kwargs):
     """This function computes features matrix for one window.
 
     Parameters

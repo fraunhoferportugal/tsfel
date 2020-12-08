@@ -122,7 +122,7 @@ def compute_complexity(feature, domain, json_path, **kwargs):
         for _ in range(20):
 
             start = time.time()
-            calc_window_features(wave[:int(ti)], one_feat_dict, fs, features_path=features_path)
+            calc_window_features(one_feat_dict, wave[:int(ti)], fs, features_path=features_path)
             end = time.time()
 
             s += [end - start]
