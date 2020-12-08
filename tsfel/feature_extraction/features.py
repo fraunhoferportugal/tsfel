@@ -636,7 +636,7 @@ def mean_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return np.mean(np.abs(signal - matchLastDimByRepeat(np.mean(signal, axis=-1), signal)), axis=-1)
+    return np.mean(np.abs(signal - match_last_dim_by_value_repeat(np.mean(signal, axis=-1), signal)), axis=-1)
 
 
 
@@ -805,6 +805,8 @@ def ecdf_percentile(signal, percentile=None):
         percentile = [0.2, 0.8]
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
+    if isinstance(percentile, (str)):
+        percentile = [float(percentile)]
 
     # calculate ecdf
     x, y = calc_ecdf(signal)
@@ -989,7 +991,7 @@ def max_frequency(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     cum_fmag = np.cumsum(fmag, axis=-1)
-    expanded = matchLastDimByRepeat(
+    expanded = match_last_dim_by_value_repeat(
         np.take(cum_fmag, -1, axis=-1), cum_fmag)
 
     try:
@@ -1023,7 +1025,7 @@ def median_frequency(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     cum_fmag = np.cumsum(fmag, axis=-1)
-    expanded = matchLastDimByRepeat(
+    expanded = match_last_dim_by_value_repeat(
         np.take(cum_fmag, -1, axis=-1), cum_fmag)
 
     try:
@@ -1060,7 +1062,7 @@ def spectral_centroid(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
     return np.sum(f * devide_keep_zero(fmag, summedFmag), axis=-1)
 
 
@@ -1094,7 +1096,7 @@ def spectral_decrease(signal, fs):
 
     # Sum of numerator
     soma_num = np.sum(
-        (fmag_band - matchLastDimByRepeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
+        (fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
 
     return devide_keep_zero(1, np.sum(fmag_band, axis=-1)) * soma_num
 
@@ -1125,9 +1127,9 @@ def spectral_kurtosis(signal, fs):
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
     spread = spectral_spread(signal, fs)
-    summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    spect_kurt = ((f - matchLastDimByRepeat(spect_centr, f)) ** 4) * (fmag / summedFmag)
+    spect_kurt = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4) * (fmag / summedFmag)
     return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread ** 4)
 
 
@@ -1156,9 +1158,9 @@ def spectral_skewness(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
-    summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    skew = ((f - matchLastDimByRepeat(spect_centr, f)) ** 3) * (fmag / summedFmag)
+    skew = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3) * (fmag / summedFmag)
     return devide_keep_zero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
 
 
@@ -1187,8 +1189,8 @@ def spectral_spread(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     spect_centroid = spectral_centroid(signal, fs)
-    helper = (f - matchLastDimByRepeat(spect_centroid, f)) ** 2
-    summedFmag = matchLastDimByRepeat(np.sum(fmag, axis=-1), fmag)
+    helper = (f - match_last_dim_by_value_repeat(spect_centroid, f)) ** 2
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
     return np.sum(helper * devide_keep_zero(fmag, summedFmag), axis=-1) ** 0.5
 
 
@@ -1313,7 +1315,7 @@ def spectral_roll_off(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     cum_fmag = np.cumsum(fmag, axis=-1)
-    value = matchLastDimByRepeat(0.95 * np.sum(fmag, axis=-1), cum_fmag)
+    value = match_last_dim_by_value_repeat(0.95 * np.sum(fmag, axis=-1), cum_fmag)
     ind_mag = np.argmax(np.array(np.asarray(cum_fmag > value)), axis=-1)
     ind_mag = np.expand_dims(ind_mag, axis=-1)
     return np.squeeze(np.take(f, ind_mag), axis=-1)
@@ -1343,7 +1345,7 @@ def spectral_roll_on(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     cum_fmag = np.cumsum(fmag, axis=-1)
-    value = matchLastDimByRepeat(0.05 * np.sum(fmag, axis=-1), cum_fmag)
+    value = match_last_dim_by_value_repeat(0.05 * np.sum(fmag, axis=-1), cum_fmag)
     ind_mag = np.argmax(np.array(np.asarray(cum_fmag >= value)), axis=-1)
     ind_mag = np.expand_dims(ind_mag, axis=-1)
     return np.squeeze(np.take(f, ind_mag), axis=-1)

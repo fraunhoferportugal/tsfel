@@ -18,11 +18,11 @@ def vectorize(fn, signal, *args, **kwargs):
         return res.reshape((*signal.shape[:-1], -1))
 
 
-def matchLastDimByRepeat(values, wts):
+def match_last_dim_by_value_repeat(values, wts):
     return np.repeat(np.expand_dims(values, axis=-1), np.ma.size(wts, axis=-1), axis=-1)
 
 
-def lastDimToMatchShape(arr, targetArr):
+def tile_last_dim_to_match_shape(arr, targetArr):
     return np.tile(arr, np.shape(targetArr)[:-1] + (1,))
 
 
@@ -41,12 +41,9 @@ def compute_time(signal, fs):
     time : float list
         Signal time
 
-    From: https://tsfel.readthedocs.io/en/latest/_modules/tsfel/feature_extraction/features_utils.html#kde
-
-
     """
 
-    return lastDimToMatchShape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1./fs), signal)
+    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1./fs), signal)
 
 
 def devide_keep_zero(a, b, out=np.zeros_like):
@@ -75,8 +72,6 @@ def calc_fft(signal, sf):
     fmag: nd-array
         Amplitude of the frequency values (yy axis)
 
-    From: https://tsfel.readthedocs.io/en/latest/_modules/tsfel/feature_extraction/features_utils.html#kde
-
     """
 
     fmag = np.abs(np.fft.fft(signal, axis=-1))
@@ -86,7 +81,7 @@ def calc_fft(signal, sf):
     # as we already assumed they all have the same length and the same sf, we can just bring f to the same shape as the fmag return value
 
     fmag_ret = fmag[..., :signalLength]
-    f_ret = lastDimToMatchShape(f, fmag_ret)
+    f_ret = tile_last_dim_to_match_shape(f, fmag_ret)
 
     return f_ret, fmag_ret
 
