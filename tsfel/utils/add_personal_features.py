@@ -47,8 +47,9 @@ def add_feature_json(features_path, json_path):
             # Access to personal features.json
             feat_json = load_json(json_path)
 
-            # Assign domain
+            # Assign domain and tag
             domain = getattr(f, "domain", None)
+            tag = getattr(f, "tag", None)
 
             # Feature specifications
             # Description
@@ -70,7 +71,7 @@ def add_feature_json(features_path, json_path):
 
                 for p in args_name[1:]:
                     if p not in list(defaults.keys()):
-                        if p is 'fs':
+                        if p == 'fs':
                             # Assigning a default value for fs if not given
                             defaults[p] = 100
                         else:
@@ -92,6 +93,10 @@ def add_feature_json(features_path, json_path):
                 feat_json[domain][fname] = new_feature
             except KeyError:
                 feat_json[domain] = {fname: new_feature}
+
+            # Insert tag if it is declared
+            if tag is not None:
+                feat_json[domain][fname]['tag'] = tag
 
             # Write new feature on json file
             with open(json_path, "w") as fout:

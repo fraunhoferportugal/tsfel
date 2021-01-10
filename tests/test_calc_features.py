@@ -46,6 +46,8 @@ settings4 = tsfel.get_features_by_domain('spectral')
 settings5 = tsfel.get_features_by_domain()
 settings6 = tsfel.extract_sheet('Features')
 settings7 = tsfel.extract_sheet('Features_test', path_json=personal_path_json)
+settings8 = tsfel.get_features_by_tag('inertial')
+settings10 = tsfel.get_features_by_tag()
 
 # Signal processing
 data_new = tsfel.merge_time_series(sensor_data, resample_rate, time_unit)
