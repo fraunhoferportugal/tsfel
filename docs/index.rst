@@ -6,7 +6,7 @@ Welcome to TSFEL documentation!
     :scale: 35 %
     :alt: TSFEL!
 
-Time Series Feature Extraction Library (TSFEL for short) is a Python package for feature extraction on time series data. It aims to provide exploratory feature extraction tasks on time series without requiring significant programming effort. TSFEL automatically extracts over 60 different features on the statistical, temporal and spectral domains. TSFEL was built by data scientists for data scientists!
+Time Series Feature Extraction Library (TSFEL for short) is a Python package for feature extraction on time series data. It provides exploratory feature extraction tasks on time series without requiring significant programming effort. TSFEL automatically extracts over 60 different features on the statistical, temporal and spectral domains. TSFEL was built by data scientists for data scientists!
 
 Highlights
 ==========

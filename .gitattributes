@@ -23,7 +23,7 @@
 *.ipynb  text
 
 # Consider notebook files as support documentation
-.ipynb linguist-documentation
+*.ipynb linguist-documentation
 
 # Note: .db, .p, and .pkl files are associated
 # with the python modules ``pickle``, ``dbm.*``,
