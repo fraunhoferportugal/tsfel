@@ -26,6 +26,7 @@ Contents
    Get Started <descriptions/get_started>
    Feature List <descriptions/feature_list>
    Personalised Features <descriptions/personal>
+   Frequently Asked Questions <descriptions/faq>
    Module Reference <descriptions/modules>
    Authors <authors>
    Changelog <changelog>

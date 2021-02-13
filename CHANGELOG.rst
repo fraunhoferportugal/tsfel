@@ -2,6 +2,25 @@
 Changelog
 =========
 
+Version 0.1.4
+=============
+- Bugfixes
+    - Fixed a bug on the progress bar not being displayed if the signal is passed already divided into windows (`#49 <https://github.com/fraunhoferportugal/tsfel/issues/49>`_)
+    - Fixed a bug on the ``distance`` feature (`#54 <https://github.com/fraunhoferportugal/tsfel/issues/54>`_)
+    - Fixed a bug raising zero division in the ECDF slope feature (`#57 <https://github.com/fraunhoferportugal/tsfel/pull/57>`_)
+    - Fixed a bug when adding customised features using the JSON
+    - Fixed a bug on LPC was returning inconsistent values (`#58 <https://github.com/fraunhoferportugal/tsfel/pull/58>`_)
+    - Fixed a bug on normalised autocorrelation (`#64 <https://github.com/fraunhoferportugal/tsfel/pull/64>`_)
+
+- Improvements
+    - Refactoring of some code sections and overall improved stability
+    - The documentation has been improved and a FAQ section was created
+    - The ``window_splitter`` parameter is now deprecated. If the user selected a ``window_size`` it is assumed that the signal must be divided into windows.
+    - Unit tests improvements
+
+- New features
+    - Added to return the size of the feature vector from the configuration dictionary (`#50 <https://github.com/fraunhoferportugal/tsfel/issues/50>`_)
+
 
 Version 0.1.3
 =============
