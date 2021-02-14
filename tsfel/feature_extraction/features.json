@@ -320,17 +320,6 @@
       "n_features": "percentile",
       "use": "yes"
     },
-    "ECDF Slope": {
-      "complexity": "log",
-      "description": "Computes the slope of the ECDF between two percentiles.",
-      "function": "tsfel.ecdf_slope",
-      "parameters": {
-        "p_end": 0.75,
-        "p_init": 0.5
-      },
-      "n_features": 1,
-      "use": "yes"
-    },
     "Histogram": {
       "complexity": "log",
       "description": "Computes histogram of the signal.",

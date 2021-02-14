@@ -215,18 +215,6 @@ def test_ecdf_percentile():
     np.testing.assert_almost_equal(ecdf_percentile(noiseWave), (-0.8095410722491809, 0.796916231269631))
 
 
-def test_ecdf_slope():
-    np.testing.assert_almost_equal(ecdf_slope(const0), np.inf)
-    np.testing.assert_almost_equal(ecdf_slope(const1), np.inf)
-    np.testing.assert_almost_equal(ecdf_slope(constNeg), np.inf)
-    np.testing.assert_almost_equal(ecdf_slope(constF), np.inf)
-    np.testing.assert_almost_equal(ecdf_slope(lin), 0.05)
-    np.testing.assert_almost_equal(ecdf_slope(lin0), 0.0475)
-    np.testing.assert_almost_equal(ecdf_slope(wave), 0.3535534)
-    np.testing.assert_almost_equal(ecdf_slope(offsetWave), 0.3535534)
-    np.testing.assert_almost_equal(ecdf_slope(noiseWave), 0.3594095)
-
-
 def test_ecdf_percentile_count():
     np.testing.assert_almost_equal(ecdf_percentile_count(const0), (0, 0))
     np.testing.assert_almost_equal(ecdf_percentile_count(const1), (1, 1))
