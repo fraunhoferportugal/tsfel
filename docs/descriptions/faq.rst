@@ -20,12 +20,12 @@ FAQ
 
     * **Does TSFEL allow to extract features from multi-dimensional time series with variable lengths?**
 
-        Yes, it is possible, indeed. That's actually one of the functionalities that weren't adequately addressed by similar packages when we started the development of TSFEL. I recommend that the time series be stored in a data file and processed using the dataset_features_extractor. We are still updating the documentation of this functionality. In the meantime, you can read Section 2.2.1. Data ingestion and preprocessing of TSFEL publication which addresses that topic.
+        Yes, it is possible, indeed. That's actually one of the functionalities that weren't adequately addressed by similar packages when we started the development of TSFEL. I recommend that the time series be stored in a data file and processed using the dataset_features_extractor. We are still updating the documentation of this functionality. In the meantime, you can read Section 2.2.1. Data ingestion and preprocessing of `TSFEL publication <https://www.sciencedirect.com/science/article/pii/S2352711020300017/>`_ which addresses that topic.
 
 
     * **Do I have examples showcasing a complete pipeline using TSFEL?**
 
-       Sure, we provide several notebooks with examples of complete classification pipelines using TSFEL. The notebooks are available here. If you want to share a notebook with additional pipelines, please feel free to reach us.
+       Sure, we provide several notebooks with examples of complete classification pipelines using TSFEL. The notebooks are available `here <https://github.com/fraunhoferportugal/tsfel/tree/development/notebooks/>`_. If you want to share a notebook with additional pipelines, please feel free to reach us.
 
 
     * **Why should I use TSFEL?**
