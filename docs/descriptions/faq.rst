@@ -25,7 +25,7 @@ FAQ
 
     * **Do I have examples showcasing a complete pipeline using TSFEL?**
 
-       Sure, we provide several notebooks with examples of complete classification pipelines using TSFEL. The notebooks are available `here <https://github.com/fraunhoferportugal/tsfel/tree/development/notebooks/>`_. If you want to share a notebook with additional pipelines, please feel free to reach us.
+       Sure, we provide several notebooks with examples of complete classification pipelines using TSFEL. The notebooks are available `here <https://github.com/fraunhoferportugal/tsfel/tree/master/notebooks/>`_. If you want to share a notebook with additional pipelines, please feel free to reach us.
 
 
     * **Why should I use TSFEL?**
