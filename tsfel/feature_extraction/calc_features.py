@@ -29,7 +29,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     feat_dict : dict
         Dictionary with features
     verbose : int
-        Level of function communication
+        Verbosity mode. 0 = silent, 1 = progress bar.
         (0 or 1 (Default))
     \**kwargs:
     See below:
@@ -61,10 +61,17 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         * *output_directory* (``String``) --
             Output directory
             (default: ``'output_directory', str(Path.home()) + '/tsfel_output'``)
+
         * *features_path* (``string``) --
             Directory of script with personal features
+
         * *header_names* (``list or array``) --
             Names of each column window
+
+        * *n_jobs* (``int``) --
+            The number of jobs to run in parallel. ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+            ``-1`` means using all processors.
+            (default: ``None`` in Windows and ``-1`` for other systems)
 
     Returns
     -------
@@ -96,7 +103,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     n_jobs = kwargs.get('n_jobs', n_jobs_default)
 
     if main_directory[-1] != os.sep:
-        main_directory = main_directory+os.sep
+        main_directory = main_directory + os.sep
 
     folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
@@ -193,7 +200,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     fs : int or None
         Sampling frequency
     verbose : int
-        Level of function communication
+        Verbosity mode. 0 = silent, 1 = progress bar.
         (0 or 1 (Default))
     \**kwargs:
     See below:
@@ -207,8 +214,14 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
         * *features_path* (``string``) --
             Directory of script with personal features
+
         * *header_names* (``list or array``) --
             Names of each column window
+
+        * *n_jobs* (``int``) --
+            The number of jobs to run in parallel. ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+            ``-1`` means using all processors.
+            (default: ``None`` in Windows and ``-1`` for other systems)
 
     Returns
     -------
@@ -248,15 +261,17 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
     if len(signal_windows) == 0:
         raise SystemExit('Empty signal windows. Please check window size input parameter.')
-    
+
     features_final = pd.DataFrame()
 
     if isinstance(signal_windows, pd.DataFrame):
-        features_final = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+        features_final = calc_window_features(dict_features, signal_windows, fs, verbose=verbose, single_window=True,
+                                              features_path=features_path,
                                               header_names=names)
     else:
         if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(dict_features, signal_windows, fs, features_path=features_path,
+            feat_val = calc_window_features(dict_features, signal_windows, fs, verbose=verbose, single_window=True,
+                                            features_path=features_path,
                                             header_names=names)
             feat_val.reset_index(drop=True)
             return feat_val
@@ -306,7 +321,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     return features_final.reset_index(drop=True)
 
 
-def calc_window_features(dict_features, signal_window, fs, **kwargs):
+def calc_window_features(dict_features, signal_window, fs, verbose=1, single_window=False, **kwargs):
     """This function computes features matrix for one window.
 
     Parameters
@@ -317,6 +332,11 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
         Input from which features are computed, window
     fs : int
         Sampling frequency
+    verbose : int
+        Level of function communication
+        (0 or 1 (Default))
+    single_window: Bool
+        Boolean value for printing the progress bar for only one window feature extraction
     \**kwargs:
     See below:
         * *features_path* (``string``) --
@@ -353,10 +373,29 @@ def calc_window_features(dict_features, signal_window, fs, **kwargs):
     feature_results = []
     feature_names = []
 
+    # Starting the display of progress bar for notebooks interfaces
+    # Iterating over features of a single window
+    if verbose == 1 and single_window:
+
+        feat_nb = np.hstack([list(dict_features[_type].keys()) for _type in domain])
+
+        if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
+                get_ipython().__class__.__name__ == 'Shell'):
+            print(len(feat_nb))
+            out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
+        else:
+            out = None
+
+        i_feat = -1
+
     for _type in domain:
         domain_feats = dict_features[_type].keys()
 
         for feat in domain_feats:
+
+            if verbose == 1 and single_window:
+                i_feat = i_feat + 1
+                display_progress_bar(i_feat, feat_nb, out)
 
             # Only returns used functions
             if dict_features[_type][feat]['use'] == 'yes':

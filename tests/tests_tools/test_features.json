@@ -4,6 +4,7 @@
             "complexity": "constant",
             "description": "Computes the mean value of each spectrogram frequency.",
             "function": "tsfel.fft_mean_coeff",
+            "n_features": "nfreq",
             "parameters": {
                 "fs": 100,
                 "nfreq": 256
@@ -14,6 +15,7 @@
             "complexity": "log",
             "description": "Computes the fundamental frequency.",
             "function": "tsfel.fundamental_frequency",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -23,24 +25,29 @@
             "complexity": "log",
             "description": "Computes the human range energy ratio given by the ratio between the energy in frequency 0.6-2.5Hz and the whole energy band.",
             "function": "tsfel.human_range_energy",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
+            "tag": "inertial",
             "use": "yes"
         },
         "LPCC": {
             "complexity": "log",
             "description": "Computes the linear prediction cepstral coefficients.",
             "function": "tsfel.lpcc",
+            "n_features": "n_coeff",
             "parameters": {
                 "n_coeff": 12
             },
+            "tag": "audio",
             "use": "yes"
         },
         "MFCC": {
             "complexity": "constant",
             "description": "Computes the MEL cepstral coefficients.",
             "function": "tsfel.mfcc",
+            "n_features": "num_ceps",
             "parameters": {
                 "cep_lifter": 22,
                 "fs": 100,
@@ -49,12 +56,17 @@
                 "num_ceps": 12,
                 "pre_emphasis": 0.97
             },
+            "tag": [
+                "audio",
+                "emg"
+            ],
             "use": "yes"
         },
         "Max power spectrum": {
             "complexity": "log",
             "description": "Computes the maximum power spectrum density.",
             "function": "tsfel.max_power_spectrum",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -64,6 +76,7 @@
             "complexity": "log",
             "description": "Computes the maximum frequency.",
             "function": "tsfel.max_frequency",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -73,6 +86,7 @@
             "complexity": "log",
             "description": "Computes the median frequency.",
             "function": "tsfel.median_frequency",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -82,6 +96,7 @@
             "complexity": "log",
             "description": "Computes power spectrum density bandwidth of the signal.",
             "function": "tsfel.power_bandwidth",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -91,15 +106,18 @@
             "complexity": "linear",
             "description": "Computes the barycenter of the spectrum.",
             "function": "tsfel.spectral_centroid",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
+            "tag": "audio",
             "use": "yes"
         },
         "Spectral decrease": {
             "complexity": "log",
             "description": "Computes the amount of decreasing of the spectra amplitude.",
             "function": "tsfel.spectral_decrease",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -109,6 +127,7 @@
             "complexity": "log",
             "description": "Computes the signal spectral distance.",
             "function": "tsfel.spectral_distance",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -118,15 +137,18 @@
             "complexity": "log",
             "description": "Computes the spectral entropy of the signal based on Fourier transform.",
             "function": "tsfel.spectral_entropy",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
+            "tag": "eeg",
             "use": "yes"
         },
         "Spectral kurtosis": {
             "complexity": "linear",
             "description": "Computes the flatness of a distribution around its mean value.",
             "function": "tsfel.spectral_kurtosis",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -136,6 +158,7 @@
             "complexity": "log",
             "description": "Computes number of positive turning points of the fft magnitude signal",
             "function": "tsfel.spectral_positive_turning",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -145,15 +168,18 @@
             "complexity": "log",
             "description": "Computes the frequency where 95% of the signal magnitude is contained below of this value.",
             "function": "tsfel.spectral_roll_off",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
+            "tag": "audio",
             "use": "yes"
         },
         "Spectral roll-on": {
             "complexity": "log",
             "description": "Computes the frequency where 5% of the signal magnitude is contained below of this value.",
             "function": "tsfel.spectral_roll_on",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -163,6 +189,7 @@
             "complexity": "linear",
             "description": "Computes the asymmetry of a distribution around its mean value.",
             "function": "tsfel.spectral_skewness",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -172,6 +199,7 @@
             "complexity": "log",
             "description": "Computes the spectral slope, obtained by linear regression of the spectral amplitude.",
             "function": "tsfel.spectral_slope",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -181,6 +209,7 @@
             "complexity": "linear",
             "description": "Computes the spread of the spectrum around its mean value.",
             "function": "tsfel.spectral_spread",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -190,6 +219,7 @@
             "complexity": "log",
             "description": "Computes the amount of variation of the spectrum along time.",
             "function": "tsfel.spectral_variation",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -199,50 +229,63 @@
             "complexity": "linear",
             "description": "Computes CWT absolute mean value of each wavelet scale.",
             "function": "tsfel.wavelet_abs_mean",
+            "n_features": "widths",
             "parameters": {
                 "function": "scipy.signal.ricker",
                 "widths": "np.arange(1,10)"
             },
+            "tag": [
+                "eeg",
+                "ecg"
+            ],
             "use": "yes"
         },
         "Wavelet energy": {
             "complexity": "linear",
             "description": "Computes CWT energy of each wavelet scale.",
             "function": "tsfel.wavelet_energy",
+            "n_features": "widths",
             "parameters": {
                 "function": "scipy.signal.ricker",
                 "widths": "np.arange(1,10)"
             },
+            "tag": "eeg",
             "use": "yes"
         },
         "Wavelet entropy": {
             "complexity": "linear",
             "description": "Computes CWT entropy of the signal.",
             "function": "tsfel.wavelet_entropy",
+            "n_features": 1,
             "parameters": {
                 "function": "scipy.signal.ricker",
                 "widths": "np.arange(1,10)"
             },
+            "tag": "eeg",
             "use": "yes"
         },
         "Wavelet standard deviation": {
             "complexity": "linear",
             "description": "Computes CWT std value of each wavelet scale.",
             "function": "tsfel.wavelet_std",
+            "n_features": "widths",
             "parameters": {
                 "function": "scipy.signal.ricker",
                 "widths": "np.arange(1,10)"
             },
+            "tag": "eeg",
             "use": "yes"
         },
         "Wavelet variance": {
             "complexity": "linear",
             "description": "Computes CWT variance value of each wavelet scale.",
             "function": "tsfel.wavelet_var",
+            "n_features": "widths",
             "parameters": {
                 "function": "scipy.signal.ricker",
                 "widths": "np.arange(1,10)"
             },
+            "tag": "eeg",
             "use": "yes"
         }
     },
@@ -251,6 +294,7 @@
             "complexity": "log",
             "description": "Computes the values of ECDF (empirical cumulative distribution function) along the time axis.",
             "function": "tsfel.ecdf",
+            "n_features": "d",
             "parameters": {
                 "d": 10
             },
@@ -260,8 +304,9 @@
             "complexity": "log",
             "description": "Determines the percentile value of the ECDF.",
             "function": "tsfel.ecdf_percentile",
+            "n_features": "percentile",
             "parameters": {
-                "percentile": null
+                "percentile": "[0.2, 0.8]"
             },
             "use": "yes"
         },
@@ -269,18 +314,9 @@
             "complexity": "log",
             "description": "Determines the cumulative sum of samples that are less than the percentile.",
             "function": "tsfel.ecdf_percentile_count",
+            "n_features": "percentile",
             "parameters": {
-                "percentile": null
-            },
-            "use": "yes"
-        },
-        "ECDF Slope": {
-            "complexity": "log",
-            "description": "Computes the slope of the ECDF between two percentiles.",
-            "function": "tsfel.ecdf_slope",
-            "parameters": {
-                "p_end": 0.75,
-                "p_init": 0.5
+                "percentile": "[0.2, 0.8]"
             },
             "use": "yes"
         },
@@ -288,6 +324,7 @@
             "complexity": "log",
             "description": "Computes histogram of the signal.",
             "function": "tsfel.hist",
+            "n_features": "nbins",
             "parameters": {
                 "nbins": 10,
                 "r": 1
@@ -298,6 +335,7 @@
             "complexity": "constant",
             "description": "Computes interquartile range of the signal.",
             "function": "tsfel.interq_range",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -305,6 +343,7 @@
             "complexity": "constant",
             "description": "Computes kurtosis of the signal.",
             "function": "tsfel.kurtosis",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -312,6 +351,7 @@
             "complexity": "constant",
             "description": "Computes the maximum value of the signal.",
             "function": "tsfel.calc_max",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -319,13 +359,16 @@
             "complexity": "constant",
             "description": "Computes the mean value of the signal.",
             "function": "tsfel.calc_mean",
+            "n_features": 1,
             "parameters": "",
+            "tag": "inertial",
             "use": "yes"
         },
         "Mean absolute deviation": {
             "complexity": "log",
             "description": "Computes mean absolute deviation of the signal.",
             "function": "tsfel.mean_abs_deviation",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -333,6 +376,7 @@
             "complexity": "constant",
             "description": "Computes median of the signal.",
             "function": "tsfel.calc_median",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -340,6 +384,7 @@
             "complexity": "constant",
             "description": "Computes median absolute deviation of the signal.",
             "function": "tsfel.median_abs_deviation",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -347,36 +392,27 @@
             "complexity": "constant",
             "description": "Computes the minimum value of the signal.",
             "function": "tsfel.calc_min",
+            "n_features": 1,
             "parameters": "",
-            "use": "yes"
-        },
-        "New Feature": {
-            "complexity": "constant",
-            "description": "Computes a new feature.",
-            "function": "new_feature",
-            "parameters": "",
-            "use": "yes"
-        },
-        "New Feature with parameter": {
-            "complexity": "constant",
-            "description": "Computes a new feature with parameter.",
-            "function": "new_feature_with_parameter",
-            "parameters": {
-                "weight": 0.5
-            },
             "use": "yes"
         },
         "Root mean square": {
             "complexity": "constant",
             "description": "Computes root mean square of the signal.",
             "function": "tsfel.rms",
+            "n_features": 1,
             "parameters": "",
+            "tag": [
+                "emg",
+                "inertial"
+            ],
             "use": "yes"
         },
         "Skewness": {
             "complexity": "constant",
             "description": "Computes skewness of the signal.",
             "function": "tsfel.skewness",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -384,6 +420,7 @@
             "complexity": "constant",
             "description": "Computes standard deviation of the signal.",
             "function": "tsfel.calc_std",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -391,6 +428,7 @@
             "complexity": "constant",
             "description": "Computes variance of the signal.",
             "function": "tsfel.calc_var",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -416,13 +454,16 @@
             "complexity": "log",
             "description": "Computes the absolute energy of the signal.",
             "function": "tsfel.abs_energy",
+            "n_features": 1,
             "parameters": "",
+            "tag": "audio",
             "use": "yes"
         },
         "Area under the curve": {
             "complexity": "log",
             "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
             "function": "tsfel.auc",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -432,13 +473,16 @@
             "complexity": "constant",
             "description": "Computes autocorrelation of the signal.",
             "function": "tsfel.autocorr",
+            "n_features": 1,
             "parameters": "",
+            "tag": "inertial",
             "use": "yes"
         },
         "Centroid": {
             "complexity": "constant",
             "description": "Computes the centroid along the time axis.",
             "function": "tsfel.calc_centroid",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
@@ -448,15 +492,18 @@
             "complexity": "log",
             "description": "Computes the entropy of the signal using the Shannon Entropy.",
             "function": "tsfel.entropy",
+            "n_features": 1,
             "parameters": {
                 "prob": "standard"
             },
+            "tag": "eeg",
             "use": "yes"
         },
         "Mean absolute diff": {
             "complexity": "constant",
             "description": "Computes mean absolute differences of the signal.",
             "function": "tsfel.mean_abs_diff",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -464,6 +511,7 @@
             "complexity": "constant",
             "description": "Computes mean of differences of the signal.",
             "function": "tsfel.mean_diff",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -471,6 +519,7 @@
             "complexity": "constant",
             "description": "Computes median absolute differences of the signal.",
             "function": "tsfel.median_abs_diff",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -478,6 +527,7 @@
             "complexity": "constant",
             "description": "Computes median of differences of the signal.",
             "function": "tsfel.median_diff",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -485,13 +535,26 @@
             "complexity": "constant",
             "description": "Computes number of negative turning points of the signal.",
             "function": "tsfel.negative_turning",
+            "n_features": 1,
             "parameters": "",
+            "tag": "emg",
+            "use": "yes"
+        },
+        "Neighbourhood peaks": {
+            "complexity": "constant",
+            "description": "Computes the number of peaks from a defined neighbourhood of the signal.",
+            "function": "tsfel.neighbourhood_peaks",
+            "n_features": 1,
+            "parameters": {
+                "n": 10
+            },
             "use": "yes"
         },
         "Peak to peak distance": {
             "complexity": "constant",
             "description": "Computes the peak to peak distance.",
             "function": "tsfel.pk_pk_distance",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -499,13 +562,16 @@
             "complexity": "constant",
             "description": "Computes number of positive turning points of the signal.",
             "function": "tsfel.positive_turning",
+            "n_features": 1,
             "parameters": "",
+            "tag": "emg",
             "use": "yes"
         },
         "Signal distance": {
             "complexity": "constant",
             "description": "Computes signal traveled distance.",
             "function": "tsfel.distance",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -513,6 +579,7 @@
             "complexity": "log",
             "description": "Computes the slope of the signal by fitting a linear equation to the observed data.",
             "function": "tsfel.slope",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -520,6 +587,7 @@
             "complexity": "constant",
             "description": "Computes sum of absolute differences of the signal.",
             "function": "tsfel.sum_abs_diff",
+            "n_features": 1,
             "parameters": "",
             "use": "yes"
         },
@@ -527,16 +595,23 @@
             "complexity": "constant",
             "description": "Computes the total energy of the signal.",
             "function": "tsfel.total_energy",
+            "n_features": 1,
             "parameters": {
                 "fs": 100
             },
+            "tag": "audio",
             "use": "yes"
         },
         "Zero crossing rate": {
             "complexity": "constant",
             "description": "Computes Zero-crossing rate of the signal.",
             "function": "tsfel.zero_cross",
+            "n_features": 1,
             "parameters": "",
+            "tag": [
+                "audio",
+                "emg"
+            ],
             "use": "yes"
         }
     }

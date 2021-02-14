@@ -24,7 +24,11 @@ Let us start by downloading a some data. A complete dataset description can be f
     import numpy as np
     import pandas as pd
 
+<<<<<<< HEAD
     Load the dataset from online repository
+=======
+    # Load the dataset from online repository
+>>>>>>> development
     !wget https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.zip
 
     # Unzip the dataset

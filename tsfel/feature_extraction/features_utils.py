@@ -146,13 +146,14 @@ def autocorr_norm(signal):
 
     """
 
+    variance = np.var(signal)
     signal = np.copy(signal - signal.mean())
     r = scipy.signal.correlate(signal, signal)[-len(signal):]
 
-    if np.sum(signal) == 0:
+    if (signal == 0).all():
         return np.zeros(len(signal))
 
-    acf = r / (np.var(signal) * (np.arange(len(signal), 0, -1)))
+    acf = r / variance / len(signal)
 
     return acf
 
@@ -206,22 +207,27 @@ def lpc(signal, n_coeff=12):
 
     """
 
+    if signal.ndim > 1:
+        raise ValueError("Only 1 dimensional arrays are valid")
+    if n_coeff > signal.size:
+        raise ValueError("Input signal must have a length >= n_coeff")
+
     # Calculate LPC with Yule-Walker
-    acf = autocorr_norm(signal)
+    acf = np.correlate(signal, signal, 'full')
 
+    r = np.zeros(n_coeff+1, 'float32')
     # Assuring that works for all type of input lengths
-    if len(acf) < n_coeff:
-        n_coeff = len(acf)-1
+    nx = np.min([n_coeff+1, len(signal)])
+    r[:nx] = acf[len(signal)-1:len(signal)+n_coeff]
 
-    r = -acf[1:n_coeff + 1].T
-    smatrix = create_symmetric_matrix(acf, n_coeff)
+    smatrix = create_symmetric_matrix(r[:-1], n_coeff)
+
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(n_coeff))
+        return tuple(np.zeros(n_coeff+1))
 
-    lpc_coeffs = np.dot(np.linalg.inv(smatrix), r)
-    lpc_coeffs = lpc_coeffs / (abs(lpc_coeffs).max())
+    lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
-    return tuple(lpc_coeffs)
+    return tuple(np.concatenate(([1.], lpc_coeffs)))
 
 
 def create_xx(features):

@@ -54,7 +54,6 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | ECDF                       |          1         |
 | ECDF Percentile            |          1         |
 | ECDF Percentile Count      |          1         |
-| ECDF Slope                 |          1         |
 | Histogram                  |          1         |
 | Interquartile range        |          1         |
 | Kurtosis                   |          1         |

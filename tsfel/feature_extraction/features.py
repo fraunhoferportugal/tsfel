@@ -6,6 +6,7 @@ from tsfel.feature_extraction.features_utils import *
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "inertial")
 def autocorr(signal):
     """Computes autocorrelation of the signal.
 
@@ -62,6 +63,7 @@ def calc_centroid(signal, fs):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "emg")
 def negative_turning(signal):
     """Computes number of negative turning points of the signal.
 
@@ -79,12 +81,13 @@ def negative_turning(signal):
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
+    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
 
     return len(negative_turning_pts)
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "emg")
 def positive_turning(signal):
     """Computes number of positive turning points of the signal.
 
@@ -105,7 +108,7 @@ def positive_turning(signal):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
@@ -210,7 +213,7 @@ def distance(signal):
         Signal distance
 
     """
-    diff_sig = np.diff(signal)
+    diff_sig = np.diff(signal).astype(float)
     return np.sum([np.sqrt(1 + diff_sig ** 2)])
 
 
@@ -235,6 +238,7 @@ def sum_abs_diff(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", ["audio", "emg"])
 def zero_cross(signal):
     """Computes Zero-crossing rate of the signal.
 
@@ -258,6 +262,7 @@ def zero_cross(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "audio")
 def total_energy(signal, fs):
     """Computes the total energy of the signal.
 
@@ -329,6 +334,7 @@ def auc(signal, fs):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "audio")
 def abs_energy(signal):
     """Computes the absolute energy of the signal.
 
@@ -345,7 +351,7 @@ def abs_energy(signal):
         Absolute energy
 
     """
-    return np.sum(signal ** 2)
+    return np.sum(np.abs(signal) ** 2)
 
 
 @set_domain("domain", "temporal")
@@ -369,6 +375,7 @@ def pk_pk_distance(signal):
 
 
 @set_domain("domain", "temporal")
+@set_domain("tag", "eeg")
 def entropy(signal, prob='standard'):
     """Computes the entropy of the signal using the Shannon Entropy.
 
@@ -442,6 +449,7 @@ def neighbourhood_peaks(signal, n=10):
         peaks &= (subsequence > np.roll(signal, i)[n:-n])
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
+
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
 
@@ -573,6 +581,7 @@ def calc_min(signal):
 
 
 @set_domain("domain", "statistical")
+@set_domain("tag", "inertial")
 def calc_mean(signal):
     """Computes mean value of the signal.
 
@@ -653,6 +662,7 @@ def median_abs_deviation(signal):
 
 
 @set_domain("domain", "statistical")
+@set_domain("tag", ["inertial", "emg"])
 def rms(signal):
     """Computes root mean square of the signal.
 
@@ -740,38 +750,8 @@ def ecdf(signal, d=10):
 
 
 @set_domain("domain", "statistical")
-def ecdf_slope(signal, p_init=0.5, p_end=0.75):
-    """Computes the slope of the ECDF between two percentiles.
-    Possibility to return infinity values.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which ECDF is computed
-    p_init : float
-        Initial percentile
-    p_end : float
-        End percentile
-
-    Returns
-    -------
-    float
-        The slope of the ECDF between two percentiles
-    """
-    signal = np.array(signal)
-    # check if signal is constant
-    if np.sum(np.diff(signal)) == 0:
-        return np.inf
-    else:
-        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
-        return (p_end - p_init) / (x_end - x_init)
-
-
-@set_domain("domain", "statistical")
-def ecdf_percentile(signal, percentile=None):
-    """Computes the percentile value of the ECDF.
+def ecdf_percentile(signal, percentile=[0.2, 0.8]):
+    """Computes the percentile values of the ECDF.
 
     Feature computational cost: 1
 
@@ -788,8 +768,8 @@ def ecdf_percentile(signal, percentile=None):
         The input value(s) of the ECDF
     """
     signal = np.array(signal)
-    if percentile is None:
-        percentile = [0.2, 0.8]
+    if isinstance(percentile, str):
+        percentile = eval(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -811,7 +791,7 @@ def ecdf_percentile(signal, percentile=None):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile_count(signal, percentile=None):
+def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
     """Computes the cumulative sum of samples that are less than the percentile.
 
     Feature computational cost: 1
@@ -829,8 +809,8 @@ def ecdf_percentile_count(signal, percentile=None):
         The cumulative sum of samples
     """
     signal = np.array(signal)
-    if percentile is None:
-        percentile = [0.2, 0.8]
+    if isinstance(percentile, str):
+        percentile = eval(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -912,7 +892,7 @@ def fundamental_frequency(signal, fs):
 
     # Finding big peaks, not considering noise peaks with low amplitude
 
-    bp = scipy.signal.find_peaks(fmag, height=max(fmag)*0.3)[0]
+    bp = scipy.signal.find_peaks(fmag, height=max(fmag) * 0.3)[0]
 
     # # Condition for offset removal, since the offset generates a peak at frequency zero
     bp = bp[bp != 0]
@@ -1009,6 +989,7 @@ def median_frequency(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def spectral_centroid(signal, fs):
     """Barycenter of the spectrum.
 
@@ -1203,7 +1184,7 @@ def spectral_slope(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     sum_fmag = fmag.sum()
-    dot_ff = (f*f).sum()
+    dot_ff = (f * f).sum()
     sum_f = f.sum()
     len_f = len(f)
 
@@ -1213,10 +1194,9 @@ def spectral_slope(signal, fs):
         if not (len_f * dot_ff - sum_f ** 2):
             return 0
         else:
-            num_ = (1 / sum_fmag) * (len_f * np.sum(f*fmag) - sum_f * sum_fmag)
+            num_ = (1 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
             denom_ = (len_f * dot_ff - sum_f ** 2)
             return num_ / denom_
-
 
 
 @set_domain("domain", "spectral")
@@ -1282,12 +1262,13 @@ def spectral_positive_turning(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def spectral_roll_off(signal, fs):
     """Computes the spectral roll-off of the signal.
 
@@ -1346,6 +1327,7 @@ def spectral_roll_on(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "inertial")
 def human_range_energy(signal, fs):
     """Computes the human range energy ratio.
 
@@ -1383,6 +1365,7 @@ def human_range_energy(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", ["audio", "emg"])
 def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lifter=22):
     """Computes the MEL cepstral coefficients.
 
@@ -1511,6 +1494,7 @@ def fft_mean_coeff(signal, fs, nfreq=256):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "audio")
 def lpcc(signal, n_coeff=12):
     """Computes the linear prediction cepstral coefficients.
 
@@ -1546,6 +1530,7 @@ def lpcc(signal, n_coeff=12):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def spectral_entropy(signal, fs):
     """Computes the spectral entropy of the signal based on Fourier transform.
 
@@ -1586,6 +1571,7 @@ def spectral_entropy(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT entropy of the signal.
 
@@ -1624,6 +1610,7 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", ["eeg", "ecg"])
 def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT absolute mean value of each wavelet scale.
 
@@ -1649,6 +1636,7 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
 
 
 @set_domain("domain", "spectral")
+@set_domain("domain", "eeg")
 def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT std value of each wavelet scale.
 
@@ -1674,6 +1662,7 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT variance value of each wavelet scale.
 
@@ -1699,6 +1688,7 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
+@set_domain("tag", "eeg")
 def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT energy of each wavelet scale.
 
