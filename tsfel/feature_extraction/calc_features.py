@@ -29,7 +29,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     feat_dict : dict
         Dictionary with features
     verbose : int
-        Level of function communication
+        Verbosity mode. 0 = silent, 1 = progress bar.
         (0 or 1 (Default))
     \**kwargs:
     See below:
@@ -61,10 +61,17 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         * *output_directory* (``String``) --
             Output directory
             (default: ``'output_directory', str(Path.home()) + '/tsfel_output'``)
+
         * *features_path* (``string``) --
             Directory of script with personal features
+
         * *header_names* (``list or array``) --
             Names of each column window
+
+        * *n_jobs* (``int``) --
+            The number of jobs to run in parallel. ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+            ``-1`` means using all processors.
+            (default: ``None`` in Windows and ``-1`` for other systems)
 
     Returns
     -------
@@ -193,7 +200,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     fs : int or None
         Sampling frequency
     verbose : int
-        Level of function communication
+        Verbosity mode. 0 = silent, 1 = progress bar.
         (0 or 1 (Default))
     \**kwargs:
     See below:
@@ -207,8 +214,14 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
         * *features_path* (``string``) --
             Directory of script with personal features
+
         * *header_names* (``list or array``) --
             Names of each column window
+
+        * *n_jobs* (``int``) --
+            The number of jobs to run in parallel. ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+            ``-1`` means using all processors.
+            (default: ``None`` in Windows and ``-1`` for other systems)
 
     Returns
     -------
