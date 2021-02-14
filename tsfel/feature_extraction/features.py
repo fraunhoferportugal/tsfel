@@ -750,36 +750,6 @@ def ecdf(signal, d=10):
 
 
 @set_domain("domain", "statistical")
-def ecdf_slope(signal, p_init=0.5, p_end=0.75):
-    """Computes the slope of the ECDF between two percentiles.
-    Possibility to return infinity and nan values.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which ECDF is computed
-    p_init : float
-        Initial percentile
-    p_end : float
-        End percentile
-
-    Returns
-    -------
-    float
-        The slope of the ECDF between two percentiles
-    """
-    signal = np.array(signal)
-    # check if signal is constant
-    if np.sum(np.diff(signal)) == 0:
-        return np.inf
-    else:
-        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
-        return (p_end - p_init) / (x_end - x_init) if (x_end - x_init) != 0 else np.nan
-
-
-@set_domain("domain", "statistical")
 def ecdf_percentile(signal, percentile=[0.2, 0.8]):
     """Computes the percentile values of the ECDF.
 
