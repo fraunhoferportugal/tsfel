@@ -15,7 +15,7 @@ Time series are passed as inputs for the main TSFEL extraction method, either as
 Extract from time series as array objects
 -----------------------------------------
 
-Let us start by downloading a some data. A complete dataset description can be found in [1]_. On this example we will use a time series sampled by an accelerometer sensor at 50 Hz.
+Let us start by downloading some data. A complete dataset description can be found in [1]_. On this example we will use a time series sampled by an accelerometer sensor at 50 Hz.
 
 .. code:: python
 
