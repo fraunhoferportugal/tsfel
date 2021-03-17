@@ -37,7 +37,7 @@ def calc_fft(signal, fs):
     ----------
     signal : nd-array
         The input signal from which fft is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -68,7 +68,7 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     ----------
     signal : nd-array
         Input from which filterbank is computed
-    fs : int
+    fs : float
         Sampling frequency
     pre_emphasis : float
         Pre-emphasis coefficient for pre-emphasis filter application
