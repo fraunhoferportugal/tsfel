@@ -165,7 +165,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
         Input from which features are computed, window
     dict_features : dict
         Dictionary with features
-    fs : int or None
+    fs : float or None
         Sampling frequency
     \**kwargs:
         * *features_path* (``string``) --
@@ -330,7 +330,7 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
         Dictionary with features
     signal_window: pandas DataFrame
         Input from which features are computed, window
-    fs : int
+    fs : float
         Sampling frequency
     verbose : int
         Level of function communication

@@ -272,7 +272,7 @@ def total_energy(signal, fs):
     ----------
     signal : nd-array
         Signal from which total energy is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -320,7 +320,7 @@ def auc(signal, fs):
     ----------
     signal : nd-array
         Input from which the area under the curve is computed
-    fs : int
+    fs : float
         Sampling Frequency
     Returns
     -------
@@ -846,7 +846,7 @@ def spectral_distance(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral distance is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -878,7 +878,7 @@ def fundamental_frequency(signal, fs):
     ----------
     signal : nd-array
         Input from which fundamental frequency is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -915,7 +915,7 @@ def max_power_spectrum(signal, fs):
     ----------
     signal : nd-array
         Input from which maximum power spectrum is computed
-    fs : scalar
+    fs : float
         Sampling frequency
 
     Returns
@@ -925,9 +925,9 @@ def max_power_spectrum(signal, fs):
 
     """
     if np.std(signal) == 0:
-        return float(max(scipy.signal.welch(signal, int(fs), nperseg=len(signal))[1]))
+        return float(max(scipy.signal.welch(signal, fs, nperseg=len(signal))[1]))
     else:
-        return float(max(scipy.signal.welch(signal / np.std(signal), int(fs), nperseg=len(signal))[1]))
+        return float(max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1]))
 
 
 @set_domain("domain", "spectral")
@@ -940,7 +940,7 @@ def max_frequency(signal, fs):
     ----------
     signal : nd-array
         Input from which maximum frequency is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1033,7 +1033,7 @@ def spectral_decrease(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral decrease is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1074,7 +1074,7 @@ def spectral_kurtosis(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral kurtosis is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1105,7 +1105,7 @@ def spectral_skewness(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral skewness is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1138,7 +1138,7 @@ def spectral_spread(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral spread is computed.
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1173,7 +1173,7 @@ def spectral_slope(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral slope is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1215,7 +1215,7 @@ def spectral_variation(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral variation is computed.
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1248,7 +1248,7 @@ def spectral_positive_turning(signal, fs):
     ----------
     signal : nd-array
         Input from which the number of positive turning points of the fft magnitude are computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1281,7 +1281,7 @@ def spectral_roll_off(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral roll-off is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1310,7 +1310,7 @@ def spectral_roll_on(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral roll-on is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1340,7 +1340,7 @@ def human_range_energy(signal, fs):
     ----------
     signal : nd-array
         Signal from which human range energy ratio is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1381,7 +1381,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     ----------
     signal : nd-array
         Input from which MEL coefficients is computed
-    fs : int
+    fs : float
         Sampling frequency
     pre_emphasis : float
         Pre-emphasis coefficient for pre-emphasis filter application
@@ -1431,7 +1431,7 @@ def power_bandwidth(signal, fs):
     ----------
     signal : nd-array
         Input from which the power bandwidth computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1474,7 +1474,7 @@ def fft_mean_coeff(signal, fs, nfreq=256):
     ----------
     signal : nd-array
         Input from which fft mean coefficients are computed
-    fs : int
+    fs : float
         Sampling frequency
     nfreq : int
         The number of frequencies
@@ -1540,7 +1540,7 @@ def spectral_entropy(signal, fs):
     ----------
     signal : nd-array
         Input from which spectral entropy is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
