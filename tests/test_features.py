@@ -450,12 +450,12 @@ def test_max_fre():
     np.testing.assert_almost_equal(max_frequency(const1, Fs), 0.0)
     np.testing.assert_almost_equal(max_frequency(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(max_frequency(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(max_frequency(lin, Fs), 444.44444444444446)
-    np.testing.assert_almost_equal(max_frequency(lin0, Fs), 500.0, decimal=5)
-    np.testing.assert_almost_equal(max_frequency(wave, Fs), 5.0100200400801596, decimal=5)
-    np.testing.assert_almost_equal(max_frequency(offsetWave, Fs), 5.0100200400801596, decimal=5)
-    np.testing.assert_almost_equal(max_frequency(noiseWave, Fs), 464.9298597194388, decimal=5)
-    np.testing.assert_almost_equal(max_frequency(x, Fs), 344.689378757515, decimal=1)
+    np.testing.assert_almost_equal(max_frequency(lin, Fs), 450.0)
+    np.testing.assert_almost_equal(max_frequency(lin0, Fs), 450, decimal=5)
+    np.testing.assert_almost_equal(max_frequency(wave, Fs), 5, decimal=5)
+    np.testing.assert_almost_equal(max_frequency(offsetWave, Fs), 5, decimal=5)
+    np.testing.assert_almost_equal(max_frequency(noiseWave, Fs), 465.0, decimal=5)
+    np.testing.assert_almost_equal(max_frequency(x, Fs), 345.0, decimal=1)
 
 
 def test_med_fre():
@@ -463,12 +463,12 @@ def test_med_fre():
     np.testing.assert_almost_equal(median_frequency(const1, Fs), 0.0)
     np.testing.assert_almost_equal(median_frequency(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(median_frequency(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(median_frequency(lin, Fs), 55.55555555555556)
-    np.testing.assert_almost_equal(median_frequency(lin0, Fs), 166.66666666666669, decimal=5)
-    np.testing.assert_almost_equal(median_frequency(wave, Fs), 5.0100200400801596, decimal=5)
+    np.testing.assert_almost_equal(median_frequency(lin, Fs), 50.0)
+    np.testing.assert_almost_equal(median_frequency(lin0, Fs), 150.0, decimal=5)
+    np.testing.assert_almost_equal(median_frequency(wave, Fs), 5, decimal=5)
     np.testing.assert_almost_equal(median_frequency(offsetWave, Fs), 0.0, decimal=5)
-    np.testing.assert_almost_equal(median_frequency(noiseWave, Fs), 146.29258517034066, decimal=5)
-    np.testing.assert_almost_equal(median_frequency(x, Fs), 4.008016032064128, decimal=1)
+    np.testing.assert_almost_equal(median_frequency(noiseWave, Fs), 146, decimal=5)
+    np.testing.assert_almost_equal(median_frequency(x, Fs), 4, decimal=1)
 
 
 def test_fund_fre():
@@ -476,8 +476,8 @@ def test_fund_fre():
     np.testing.assert_almost_equal(fundamental_frequency(const1, 1), 0.0)
     np.testing.assert_almost_equal(fundamental_frequency(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(fundamental_frequency(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(fundamental_frequency(lin, Fs), 55.55555555555556)
-    np.testing.assert_almost_equal(fundamental_frequency(lin0, Fs), 55.55555555555556, decimal=5)
+    np.testing.assert_almost_equal(fundamental_frequency(lin, Fs), 50.0)
+    np.testing.assert_almost_equal(fundamental_frequency(lin0, Fs), 50.0, decimal=5)
     np.testing.assert_almost_equal(fundamental_frequency(wave, Fs), 5.0100200400801596, decimal=1)
     np.testing.assert_almost_equal(fundamental_frequency(offsetWave, Fs), 5.0100200400801596, decimal=1)
     np.testing.assert_almost_equal(fundamental_frequency(noiseWave, Fs), 5.0100200400801596, decimal=1)
@@ -512,11 +512,11 @@ def test_spectral_centroid():
     np.testing.assert_almost_equal(spectral_centroid(const1, Fs), 2.7476856540265033e-14)
     np.testing.assert_almost_equal(spectral_centroid(constNeg, Fs), 2.7476856540265033e-14)
     np.testing.assert_almost_equal(spectral_centroid(constF, Fs), 2.4504208511457478e-14)
-    np.testing.assert_almost_equal(spectral_centroid(lin, Fs), 95.77382394996009)
-    np.testing.assert_almost_equal(spectral_centroid(lin0, Fs), 189.7228259594313, decimal=5)
-    np.testing.assert_almost_equal(spectral_centroid(wave, Fs), 5.010020040084022, decimal=5)
-    np.testing.assert_almost_equal(spectral_centroid(offsetWave, Fs), 1.0020040080169172, decimal=5)
-    np.testing.assert_almost_equal(spectral_centroid(noiseWave, Fs), 181.12036927310848, decimal=5)
+    np.testing.assert_almost_equal(spectral_centroid(lin, Fs), 96.7073273343592)
+    np.testing.assert_almost_equal(spectral_centroid(lin0, Fs), 186.91474845748346, decimal=5)
+    np.testing.assert_almost_equal(spectral_centroid(wave, Fs), 5.000000000003765, decimal=5)
+    np.testing.assert_almost_equal(spectral_centroid(offsetWave, Fs), 1.0000000000008324, decimal=5)
+    np.testing.assert_almost_equal(spectral_centroid(noiseWave, Fs), 181.01477847506436, decimal=5)
 
 
 def test_spectral_spread():
@@ -524,11 +524,11 @@ def test_spectral_spread():
     np.testing.assert_almost_equal(spectral_spread(const1, Fs), 2.811883163207112e-06, decimal=5)
     np.testing.assert_almost_equal(spectral_spread(constNeg, Fs), 2.811883163207112e-06, decimal=5)
     np.testing.assert_almost_equal(spectral_spread(constF, Fs), 2.657703172211011e-06, decimal=5)
-    np.testing.assert_almost_equal(spectral_spread(lin, Fs), 137.9288076645223, decimal=5)
-    np.testing.assert_almost_equal(spectral_spread(lin0, Fs), 140.93247375966078, decimal=5)
+    np.testing.assert_almost_equal(spectral_spread(lin, Fs), 138.77058121011598, decimal=5)
+    np.testing.assert_almost_equal(spectral_spread(lin0, Fs), 142.68541769470383, decimal=5)
     np.testing.assert_almost_equal(spectral_spread(wave, Fs), 3.585399057660381e-05, decimal=5)
-    np.testing.assert_almost_equal(spectral_spread(offsetWave, Fs), 2.004008016105514, decimal=5)
-    np.testing.assert_almost_equal(spectral_spread(noiseWave, Fs), 165.6402040682083, decimal=5)
+    np.testing.assert_almost_equal(spectral_spread(offsetWave, Fs), 2.000000000069193, decimal=5)
+    np.testing.assert_almost_equal(spectral_spread(noiseWave, Fs), 165.48999545678362, decimal=5)
 
 
 def test_spectral_skewness():
@@ -536,9 +536,9 @@ def test_spectral_skewness():
     np.testing.assert_almost_equal(spectral_skewness(const1, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(constNeg, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(constF, Fs), 0.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_skewness(lin, Fs), 1.5090650071326563, decimal=5)
-    np.testing.assert_almost_equal(spectral_skewness(lin0, Fs), 0.8140329168647044, decimal=5)
-    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10643315.707158063, decimal=1)
+    np.testing.assert_almost_equal(spectral_skewness(lin, Fs), 1.4986055403796703, decimal=5)
+    np.testing.assert_almost_equal(spectral_skewness(lin0, Fs), 0.8056481576984842, decimal=5)
+    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10757350.436568316, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(offsetWave, Fs), 1.5000000137542306, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(noiseWave, Fs), 0.4126776686583098, decimal=1)
 
@@ -549,18 +549,18 @@ def test_spectral_kurtosis():
     np.testing.assert_almost_equal(spectral_kurtosis(constNeg, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(constF, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(lin, Fs), 4.209140226148914, decimal=0)
-    np.testing.assert_almost_equal(spectral_kurtosis(lin0, Fs), 2.4060168768515413, decimal=5)
-    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 120959227206031.11, decimal=1)
+    np.testing.assert_almost_equal(spectral_kurtosis(lin0, Fs), 2.3783411026036405, decimal=5)
+    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 123562213974218.0, decimal=1)
     np.testing.assert_almost_equal(spectral_kurtosis(offsetWave, Fs), 3.2500028252333513, decimal=5)
-    np.testing.assert_almost_equal(spectral_kurtosis(noiseWave, Fs), 1.7251592171239667, decimal=5)
+    np.testing.assert_almost_equal(spectral_kurtosis(noiseWave, Fs), 1.724802484601064, decimal=5)
 
 
 def test_spectral_slope():
     np.testing.assert_almost_equal(spectral_slope(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_slope(const1, Fs), -0.0009818181818181818)
-    np.testing.assert_almost_equal(spectral_slope(constNeg, Fs), -0.0009818181818181818)
-    np.testing.assert_almost_equal(spectral_slope(constF, Fs), -0.0009818181818181816)
-    np.testing.assert_almost_equal(spectral_slope(lin, Fs), -0.0006056882550328839)
+    np.testing.assert_almost_equal(spectral_slope(const1, Fs), -0.0009090909090909091)
+    np.testing.assert_almost_equal(spectral_slope(constNeg, Fs), -0.0009090909090909091)
+    np.testing.assert_almost_equal(spectral_slope(constF, Fs), -0.0009090909090909091)
+    np.testing.assert_almost_equal(spectral_slope(lin, Fs), -0.0005574279006023302)
     np.testing.assert_almost_equal(spectral_slope(lin0, Fs), -0.00023672490168659717, decimal=1)
     np.testing.assert_almost_equal(spectral_slope(wave, Fs), -2.3425149700598465e-05, decimal=5)
     np.testing.assert_almost_equal(spectral_slope(offsetWave, Fs), -2.380838323353288e-05, decimal=5)
@@ -572,11 +572,11 @@ def test_spectral_decrease():
     np.testing.assert_almost_equal(spectral_decrease(const1, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_decrease(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_decrease(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_decrease(lin, Fs), -2.255518236004341)
-    np.testing.assert_almost_equal(spectral_decrease(lin0, Fs), 0.5195484076294969, decimal=5)
+    np.testing.assert_almost_equal(spectral_decrease(lin, Fs), -2.2331549790804033)
+    np.testing.assert_almost_equal(spectral_decrease(lin0, Fs), 0.4989510569852126, decimal=5)
     np.testing.assert_almost_equal(spectral_decrease(wave, Fs), 0.19999999999999687, decimal=5)
-    np.testing.assert_almost_equal(spectral_decrease(offsetWave, Fs), -26.963293719961584, decimal=5)
-    np.testing.assert_almost_equal(spectral_decrease(noiseWave, Fs), 0.06053938231990085, decimal=5)
+    np.testing.assert_almost_equal(spectral_decrease(offsetWave, Fs), -26.97129371996163, decimal=5)
+    np.testing.assert_almost_equal(spectral_decrease(noiseWave, Fs), 0.060490667569532336, decimal=5)
 
 
 def test_spectral_roll_on():
@@ -585,10 +585,10 @@ def test_spectral_roll_on():
     np.testing.assert_almost_equal(spectral_roll_on(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_roll_on(constF, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_roll_on(lin, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_roll_on(lin0, Fs), 55.55555555555556, decimal=5)
-    np.testing.assert_almost_equal(spectral_roll_on(wave, Fs), 5.0100200400801596, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_on(lin0, Fs), 50, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_on(wave, Fs), 5, decimal=5)
     np.testing.assert_almost_equal(spectral_roll_on(offsetWave, Fs), 0.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_roll_on(noiseWave, Fs), 5.0100200400801596, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_on(noiseWave, Fs), 5, decimal=5)
 
 
 def test_spectral_roll_off():
@@ -596,23 +596,23 @@ def test_spectral_roll_off():
     np.testing.assert_almost_equal(spectral_roll_off(const1, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_roll_off(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_roll_off(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_roll_off(lin, Fs), 444.44444444444446)
-    np.testing.assert_almost_equal(spectral_roll_off(lin0, Fs), 500.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_roll_off(wave, Fs), 5.0100200400801596, decimal=5)
-    np.testing.assert_almost_equal(spectral_roll_off(offsetWave, Fs), 5.0100200400801596, decimal=5)
-    np.testing.assert_almost_equal(spectral_roll_off(noiseWave, Fs), 464.9298597194388, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_off(lin, Fs), 450.0)
+    np.testing.assert_almost_equal(spectral_roll_off(lin0, Fs), 450, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_off(wave, Fs), 5.0, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_off(offsetWave, Fs), 5.0, decimal=5)
+    np.testing.assert_almost_equal(spectral_roll_off(noiseWave, Fs), 465.0, decimal=5)
 
 
 def test_spectral_distance():
     np.testing.assert_almost_equal(spectral_distance(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_distance(const1, Fs), -100)
-    np.testing.assert_almost_equal(spectral_distance(constNeg, Fs), -100)
-    np.testing.assert_almost_equal(spectral_distance(constF, Fs), -250)
-    np.testing.assert_almost_equal(spectral_distance(lin, Fs), -1256.997293357373)
-    np.testing.assert_almost_equal(spectral_distance(lin0, Fs), -323.15504563934024, decimal=5)
-    np.testing.assert_almost_equal(spectral_distance(wave, Fs), -122500.00000000022, decimal=5)
-    np.testing.assert_almost_equal(spectral_distance(offsetWave, Fs), -622500.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_distance(noiseWave, Fs), -124832.72310672606, decimal=5)
+    np.testing.assert_almost_equal(spectral_distance(const1, Fs), -110)
+    np.testing.assert_almost_equal(spectral_distance(constNeg, Fs), -110)
+    np.testing.assert_almost_equal(spectral_distance(constF, Fs), -275.0)
+    np.testing.assert_almost_equal(spectral_distance(lin, Fs), -1403.8425293964845)
+    np.testing.assert_almost_equal(spectral_distance(lin0, Fs), -377.7289783120891, decimal=5)
+    np.testing.assert_almost_equal(spectral_distance(wave, Fs), -122750.00000000019, decimal=5)
+    np.testing.assert_almost_equal(spectral_distance(offsetWave, Fs), -623750.0, decimal=5)
+    np.testing.assert_almost_equal(spectral_distance(noiseWave, Fs), -125372.23803384512, decimal=5)
 
 
 def test_spect_variation():
@@ -620,11 +620,11 @@ def test_spect_variation():
     np.testing.assert_almost_equal(spectral_variation(const1, Fs), 1.0)
     np.testing.assert_almost_equal(spectral_variation(constNeg, Fs), 1.0)
     np.testing.assert_almost_equal(spectral_variation(constF, Fs), 1.0)
-    np.testing.assert_almost_equal(spectral_variation(lin, Fs), 0.04096548417849766)
-    np.testing.assert_almost_equal(spectral_variation(lin0, Fs), 0.39913530062615254, decimal=5)
+    np.testing.assert_almost_equal(spectral_variation(lin, Fs), 0.04330670010243298)
+    np.testing.assert_almost_equal(spectral_variation(lin0, Fs), 0.3930601189429276, decimal=5)
     np.testing.assert_almost_equal(spectral_variation(wave, Fs), 0.9999999999999997, decimal=5)
     np.testing.assert_almost_equal(spectral_variation(offsetWave, Fs), 0.9999999999999999, decimal=5)
-    np.testing.assert_almost_equal(spectral_variation(noiseWave, Fs), 0.9775968083533805, decimal=5)
+    np.testing.assert_almost_equal(spectral_variation(noiseWave, Fs), 0.9775800433849368, decimal=5)
 
 
 def test_spectral_positive_turning():
@@ -634,9 +634,9 @@ def test_spectral_positive_turning():
     np.testing.assert_almost_equal(spectral_positive_turning(constF, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_positive_turning(lin, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_positive_turning(lin0, Fs), 1.0, decimal=5)
-    np.testing.assert_almost_equal(spectral_positive_turning(wave, Fs), 155, decimal=0)
-    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 158, decimal=1)
-    np.testing.assert_almost_equal(spectral_positive_turning(noiseWave, Fs), 172.0, decimal=1)
+    np.testing.assert_almost_equal(spectral_positive_turning(wave, Fs), 162, decimal=0)
+    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 161, decimal=1)
+    np.testing.assert_almost_equal(spectral_positive_turning(noiseWave, Fs), 173.0, decimal=1)
 
 
 def test_human_range_energy():
@@ -779,11 +779,11 @@ def test_spectral_entropy():
     np.testing.assert_almost_equal(spectral_entropy(const1, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_entropy(constNeg, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_entropy(constF, Fs), 0.0)
-    np.testing.assert_almost_equal(spectral_entropy(lin, Fs), 0.6006757398806453)
-    np.testing.assert_almost_equal(spectral_entropy(lin0, Fs), 0.57319032538303)
+    np.testing.assert_almost_equal(spectral_entropy(lin, Fs), 0.5983234852309258)
+    np.testing.assert_almost_equal(spectral_entropy(lin0, Fs), 0.5745416630615364)
     np.testing.assert_almost_equal(spectral_entropy(wave, Fs), 1.5228376718814352e-29)
     np.testing.assert_almost_equal(spectral_entropy(offsetWave, Fs), 1.783049297437309e-29)
-    np.testing.assert_almost_equal(spectral_entropy(noiseWave, Fs), 0.030107186831275425)
+    np.testing.assert_almost_equal(spectral_entropy(noiseWave, Fs), 0.030114182149973894)
 
 
 def test_wavelet_entropy():
