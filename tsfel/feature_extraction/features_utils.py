@@ -49,10 +49,10 @@ def calc_fft(signal, fs):
 
     """
 
-    fmag = np.abs(np.fft.fft(signal))
-    f = np.linspace(0, fs // 2, len(signal) // 2)
+    fmag = np.abs(np.fft.rfft(signal))
+    f = np.fft.rfftfreq(len(signal), d=1/fs)
 
-    return f[:len(signal) // 2].copy(), fmag[:len(signal) // 2].copy()
+    return f.copy(), fmag.copy()
 
 
 def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
