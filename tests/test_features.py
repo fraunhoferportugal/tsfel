@@ -526,7 +526,7 @@ def test_spectral_skewness():
     np.testing.assert_almost_equal(spectral_skewness(constF, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(lin, Fs), 1.4986055403796703, decimal=5)
     np.testing.assert_almost_equal(spectral_skewness(lin0, Fs), 0.8056481576984842, decimal=5)
-    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10757350.436568316, decimal=1)
+    np.testing.assert_almost_equal(spectral_skewness(wave, Fs), 10746623.828906002, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(offsetWave, Fs), 1.5000000137542306, decimal=1)
     np.testing.assert_almost_equal(spectral_skewness(noiseWave, Fs), 0.4126776686583098, decimal=1)
 
@@ -538,7 +538,7 @@ def test_spectral_kurtosis():
     np.testing.assert_almost_equal(spectral_kurtosis(constF, Fs), 0.0, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(lin, Fs), 4.209140226148914, decimal=0)
     np.testing.assert_almost_equal(spectral_kurtosis(lin0, Fs), 2.3783411026036405, decimal=5)
-    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 123562213974218.0, decimal=1)
+    np.testing.assert_almost_equal(spectral_kurtosis(wave, Fs), 123297212118194.1, decimal=1)
     np.testing.assert_almost_equal(spectral_kurtosis(offsetWave, Fs), 3.2500028252333513, decimal=5)
     np.testing.assert_almost_equal(spectral_kurtosis(noiseWave, Fs), 1.724802484601064, decimal=5)
 
@@ -623,7 +623,7 @@ def test_spectral_positive_turning():
     np.testing.assert_almost_equal(spectral_positive_turning(lin, Fs), 0.0)
     np.testing.assert_almost_equal(spectral_positive_turning(lin0, Fs), 1.0, decimal=5)
     np.testing.assert_almost_equal(spectral_positive_turning(wave, Fs), 162, decimal=0)
-    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 161, decimal=1)
+    np.testing.assert_almost_equal(spectral_positive_turning(offsetWave, Fs), 160, decimal=1)
     np.testing.assert_almost_equal(spectral_positive_turning(noiseWave, Fs), 173.0, decimal=1)
 
 
