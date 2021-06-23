@@ -3,7 +3,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 ![PyPI](https://img.shields.io/pypi/v/tsfel)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/development/notebooks/TSFEL_HAR_Example.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
@@ -54,7 +54,6 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | ECDF                       |          1         |
 | ECDF Percentile            |          1         |
 | ECDF Percentile Count      |          1         |
-| ECDF Slope                 |          1         |
 | Histogram                  |          1         |
 | Interquartile range        |          1         |
 | Kurtosis                   |          1         |
