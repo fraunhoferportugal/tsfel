@@ -10,6 +10,7 @@ def set_domain(key, value):
 
     return decorate_func
 
+
 @decorator
 def vectorize(fn, signal, *args, **kwargs):
     res = np.array([fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])])
@@ -44,7 +45,7 @@ def compute_time(signal, fs):
 
     """
 
-    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1./fs), signal)
+    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal)
 
 
 def devide_keep_zero(a, b, out=np.zeros_like):
@@ -52,7 +53,7 @@ def devide_keep_zero(a, b, out=np.zeros_like):
 
 
 def calc_fft(signal, sf):
-    """ This functions computes the fft of a signal.
+    """This functions computes the fft of a signal.
 
     Parameters
     ----------
@@ -71,7 +72,7 @@ def calc_fft(signal, sf):
     """
 
     fmag = np.abs(np.fft.rfft(signal))
-    f = np.fft.rfftfreq(len(signal), d=1/sf)
+    f = np.fft.rfftfreq(len(signal), d=1 / sf)
 
     return f.copy(), fmag.copy()
 
@@ -117,12 +118,12 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     # Fourier transform and Power spectrum
     mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
 
-    pow_frames = ((1.0 / nfft) * (mag_frames ** 2))  # Power Spectrum
+    pow_frames = (1.0 / nfft) * (mag_frames ** 2)  # Power Spectrum
 
     low_freq_mel = 0
-    high_freq_mel = (2595 * np.log10(1 + (fs / 2) / 700))  # Convert Hz to Mel
+    high_freq_mel = 2595 * np.log10(1 + (fs / 2) / 700)  # Convert Hz to Mel
     mel_points = np.linspace(low_freq_mel, high_freq_mel, nfilt + 2)  # Equally spaced in Mel scale
-    hz_points = (700 * (10 ** (mel_points / 2595) - 1))  # Convert Mel to Hz
+    hz_points = 700 * (10 ** (mel_points / 2595) - 1)  # Convert Mel to Hz
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
@@ -139,7 +140,7 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # Area Normalization
     # If we don't normalize the noise will increase with frequency because of the filter width.
-    enorm = 2.0 / (hz_points[2:nfilt + 2] - hz_points[:nfilt])
+    enorm = 2.0 / (hz_points[2 : nfilt + 2] - hz_points[:nfilt])
     fbank *= enorm[:, np.newaxis]
 
     filter_banks = np.dot(pow_frames, fbank.T)
@@ -169,7 +170,7 @@ def autocorr_norm(signal):
 
     variance = np.var(signal)
     signal = np.copy(signal - signal.mean())
-    r = scipy.signal.correlate(signal, signal)[-len(signal):]
+    r = scipy.signal.correlate(signal, signal)[-len(signal) :]
 
     if (signal == 0).all():
         return np.zeros(len(signal))
@@ -234,21 +235,21 @@ def lpc(signal, n_coeff=12):
         raise ValueError("Input signal must have a length >= n_coeff")
 
     # Calculate LPC with Yule-Walker
-    acf = np.correlate(signal, signal, 'full')
+    acf = np.correlate(signal, signal, "full")
 
-    r = np.zeros(n_coeff+1, 'float32')
+    r = np.zeros(n_coeff + 1, "float32")
     # Assuring that works for all type of input lengths
-    nx = np.min([n_coeff+1, len(signal)])
-    r[:nx] = acf[len(signal)-1:len(signal)+n_coeff]
+    nx = np.min([n_coeff + 1, len(signal)])
+    r[:nx] = acf[len(signal) - 1 : len(signal) + n_coeff]
 
     smatrix = create_symmetric_matrix(r[:-1], n_coeff)
 
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(n_coeff+1))
+        return tuple(np.zeros(n_coeff + 1))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
-    return tuple(np.concatenate(([1.], lpc_coeffs)))
+    return tuple(np.concatenate(([1.0], lpc_coeffs)))
 
 
 def create_xx(features):
@@ -267,8 +268,7 @@ def create_xx(features):
     max_f = np.abs(np.max(features, axis=-1))
     max_f = np.where(min_f != max_f, max_f, max_f + 10)
 
-    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)) \
-            .transpose(np.append(np.arange(1, features.ndim), 0))
+    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)).transpose(np.append(np.arange(1, features.ndim), 0))
 
 
 def kde(features):
@@ -292,7 +292,7 @@ def kde(features):
         noise = np.random.randn(len(features_)) * 0.0001
         features_ = np.copy(features_ + noise)
 
-    kernel = scipy.stats.gaussian_kde(features_, bw_method='silverman')
+    kernel = scipy.stats.gaussian_kde(features_, bw_method="silverman")
 
     return np.array(kernel(xx) / np.sum(kernel(xx)))
 
@@ -315,8 +315,7 @@ def gaussian(features):
 
     pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
 
-    return np.where(std_value == 0, 0.0, \
-                   np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
+    return np.where(std_value == 0, 0.0, np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
 
 
 def entropy_vectorized(p):
@@ -325,9 +324,11 @@ def entropy_vectorized(p):
     # this is the vectorized form of the if sum == 0 case used by tsfel
     # unfortunately only the parts where the condition is met is not feasable,
     #     as we would need to use list comprehension and the like
-    return np.where(np.sum(p, axis=-1) == 0, 0, \
-                    # calculate entropy
-                   - np.sum(np.where(p==0, 0, p * np.log2(p)), axis=-1) / normTerm)
+    return np.where(
+        np.sum(p, axis=-1) == 0,
+        0,  # calculate entropy
+        -np.sum(np.where(p == 0, 0, p * np.log2(p)), axis=-1) / normTerm,
+    )
 
 
 def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
@@ -365,15 +366,14 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 def calc_ecdf(signal):
     """Computes the ECDF of the signal.
 
-      Parameters
-      ----------
-      signal : nd-array
-          Input from which ECDF is computed
-      Returns
-      -------
-      nd-array
-        Sorted signal and computed ECDF.
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    Returns
+    -------
+    nd-array
+      Sorted signal and computed ECDF.
 
-      """
-    return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
-
+    """
+    return np.sort(signal), np.arange(1, len(signal) + 1) / len(signal)

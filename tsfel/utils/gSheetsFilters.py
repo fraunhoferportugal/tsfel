@@ -29,22 +29,34 @@ def filter_features(features, filters):
     features_all = list(np.concatenate([list(features[dk].keys()) for dk in sorted(features.keys())]))
     list_shown, feat_shown = list(features.keys()), features_all
     cost_shown = features_all
-    if filters['2'] != {}:
-        list_hidden = filters['2']['hiddenValues']
+    if filters["2"] != {}:
+        list_hidden = filters["2"]["hiddenValues"]
         list_shown = [dk for dk in features.keys() if dk not in list_hidden]
-    if filters['1'] != {}:
-        feat_hidden = filters['1']['hiddenValues']
+    if filters["1"] != {}:
+        feat_hidden = filters["1"]["hiddenValues"]
         feat_shown = [ff for ff in features_all if ff not in feat_hidden]
-    if filters['3'] != {}:
-        cost_numbers = filters['3']['hiddenValues']
-        cost_hidden = list(np.concatenate([['constant', 'log'] if int(cn) == 1 else
-                                           ['squared', 'nlog'] if int(cn) == 3 else ['linear']
-                                           if int(cn) == 2 else ['unknown'] for cn in cost_numbers]))
+    if filters["3"] != {}:
+        cost_numbers = filters["3"]["hiddenValues"]
+        cost_hidden = list(
+            np.concatenate(
+                [
+                    ["constant", "log"]
+                    if int(cn) == 1
+                    else ["squared", "nlog"]
+                    if int(cn) == 3
+                    else ["linear"]
+                    if int(cn) == 2
+                    else ["unknown"]
+                    for cn in cost_numbers
+                ]
+            )
+        )
         cost_shown = []
         for dk in features.keys():
-            cost_shown += [ff for ff in features[dk].keys() if features[dk][ff]['complexity'] not in cost_hidden]
-    features_filtered = list(np.concatenate([list(features[dk].keys())
-                                             for dk in sorted(features.keys()) if dk in list_shown]))
+            cost_shown += [ff for ff in features[dk].keys() if features[dk][ff]["complexity"] not in cost_hidden]
+    features_filtered = list(
+        np.concatenate([list(features[dk].keys()) for dk in sorted(features.keys()) if dk in list_shown])
+    )
     features_filtered = [ff for ff in features_filtered if ff in feat_shown]
     features_filtered = [cc for cc in features_filtered if cc in cost_shown]
 
@@ -72,7 +84,7 @@ def extract_sheet(gsheet_name, **kwargs):
     lib_path = tsfel.__path__
 
     # Access features.json
-    path_json = kwargs.get('path_json', lib_path[0] + '/feature_extraction/features.json')
+    path_json = kwargs.get("path_json", lib_path[0] + "/feature_extraction/features.json")
 
     # Read features.json into a dictionary of features and parameters
     dict_features = load_json(path_json)
@@ -84,9 +96,8 @@ def extract_sheet(gsheet_name, **kwargs):
 
     # Access Google sheet
     # Scope and credentials using the content of client_secret.json file
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name(lib_path[0] + '/utils/client_secret.json', scope)
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(lib_path[0] + "/utils/client_secret.json", scope)
 
     # Create a gspread client authorizing it using those credentials
     client = gspread.authorize(creds)
@@ -101,16 +112,17 @@ def extract_sheet(gsheet_name, **kwargs):
     list_of_features = sheet.col_values(2)[4:]
 
     try:
-        filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
+        filters = metadata["sheets"][sheet.id]["basicFilter"]["criteria"]
         list_filt_features = filter_features(dict_features, filters)
     except KeyError:
-        print('No filters running. Check Google Sheet filters.')
+        print("No filters running. Check Google Sheet filters.")
         list_filt_features = list_of_features.copy()
 
-    use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
+    use_or_not = ["TRUE" if lf in list_filt_features else "FALSE" for lf in list_of_features]
 
-    assert len(list_of_features) <= (len_json), \
-        "To insert a new feature, please add it to data/features.json with the code in src/utils/features.py"
+    assert len(list_of_features) <= (
+        len_json
+    ), "To insert a new feature, please add it to data/features.json with the code in src/utils/features.py"
 
     # adds a new feature in Google sheet if it is missing from features.json
     if len(list_of_features) < (len_json):
@@ -120,25 +132,30 @@ def extract_sheet(gsheet_name, **kwargs):
             for feat in dict_features[domain].keys():
                 if feat not in list_of_features:
                     feat_dict = dict_features[domain][feat]
-                    param = ''
-                    fs = 'no'
+                    param = ""
+                    fs = "no"
 
                     # Read parameters from features.json
-                    if feat_dict['parameters']:
-                        param = feat_dict['parameters'].copy()
-                        if 'fs' in feat_dict['parameters']:
-                            fs = 'yes'
-                            param.pop('fs')
+                    if feat_dict["parameters"]:
+                        param = feat_dict["parameters"].copy()
+                        if "fs" in feat_dict["parameters"]:
+                            fs = "yes"
+                            param.pop("fs")
                             if len(param) == 0:
-                                param = ''
+                                param = ""
 
-                    curve = feat_dict['complexity']
-                    curves_all = ['linear', 'log', 'squared', 'nlog', 'constant']
-                    complexity = compute_complexity(feat, domain,
-                                                    path_json) if curve not in curves_all else 1 if curve in [
-                        'constant', 'log'] else 2 if curve == 'linear' else 3
-                    new_feat = ['', feat, domain, complexity, fs, str(param),
-                                feat_dict['description']]
+                    curve = feat_dict["complexity"]
+                    curves_all = ["linear", "log", "squared", "nlog", "constant"]
+                    complexity = (
+                        compute_complexity(feat, domain, path_json)
+                        if curve not in curves_all
+                        else 1
+                        if curve in ["constant", "log"]
+                        else 2
+                        if curve == "linear"
+                        else 3
+                    )
+                    new_feat = ["", feat, domain, complexity, fs, str(param), feat_dict["description"]]
 
                     # checks if the Google sheet has no features
                     if sheet.findall(domain) == []:
@@ -155,14 +172,14 @@ def extract_sheet(gsheet_name, **kwargs):
 
         # Update filtered features from Google sheet. Check if filters exist.
         try:
-            filters = metadata['sheets'][sheet.id]['basicFilter']['criteria']
+            filters = metadata["sheets"][sheet.id]["basicFilter"]["criteria"]
             list_filt_features = filter_features(dict_features, filters)
         except KeyError:
             list_filt_features = list_of_features.copy()
 
-        use_or_not = ['TRUE' if lf in list_filt_features else 'FALSE' for lf in list_of_features]
+        use_or_not = ["TRUE" if lf in list_filt_features else "FALSE" for lf in list_of_features]
 
-    assert 'TRUE' in use_or_not, 'Please select a feature to extract!' + '\n'
+    assert "TRUE" in use_or_not, "Please select a feature to extract!" + "\n"
 
     # Reading from Google Sheet
     # Domain
@@ -174,52 +191,66 @@ def extract_sheet(gsheet_name, **kwargs):
     try:
         gs_fs = int(sheet.cell(4, 9).value)
     except ValueError:
-        warnings.warn('Invalid sampling frequency. Setting a default 100Hz sampling frequency.')
+        warnings.warn("Invalid sampling frequency. Setting a default 100Hz sampling frequency.")
         gs_fs = 100
         sheet.update_cell(4, 9, str(gs_fs))
 
     # Fix for empty cells in parameters column
     if len(gs_param_list) < len(list_of_features):
-        empty = [''] * (len(list_of_features) - len(gs_param_list))
+        empty = [""] * (len(list_of_features) - len(gs_param_list))
         gs_param_list = gs_param_list + empty
 
     # Update dict of features with changes from Google sheet
     for ii, feature in enumerate(list_of_features):
         domain = list_domain[ii]
         try:
-            if use_or_not[ii] == 'TRUE':
-                dict_features[domain][feature]['use'] = 'yes'
+            if use_or_not[ii] == "TRUE":
+                dict_features[domain][feature]["use"] = "yes"
                 # Check features parameters from Google sheet
-                if gs_param_list[ii] != '':
-                    if dict_features[domain][feature]['parameters'] == '' or ('fs' in list(
-                            dict(dict_features[domain][feature]['parameters'])) and len(list(
-                            dict(dict_features[domain][feature]['parameters']))) == 1):
-                        warnings.warn('The ' + feature + ' feature does not require parameters.')
+                if gs_param_list[ii] != "":
+                    if dict_features[domain][feature]["parameters"] == "" or (
+                        "fs" in list(dict(dict_features[domain][feature]["parameters"]))
+                        and len(list(dict(dict_features[domain][feature]["parameters"]))) == 1
+                    ):
+                        warnings.warn("The " + feature + " feature does not require parameters.")
                     else:
                         try:
                             param_sheet = ast.literal_eval(gs_param_list[ii])
                             if not isinstance(param_sheet, dict):
-                                warnings.warn('Invalid parameter format. Using the following parameters for ' + feature + ' feature: '
-                                              + str(dict_features[domain][feature]['parameters']))
+                                warnings.warn(
+                                    "Invalid parameter format. Using the following parameters for "
+                                    + feature
+                                    + " feature: "
+                                    + str(dict_features[domain][feature]["parameters"])
+                                )
                             else:
                                 # update dic of features based on Google sheet
-                                dict_features[domain][feature]['parameters'] = param_sheet
+                                dict_features[domain][feature]["parameters"] = param_sheet
                         except ValueError:
-                            warnings.warn('Invalid parameter format. Using the following parameters for ' + feature + ' feature: '
-                                          + str(dict_features[domain][feature]['parameters']))
-                elif dict_features[domain][feature]['parameters'] != '' and ('fs' not in list(
-                        dict(dict_features[domain][feature]['parameters'])) or len(list(
-                        dict(dict_features[domain][feature]['parameters']))) != 1):
-                    warnings.warn('Using the following parameters for ' + feature + ' feature: '
-                                  + str(dict_features[domain][feature]['parameters']))
+                            warnings.warn(
+                                "Invalid parameter format. Using the following parameters for "
+                                + feature
+                                + " feature: "
+                                + str(dict_features[domain][feature]["parameters"])
+                            )
+                elif dict_features[domain][feature]["parameters"] != "" and (
+                    "fs" not in list(dict(dict_features[domain][feature]["parameters"]))
+                    or len(list(dict(dict_features[domain][feature]["parameters"]))) != 1
+                ):
+                    warnings.warn(
+                        "Using the following parameters for "
+                        + feature
+                        + " feature: "
+                        + str(dict_features[domain][feature]["parameters"])
+                    )
                 # Check features that use sampling frequency parameter
-                if gs_fs_list[ii] != 'no':
+                if gs_fs_list[ii] != "no":
                     # update dict of features based on Google sheet fs
-                    dict_features[domain][feature]['parameters']['fs'] = gs_fs
+                    dict_features[domain][feature]["parameters"]["fs"] = gs_fs
 
             else:
-                dict_features[domain][feature]['use'] = 'no'
+                dict_features[domain][feature]["use"] = "no"
         except KeyError:
-            print('Unknown domain at cell', int(ii + 5))
+            print("Unknown domain at cell", int(ii + 5))
 
     return dict_features

@@ -3,8 +3,6 @@ from tsfel.feature_extraction.features_utils import *
 
 
 # ############################################# TEMPORAL DOMAIN ##################################################### #
-
-
 @set_domain("domain", "temporal")
 @set_domain("tag", "inertial")
 @vectorize
@@ -53,7 +51,7 @@ def calc_centroid(signal, fs):
     energy = signal ** 2
 
     t_energy = np.sum(time * energy, axis=-1)
-    energy_sum = np.array(np.sum(energy, axis=-1), dtype = float)
+    energy_sum = np.array(np.sum(energy, axis=-1), dtype=float)
     return devide_keep_zero(t_energy, energy_sum)
 
 
@@ -114,19 +112,19 @@ def positive_turning(signal):
 def mean_abs_diff(signal):
     """Computes mean absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which mean absolute deviation is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean absolute deviation is computed
 
-   Returns
-   -------
-   float
-       Mean absolute difference result
+    Returns
+    -------
+    float
+        Mean absolute difference result
 
-   """
+    """
     return np.mean(np.abs(np.diff(signal)), axis=-1)
 
 
@@ -134,61 +132,59 @@ def mean_abs_diff(signal):
 def mean_diff(signal):
     """Computes mean of differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which mean of differences is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean of differences is computed
 
-   Returns
-   -------
-   float
-       Mean difference result
+    Returns
+    -------
+    float
+        Mean difference result
 
-   """
+    """
     return np.mean(np.diff(signal), axis=-1)
-
 
 
 @set_domain("domain", "temporal")
 def median_abs_diff(signal):
     """Computes median absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which median absolute difference is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median absolute difference is computed
 
-   Returns
-   -------
-   float
-       Median absolute difference result
+    Returns
+    -------
+    float
+        Median absolute difference result
 
-   """
+    """
     return np.median(np.abs(np.diff(signal)), axis=-1)
-
 
 
 @set_domain("domain", "temporal")
 def median_diff(signal):
     """Computes median of differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which median of differences is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median of differences is computed
 
-   Returns
-   -------
-   float
-       Median difference result
+    Returns
+    -------
+    float
+        Median difference result
 
-   """
+    """
     return np.median(np.diff(signal), axis=-1)
 
 
@@ -196,20 +192,20 @@ def median_diff(signal):
 def distance(signal):
     """Computes signal traveled distance.
 
-    Calculates the total distance traveled by the signal
-    using the hipotenusa between 2 datapoints.
+     Calculates the total distance traveled by the signal
+     using the hipotenusa between 2 datapoints.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which distance is computed
+     Parameters
+     ----------
+     signal : nd-array
+         Input from which distance is computed
 
-    Returns
-    -------
-    float
-        Signal distance
+     Returns
+     -------
+     float
+         Signal distance
 
     """
     return np.sum(np.sqrt(np.diff(signal) ** 2 + 1), axis=-1)
@@ -219,19 +215,19 @@ def distance(signal):
 def sum_abs_diff(signal):
     """Computes sum of absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which sum absolute difference is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which sum absolute difference is computed
 
-   Returns
-   -------
-   float
-       Sum absolute difference result
+    Returns
+    -------
+    float
+        Sum absolute difference result
 
-   """
+    """
     return np.sum(np.abs(np.diff(signal)), axis=-1)
 
 
@@ -279,7 +275,7 @@ def total_energy(signal, fs):
         Total energy
 
     """
-    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1./fs)
+    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1.0 / fs)
 
 
 @set_domain("domain", "temporal")
@@ -329,7 +325,6 @@ def auc(signal, fs):
     return np.sum(0.5 * np.diff(t, axis=-1) * np.abs(signal[..., :-1] + signal[..., 1:]), axis=-1)
 
 
-
 @set_domain("domain", "temporal")
 @set_domain("tag", "audio")
 def abs_energy(signal):
@@ -370,10 +365,11 @@ def pk_pk_distance(signal):
     """
     return np.abs(np.max(signal, axis=-1) - np.min(signal, axis=-1))
 
+
 @set_domain("domain", "temporal")
 @set_domain("tag", "eeg")
 @vectorize
-def entropy(signal, prob='standard'):
+def entropy(signal, prob="standard"):
     """Computes the entropy of the signal using the Shannon Entropy.
 
     Description in Article:
@@ -396,12 +392,12 @@ def entropy(signal, prob='standard'):
 
     """
 
-    if prob == 'standard':
+    if prob == "standard":
         value, counts = np.unique(signal, return_counts=True)
         p = counts / counts.sum()
-    elif prob == 'kde':
+    elif prob == "kde":
         p = kde(signal)
-    elif prob == 'gauss':
+    elif prob == "gauss":
         p = gaussian(signal)
 
     if np.sum(p) == 0:
@@ -416,7 +412,7 @@ def entropy(signal, prob='standard'):
     elif np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
         return 0.0
     else:
-        return - np.sum(p * np.log2(p)) / np.log2(len(signal))
+        return -np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 @set_domain("domain", "temporal")
@@ -442,16 +438,14 @@ def neighbourhood_peaks(signal, n=10):
     signal = np.array(signal)
     subsequence = signal[n:-n]
     # initial iteration
-    peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
+    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n])
     for i in range(2, n + 1):
-        peaks &= (subsequence > np.roll(signal, i)[n:-n])
-        peaks &= (subsequence > np.roll(signal, -i)[n:-n])
+        peaks &= subsequence > np.roll(signal, i)[n:-n]
+        peaks &= subsequence > np.roll(signal, -i)[n:-n]
     return np.sum(peaks)
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
-
-
 @set_domain("domain", "statistical")
 @vectorize
 def hist(signal, nbins=10, r=1):
@@ -867,7 +861,6 @@ def ecdf_percentile_count(signal, percentile=None):
 
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #
-
 @set_domain("domain", "spectral")
 def spectral_distance(signal, fs):
     """Computes the signal spectral distance.
@@ -896,7 +889,7 @@ def spectral_distance(signal, fs):
 
     # Compute the linear regression
     # TODO: there must be a nicer version than this transpose...
-    points_y = np.linspace(0, cum_fmag[...,-1], np.ma.size(cum_fmag, axis=-1))
+    points_y = np.linspace(0, cum_fmag[..., -1], np.ma.size(cum_fmag, axis=-1))
     points_y = points_y.transpose(np.append(np.arange(1, signal.ndim), 0))
 
     return np.sum(points_y - cum_fmag, axis=-1)
@@ -990,12 +983,10 @@ def max_frequency(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     cum_fmag = np.cumsum(fmag, axis=-1)
-    expanded = match_last_dim_by_value_repeat(
-        np.take(cum_fmag, -1, axis=-1), cum_fmag)
+    expanded = match_last_dim_by_value_repeat(np.take(cum_fmag, -1, axis=-1), cum_fmag)
 
     try:
-        ind_mag = np.argmax(
-            np.array(np.asarray(cum_fmag > expanded * 0.95)), axis=-1)
+        ind_mag = np.argmax(np.array(np.asarray(cum_fmag > expanded * 0.95)), axis=-1)
     except IndexError:
         ind_mag = np.argmax(cum_fmag, axis=-1)
 
@@ -1024,12 +1015,10 @@ def median_frequency(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     cum_fmag = np.cumsum(fmag, axis=-1)
-    expanded = match_last_dim_by_value_repeat(
-        np.take(cum_fmag, -1, axis=-1), cum_fmag)
+    expanded = match_last_dim_by_value_repeat(np.take(cum_fmag, -1, axis=-1), cum_fmag)
 
     try:
-        ind_mag = np.argmax(
-            np.array(np.asarray(cum_fmag > expanded * 0.5)), axis=-1)
+        ind_mag = np.argmax(np.array(np.asarray(cum_fmag > expanded * 0.5)), axis=-1)
     except IndexError:
         ind_mag = np.argmax(cum_fmag, axis=-1)
 
@@ -1095,8 +1084,7 @@ def spectral_decrease(signal, fs):
     len_fmag_band = np.arange(1, np.ma.size(fmag, axis=-1))
 
     # Sum of numerator
-    soma_num = np.sum(
-        (fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
+    soma_num = np.sum((fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
 
     return devide_keep_zero(1, np.sum(fmag_band, axis=-1)) * soma_num
 
@@ -1222,7 +1210,9 @@ def spectral_slope(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
 
-    num_ = devide_keep_zero(1, np.sum(fmag, axis=-1)) * (np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1))
+    num_ = devide_keep_zero(1, np.sum(fmag, axis=-1)) * (
+        np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1)
+    )
     denom_ = np.ma.size(f, axis=-1) * np.sum(f * f, axis=-1) - np.sum(f, axis=-1) ** 2
     return devide_keep_zero(num_, denom_)
 
@@ -1256,7 +1246,7 @@ def spectral_variation(signal, fs):
 
     sum1 = np.sum(fmag[..., :-1] * fmag[..., 1:], axis=-1)
     sum2 = np.sum(fmag[..., 1:] ** 2, axis=-1)
-    sum3 = np.sum(fmag[...,:-1] ** 2, axis=-1)
+    sum3 = np.sum(fmag[..., :-1] ** 2, axis=-1)
 
     return 1 - devide_keep_zero(sum1, ((sum2 ** 0.5) * (sum3 ** 0.5)))
 
@@ -1379,8 +1369,7 @@ def human_range_energy(signal, fs):
 
     allenergy = np.sum(fmag ** 2, axis=-1)
 
-    hr_energy = np.sum(fmag[..., np.argmin(
-        np.abs(0.6 - f[..., :])):np.argmin(np.abs(2.5 - f[..., :]))] ** 2, axis=-1)
+    hr_energy = np.sum(fmag[..., np.argmin(np.abs(0.6 - f[..., :])) : np.argmin(np.abs(2.5 - f[..., :]))] ** 2, axis=-1)
 
     return devide_keep_zero(hr_energy, allenergy)
 
@@ -1424,9 +1413,9 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     """
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
+    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm="ortho")[1 : (num_ceps + 1)]  # Keep 2-13
 
-    mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
+    mel_coeff -= np.mean(mel_coeff, axis=0) + 1e-8
 
     # liftering
     ncoeff = len(mel_coeff)
