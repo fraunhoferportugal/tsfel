@@ -72,7 +72,8 @@ def calc_fft(signal, sf):
     """
 
     fmag = np.abs(np.fft.rfft(signal))
-    f = np.fft.rfftfreq(len(signal), d=1 / sf)
+    len_signal = len(signal[-1, ...]) if len(np.shape(signal)) > 1 else len(signal)
+    f = np.fft.rfftfreq(len_signal, d=1 / sf)
 
     return f.copy(), fmag.copy()
 

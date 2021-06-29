@@ -384,6 +384,36 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
 
+    if names is None:
+        # Name of each column to be concatenate with feature name
+        if isinstance(signal_window, pd.DataFrame):
+            header_names = signal_window.columns.values
+            header_names = np.arange(signal_window.shape[-1])
+            if single_window:
+                signal_window = np.array(signal_window).astype(float)
+                signal_window = np.swapaxes(signal_window, -1, -2)
+
+        else:
+            signal_window = np.array(signal_window)
+            if len(signal_window.shape) == 1:
+                signal_window = np.array([signal_window])
+                header_names = np.array([0])
+            else:
+                header_names = np.arange(signal_window.shape[-1])
+
+    else:
+        if len(names) != len(list(header_names)):
+            raise Exception("header_names dimension does not match input columns.")
+        else:
+            header_names = names
+
+    if not single_window:
+        # To handle object type signals
+        signal_window = np.array(signal_window).astype(float)
+
+        # Needed because the vectorization always uses the last axis, no matter the data depth
+        signal_window = np.swapaxes(signal_window, -1, -2)
+
     # Execute imports
     exec("from tsfel import *")
     domain = dict_features.keys()
@@ -446,31 +476,9 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
                         else:
                             parameters_total["fs"] = fs
 
-                # Name of each column to be concatenate with feature name
-                if isinstance(signal_window, pd.DataFrame):
-                    header_names = signal_window.columns.values
-                    signal_window = signal_window.values
-                else:
-                    signal_window = np.array(signal_window)
-                    if len(signal_window.shape) == 1:
-                        signal_window = np.array([signal_window])
-                    header_names = np.arange(signal_window.shape[-1])
-
-                if names is not None:
-                    if len(names) != len(list(header_names)):
-                        raise Exception("header_names dimension does not match input columns.")
-                    else:
-                        header_names = names
-
-                # To handle object type signals
-                signal_window = np.array(signal_window).astype(float)
-
-                # Needed because the vectorization always uses the last axis, no matter the data depth
-                window = np.swapaxes(signal_window, -1, -2)
-
                 # python expressions in google sheets is broken with this version as the eval was removed (also no objects as strings ie no {foo: '[0.2, 0.8]'})
                 # TODO: please consider removing that functionality for security reasons
-                eval_result = locals()[func_total](window, **parameters_total)
+                eval_result = locals()[func_total](signal_window, **parameters_total)
 
                 for ax in range(len(header_names)):
                     # Function returns more than one element
