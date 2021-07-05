@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.1.5-dev
+=============
+- Changes
+    - Feature ``total energy`` changed name to ``average power``
+    - Features ``peak to peak``, ``absolute energy`` and ``entropy`` are now classified as statistical
+
+
 Version 0.1.4
 =============
 - Bugfixes
