@@ -82,7 +82,7 @@ def correlated_features(features, threshold=0.95):
         correlated features names
 
     """
-    corr_matrix = features.corr()
+    corr_matrix = features.corr().abs()
     # Select upper triangle of correlation matrix
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
     # Find index and column name of features with correlation greater than 0.95
