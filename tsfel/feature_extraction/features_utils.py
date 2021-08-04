@@ -1,6 +1,6 @@
 import scipy
 import numpy as np
-
+from decorator import decorator
 
 def set_domain(key, value):
     def decorate_func(func):
@@ -8,6 +8,22 @@ def set_domain(key, value):
         return func
 
     return decorate_func
+
+@decorator
+def vectorize(fn, signal, *args, **kwargs):
+    res = np.array([fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])])
+    if res.size == np.prod(signal.shape[:-1]):
+        return res.reshape(signal.shape[:-1])
+    else:
+        return res.reshape((*signal.shape[:-1], -1))
+
+
+def match_last_dim_by_value_repeat(values, wts):
+    return np.repeat(np.expand_dims(values, axis=-1), np.ma.size(wts, axis=-1), axis=-1)
+
+
+def tile_last_dim_to_match_shape(arr, targetArr):
+    return np.tile(arr, np.shape(targetArr)[:-1] + (1,))
 
 
 def compute_time(signal, fs):
@@ -27,17 +43,26 @@ def compute_time(signal, fs):
 
     """
 
-    return np.arange(0, len(signal))/fs
+    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1./fs), signal)
 
 
-def calc_fft(signal, fs):
+def devide_keep_zero(a, b, out=np.zeros_like):
+    return np.divide(a, b, out=out(b), where=b != 0)
+
+
+def calc_fft(signal, sf):
     """ This functions computes the fft of a signal.
+
+    Assumption
+    ----------
+    This is a well behaved ndarray in which each dimension has the same length.
+    willma.ill fail / the wrong dimension is used, as numpy will (likely) flatten all mismatching dimensions below
 
     Parameters
     ----------
     signal : nd-array
         The input signal from which fft is computed
-    fs : int
+    sf : int
         Sampling frequency
 
     Returns
@@ -49,10 +74,18 @@ def calc_fft(signal, fs):
 
     """
 
-    fmag = np.abs(np.fft.fft(signal))
-    f = np.linspace(0, fs // 2, len(signal) // 2)
+    fmag = np.abs(np.fft.fft(signal, axis=-1))
+    signalLength = np.ma.size(signal, axis=-1) // 2
+    f = np.linspace(0, sf // 2, signalLength)
 
-    return f[:len(signal) // 2].copy(), fmag[:len(signal) // 2].copy()
+    # as we already assumed they all have the same length and the same sf, we can just bring f to the same shape as the fmag return value
+
+    fmag_ret = fmag[..., :signalLength]
+    f_ret = tile_last_dim_to_match_shape(f, fmag_ret)
+
+    return f_ret, fmag_ret
+
+
 
 
 def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
@@ -230,37 +263,25 @@ def lpc(signal, n_coeff=12):
     return tuple(np.concatenate(([1.], lpc_coeffs)))
 
 
+
 def create_xx(features):
     """Computes the range of features amplitude for the probability density function calculus.
-
     Parameters
     ----------
     features : nd-array
         Input features
-
     Returns
     -------
     nd-array
         range of features amplitude
-
     """
 
-    features_ = np.copy(features)
+    min_f = np.min(features, axis=-1)
+    max_f = np.abs(np.max(features, axis=-1))
+    max_f = np.where(min_f != max_f, max_f, max_f + 10)
 
-    if max(features_) < 0:
-        max_f = - max(features_)
-        min_f = min(features_)
-    else:
-        min_f = min(features_)
-        max_f = max(features_)
-
-    if min(features_) == max(features_):
-        xx = np.linspace(min_f, min_f + 10, len(features_))
-    else:
-        xx = np.linspace(min_f, max_f, len(features_))
-
-    return xx
-
+    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)) \
+            .transpose(np.append(np.arange(1, features.ndim), 0))
 
 def kde(features):
     """Computes the probability density function of the input signal using a Gaussian KDE (Kernel Density Estimate)
@@ -290,7 +311,6 @@ def kde(features):
 
 def gaussian(features):
     """Computes the probability density function of the input signal using a Gaussian function
-
     Parameters
     ----------
     features : nd-array
@@ -299,20 +319,26 @@ def gaussian(features):
     -------
     nd-array
         probability density values
-
     """
 
-    features_ = np.copy(features)
+    xx = create_xx(features)
+    std_value = np.expand_dims(np.std(features, axis=-1), axis=-1)
+    mean_value = np.expand_dims(np.mean(features, axis=-1), axis=-1)
 
-    xx = create_xx(features_)
-    std_value = np.std(features_)
-    mean_value = np.mean(features_)
-
-    if std_value == 0:
-        return 0.0
     pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
 
-    return np.array(pdf_gauss / np.sum(pdf_gauss))
+    return np.where(std_value == 0, 0.0, \
+                   np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
+
+def entropy_vectorized(p):
+    normTerm = np.log2(np.count_nonzero(p, axis=-1))
+
+    # this is the vectorized form of the if sum == 0 case used by tsfel
+    # unfortunately only the parts where the condition is met is not feasable,
+    #     as we would need to use list comprehension and the like
+    return np.where(np.sum(p, axis=-1) == 0, 0, \
+                    # calculate entropy
+                   - np.sum(np.where(p==0, 0, p * np.log2(p)), axis=-1) / normTerm)
 
 
 def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):

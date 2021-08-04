@@ -6,7 +6,7 @@ from tsfel.feature_extraction.features_utils import *
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "inertial")
+@vectorize
 def autocorr(signal):
     """Computes autocorrelation of the signal.
 
@@ -49,21 +49,15 @@ def calc_centroid(signal, fs):
 
     time = compute_time(signal, fs)
 
-    energy = np.array(signal) ** 2
+    energy = signal ** 2
 
-    t_energy = np.dot(np.array(time), np.array(energy))
-    energy_sum = np.sum(energy)
-
-    if energy_sum == 0 or t_energy == 0:
-        centroid = 0
-    else:
-        centroid = t_energy / energy_sum
-
-    return centroid
+    t_energy = np.sum(time * energy, axis=-1)
+    energy_sum = np.array(np.sum(energy, axis=-1), dtype = float)
+    return devide_keep_zero(t_energy, energy_sum)
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "emg")
+@vectorize
 def negative_turning(signal):
     """Computes number of negative turning points of the signal.
 
@@ -81,13 +75,13 @@ def negative_turning(signal):
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
+    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal+1] > 0))[0]
 
     return len(negative_turning_pts)
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "emg")
+@vectorize
 def positive_turning(signal):
     """Computes number of positive turning points of the signal.
 
@@ -108,7 +102,7 @@ def positive_turning(signal):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
@@ -130,7 +124,7 @@ def mean_abs_diff(signal):
        Mean absolute difference result
 
    """
-    return np.mean(np.abs(np.diff(signal)))
+    return np.mean(np.abs(np.diff(signal)), axis=-1)
 
 
 @set_domain("domain", "temporal")
@@ -150,7 +144,8 @@ def mean_diff(signal):
        Mean difference result
 
    """
-    return np.mean(np.diff(signal))
+    return np.mean(np.diff(signal), axis=-1)
+
 
 
 @set_domain("domain", "temporal")
@@ -170,7 +165,8 @@ def median_abs_diff(signal):
        Median absolute difference result
 
    """
-    return np.median(np.abs(np.diff(signal)))
+    return np.median(np.abs(np.diff(signal)), axis=-1)
+
 
 
 @set_domain("domain", "temporal")
@@ -190,7 +186,7 @@ def median_diff(signal):
        Median difference result
 
    """
-    return np.median(np.diff(signal))
+    return np.median(np.diff(signal), axis=-1)
 
 
 @set_domain("domain", "temporal")
@@ -213,8 +209,8 @@ def distance(signal):
         Signal distance
 
     """
-    diff_sig = np.diff(signal).astype(float)
-    return np.sum([np.sqrt(1 + diff_sig ** 2)])
+    return np.sum(np.sqrt(np.diff(signal) ** 2 + 1), axis=-1)
+
 
 
 @set_domain("domain", "temporal")
@@ -234,11 +230,11 @@ def sum_abs_diff(signal):
        Sum absolute difference result
 
    """
-    return np.sum(np.abs(np.diff(signal)))
+    return np.sum(np.abs(np.diff(signal)), axis=-1)
+
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", ["audio", "emg"])
 def zero_cross(signal):
     """Computes Zero-crossing rate of the signal.
 
@@ -258,11 +254,11 @@ def zero_cross(signal):
         Number of times that signal value cross the zero axis
 
     """
-    return len(np.where(np.diff(np.sign(signal)))[0])
+    return np.sum(np.abs(np.diff(np.sign(signal))) == 2, axis=-1)
+
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "audio")
 def total_energy(signal, fs):
     """Computes the total energy of the signal.
 
@@ -281,12 +277,11 @@ def total_energy(signal, fs):
         Total energy
 
     """
-    time = compute_time(signal, fs)
-
-    return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
+    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1./fs)
 
 
 @set_domain("domain", "temporal")
+@vectorize
 def slope(signal):
     """Computes the slope of the signal.
 
@@ -329,12 +324,11 @@ def auc(signal, fs):
 
     """
     t = compute_time(signal, fs)
+    return np.sum(0.5 * np.diff(t, axis=-1) * np.abs(signal[..., :-1] + signal[..., 1:]), axis=-1)
 
-    return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "audio")
 def abs_energy(signal):
     """Computes the absolute energy of the signal.
 
@@ -351,7 +345,8 @@ def abs_energy(signal):
         Absolute energy
 
     """
-    return np.sum(np.abs(signal) ** 2)
+    return np.sum(signal ** 2, axis=-1)
+
 
 
 @set_domain("domain", "temporal")
@@ -371,11 +366,10 @@ def pk_pk_distance(signal):
         peak to peak distance
 
     """
-    return np.abs(np.max(signal) - np.min(signal))
-
+    return np.abs(np.max(signal, axis=-1) - np.min(signal, axis=-1))
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "eeg")
+@vectorize
 def entropy(signal, prob='standard'):
     """Computes the entropy of the signal using the Shannon Entropy.
 
@@ -423,6 +417,7 @@ def entropy(signal, prob='standard'):
 
 
 @set_domain("domain", "temporal")
+@vectorize
 def neighbourhood_peaks(signal, n=10):
     """Computes the number of peaks from a defined neighbourhood of the signal.
 
@@ -450,11 +445,11 @@ def neighbourhood_peaks(signal, n=10):
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
 
-
 # ############################################ STATISTICAL DOMAIN #################################################### #
 
 
 @set_domain("domain", "statistical")
+@vectorize
 def hist(signal, nbins=10, r=1):
     """Computes histogram of the signal.
 
@@ -497,7 +492,8 @@ def interq_range(signal):
         Interquartile range result
 
     """
-    return np.percentile(signal, 75) - np.percentile(signal, 25)
+    return np.percentile(signal, 75, axis=-1) - np.percentile(signal, 25, axis=-1)
+
 
 
 @set_domain("domain", "statistical")
@@ -517,7 +513,7 @@ def kurtosis(signal):
         Kurtosis result
 
     """
-    return scipy.stats.kurtosis(signal)
+    return scipy.stats.kurtosis(signal, axis=-1)
 
 
 @set_domain("domain", "statistical")
@@ -537,7 +533,7 @@ def skewness(signal):
         Skewness result
 
     """
-    return scipy.stats.skew(signal)
+    return scipy.stats.skew(signal, axis=-1)
 
 
 @set_domain("domain", "statistical")
@@ -557,7 +553,8 @@ def calc_max(signal):
         Maximum result
 
     """
-    return np.max(signal)
+    return np.max(signal, axis=-1)
+
 
 
 @set_domain("domain", "statistical")
@@ -577,11 +574,11 @@ def calc_min(signal):
         Minimum result
 
     """
-    return np.min(signal)
+    return np.min(signal, axis=-1)
+
 
 
 @set_domain("domain", "statistical")
-@set_domain("tag", "inertial")
 def calc_mean(signal):
     """Computes mean value of the signal.
 
@@ -598,7 +595,7 @@ def calc_mean(signal):
         Mean result
 
     """
-    return np.mean(signal)
+    return np.mean(signal, axis=-1)
 
 
 @set_domain("domain", "statistical")
@@ -618,7 +615,8 @@ def calc_median(signal):
         Median result
 
     """
-    return np.median(signal)
+    return np.median(signal, axis=-1)
+
 
 
 @set_domain("domain", "statistical")
@@ -638,7 +636,8 @@ def mean_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return np.mean(np.abs(signal - np.mean(signal, axis=0)), axis=0)
+    return np.mean(np.abs(signal - match_last_dim_by_value_repeat(np.mean(signal, axis=-1), signal)), axis=-1)
+
 
 
 @set_domain("domain", "statistical")
@@ -658,11 +657,10 @@ def median_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return scipy.stats.median_absolute_deviation(signal, scale=1)
+    return scipy.stats.median_absolute_deviation(signal, scale=1, axis=-1)
 
 
 @set_domain("domain", "statistical")
-@set_domain("tag", ["inertial", "emg"])
 def rms(signal):
     """Computes root mean square of the signal.
 
@@ -681,7 +679,8 @@ def rms(signal):
         Root mean square
 
     """
-    return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
+    return np.sqrt(np.mean(np.square(signal), axis=-1))
+
 
 
 @set_domain("domain", "statistical")
@@ -701,7 +700,8 @@ def calc_std(signal):
         Standard deviation result
 
     """
-    return np.std(signal)
+    return np.std(signal, axis=-1)
+
 
 
 @set_domain("domain", "statistical")
@@ -721,10 +721,11 @@ def calc_var(signal):
         Variance result
 
     """
-    return np.var(signal)
+    return np.var(signal, axis=-1)
 
 
 @set_domain("domain", "statistical")
+@vectorize
 def ecdf(signal, d=10):
     """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
 
@@ -750,8 +751,40 @@ def ecdf(signal, d=10):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile(signal, percentile=[0.2, 0.8]):
-    """Computes the percentile values of the ECDF.
+@vectorize
+def ecdf_slope(signal, p_init=0.5, p_end=0.75):
+    """Computes the slope of the ECDF between two percentiles.
+    Possibility to return infinity values.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    p_init : float
+        Initial percentile
+    p_end : float
+        End percentile
+
+    Returns
+    -------
+    float
+        The slope of the ECDF between two percentiles
+    """
+    signal = np.array(signal)
+    # check if signal is constant
+    if np.sum(np.diff(signal)) == 0:
+        return np.inf
+    else:
+        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
+        return (p_end - p_init) / (x_end - x_init)
+
+
+@set_domain("domain", "statistical")
+@vectorize
+def ecdf_percentile(signal, percentile=None):
+    """Computes the percentile value of the ECDF.
 
     Feature computational cost: 1
 
@@ -768,10 +801,12 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
         The input value(s) of the ECDF
     """
     signal = np.array(signal)
-    if isinstance(percentile, str):
-        percentile = eval(percentile)
+    if percentile is None:
+        percentile = [0.2, 0.8]
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
+    if isinstance(percentile, (str)):
+        percentile = [float(percentile)]
 
     # calculate ecdf
     x, y = calc_ecdf(signal)
@@ -791,7 +826,8 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
+@vectorize
+def ecdf_percentile_count(signal, percentile=None):
     """Computes the cumulative sum of samples that are less than the percentile.
 
     Feature computational cost: 1
@@ -809,8 +845,8 @@ def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
         The cumulative sum of samples
     """
     signal = np.array(signal)
-    if isinstance(percentile, str):
-        percentile = eval(percentile)
+    if percentile is None:
+        percentile = [0.2, 0.8]
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -855,17 +891,20 @@ def spectral_distance(signal, fs):
         spectral distance
 
     """
-    f, fmag = calc_fft(signal, fs)
+    _, fmag = calc_fft(signal, fs)
 
-    cum_fmag = np.cumsum(fmag)
+    cum_fmag = np.cumsum(fmag, axis=-1)
 
-    # Computing the linear regression
-    points_y = np.linspace(0, cum_fmag[-1], len(cum_fmag))
+    # Compute the linear regression
+    # TODO: there must be a nicer version than this transpose...
+    points_y = np.linspace(0, cum_fmag[...,-1], np.ma.size(cum_fmag, axis=-1))
+    points_y = points_y.transpose(np.append(np.arange(1, signal.ndim), 0))
 
-    return np.sum(points_y - cum_fmag)
+    return np.sum(points_y - cum_fmag, axis=-1)
 
 
 @set_domain("domain", "spectral")
+@vectorize
 def fundamental_frequency(signal, fs):
     """Computes fundamental frequency of the signal.
 
@@ -892,7 +931,7 @@ def fundamental_frequency(signal, fs):
 
     # Finding big peaks, not considering noise peaks with low amplitude
 
-    bp = scipy.signal.find_peaks(fmag, height=max(fmag) * 0.3)[0]
+    bp = scipy.signal.find_peaks(fmag, height=max(fmag)*0.3)[0]
 
     # # Condition for offset removal, since the offset generates a peak at frequency zero
     bp = bp[bp != 0]
@@ -906,6 +945,7 @@ def fundamental_frequency(signal, fs):
 
 
 @set_domain("domain", "spectral")
+@vectorize
 def max_power_spectrum(signal, fs):
     """Computes maximum power spectrum density of the signal.
 
@@ -949,14 +989,19 @@ def max_frequency(signal, fs):
         0.95 of maximum frequency using cumsum
     """
     f, fmag = calc_fft(signal, fs)
-    cum_fmag = np.cumsum(fmag)
+
+    cum_fmag = np.cumsum(fmag, axis=-1)
+    expanded = match_last_dim_by_value_repeat(
+        np.take(cum_fmag, -1, axis=-1), cum_fmag)
 
     try:
-        ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.95)[0][0]
+        ind_mag = np.argmax(
+            np.array(np.asarray(cum_fmag > expanded * 0.95)), axis=-1)
     except IndexError:
-        ind_mag = np.argmax(cum_fmag)
+        ind_mag = np.argmax(cum_fmag, axis=-1)
 
-    return f[ind_mag]
+    ind_mag = np.expand_dims(ind_mag, axis=-1)
+    return np.squeeze(np.take(f, ind_mag), axis=-1)
 
 
 @set_domain("domain", "spectral")
@@ -978,18 +1023,22 @@ def median_frequency(signal, fs):
        0.50 of maximum frequency using cumsum.
     """
     f, fmag = calc_fft(signal, fs)
-    cum_fmag = np.cumsum(fmag)
-    try:
-        ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.50)[0][0]
-    except IndexError:
-        ind_mag = np.argmax(cum_fmag)
-    f_median = f[ind_mag]
 
-    return f_median
+    cum_fmag = np.cumsum(fmag, axis=-1)
+    expanded = match_last_dim_by_value_repeat(
+        np.take(cum_fmag, -1, axis=-1), cum_fmag)
+
+    try:
+        ind_mag = np.argmax(
+            np.array(np.asarray(cum_fmag > expanded * 0.5)), axis=-1)
+    except IndexError:
+        ind_mag = np.argmax(cum_fmag, axis=-1)
+
+    ind_mag = np.expand_dims(ind_mag, axis=-1)
+    return np.squeeze(np.take(f, ind_mag), axis=-1)
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "audio")
 def spectral_centroid(signal, fs):
     """Barycenter of the spectrum.
 
@@ -1013,10 +1062,8 @@ def spectral_centroid(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    if not np.sum(fmag):
-        return 0
-    else:
-        return np.dot(f, fmag / np.sum(fmag))
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
+    return np.sum(f * devide_keep_zero(fmag, summedFmag), axis=-1)
 
 
 @set_domain("domain", "spectral")
@@ -1042,22 +1089,16 @@ def spectral_decrease(signal, fs):
         Spectral decrease
 
     """
-    f, fmag = calc_fft(signal, fs)
+    _, fmag = calc_fft(signal, fs)
 
-    fmag_band = fmag[1:]
-    len_fmag_band = np.arange(2, len(fmag) + 1)
+    fmag_band = fmag[..., 1:]
+    len_fmag_band = np.arange(1, np.ma.size(fmag, axis=-1))
 
     # Sum of numerator
-    soma_num = np.sum((fmag_band - fmag[0]) / (len_fmag_band - 1), axis=0)
+    soma_num = np.sum(
+        (fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
 
-    if not np.sum(fmag_band):
-        return 0
-    else:
-        # Sum of denominator
-        soma_den = 1 / np.sum(fmag_band)
-
-        # Spectral decrease computing
-        return soma_den * soma_num
+    return devide_keep_zero(1, np.sum(fmag_band, axis=-1)) * soma_num
 
 
 @set_domain("domain", "spectral")
@@ -1084,11 +1125,12 @@ def spectral_kurtosis(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    if not spectral_spread(signal, fs):
-        return 0
-    else:
-        spect_kurt = ((f - spectral_centroid(signal, fs)) ** 4) * (fmag / np.sum(fmag))
-        return np.sum(spect_kurt) / (spectral_spread(signal, fs) ** 4)
+    spect_centr = spectral_centroid(signal, fs)
+    spread = spectral_spread(signal, fs)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
+
+    spect_kurt = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4) * (fmag / summedFmag)
+    return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread ** 4)
 
 
 @set_domain("domain", "spectral")
@@ -1116,12 +1158,10 @@ def spectral_skewness(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    if not spectral_spread(signal, fs):
-        return 0
-    else:
-        skew = ((f - spect_centr) ** 3) * (fmag / np.sum(fmag))
-        return np.sum(skew) / (spectral_spread(signal, fs) ** 3)
+    skew = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3) * (fmag / summedFmag)
+    return devide_keep_zero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
 
 
 @set_domain("domain", "spectral")
@@ -1149,11 +1189,9 @@ def spectral_spread(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     spect_centroid = spectral_centroid(signal, fs)
-
-    if not np.sum(fmag):
-        return 0
-    else:
-        return np.dot(((f - spect_centroid) ** 2), (fmag / np.sum(fmag))) ** 0.5
+    helper = (f - match_last_dim_by_value_repeat(spect_centroid, f)) ** 2
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
+    return np.sum(helper * devide_keep_zero(fmag, summedFmag), axis=-1) ** 0.5
 
 
 @set_domain("domain", "spectral")
@@ -1183,20 +1221,10 @@ def spectral_slope(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    sum_fmag = fmag.sum()
-    dot_ff = (f * f).sum()
-    sum_f = f.sum()
-    len_f = len(f)
+    num_ = devide_keep_zero(1, np.sum(fmag, axis=-1)) * (np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1))
+    denom_ = np.ma.size(f, axis=-1) * np.sum(f * f, axis=-1) - np.sum(f, axis=-1) ** 2
+    return devide_keep_zero(num_, denom_)
 
-    if not ([f]) or (sum_fmag == 0):
-        return 0
-    else:
-        if not (len_f * dot_ff - sum_f ** 2):
-            return 0
-        else:
-            num_ = (1 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
-            denom_ = (len_f * dot_ff - sum_f ** 2)
-            return num_ / denom_
 
 
 @set_domain("domain", "spectral")
@@ -1224,21 +1252,17 @@ def spectral_variation(signal, fs):
         Spectral Variation
 
     """
-    f, fmag = calc_fft(signal, fs)
+    _, fmag = calc_fft(signal, fs)
 
-    sum1 = np.sum(np.array(fmag)[:-1] * np.array(fmag)[1:])
-    sum2 = np.sum(np.array(fmag)[1:] ** 2)
-    sum3 = np.sum(np.array(fmag)[:-1] ** 2)
+    sum1 = np.sum(fmag[..., :-1] * fmag[..., 1:], axis=-1)
+    sum2 = np.sum(fmag[..., 1:] ** 2, axis=-1)
+    sum3 = np.sum(fmag[...,:-1] ** 2, axis=-1)
 
-    if not sum2 or not sum3:
-        variation = 1
-    else:
-        variation = 1 - (sum1 / ((sum2 ** 0.5) * (sum3 ** 0.5)))
-
-    return variation
+    return 1 - devide_keep_zero(sum1, ((sum2 ** 0.5) * (sum3 ** 0.5)))
 
 
 @set_domain("domain", "spectral")
+@vectorize
 def spectral_positive_turning(signal, fs):
     """Computes number of positive turning points of the fft magnitude signal.
 
@@ -1262,13 +1286,12 @@ def spectral_positive_turning(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where((diff_sig[array_signal+1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "audio")
 def spectral_roll_off(signal, fs):
     """Computes the spectral roll-off of the signal.
 
@@ -1291,10 +1314,11 @@ def spectral_roll_off(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    cum_ff = np.cumsum(fmag)
-    value = 0.95 * (np.sum(fmag))
-
-    return f[np.where(cum_ff >= value)[0][0]]
+    cum_fmag = np.cumsum(fmag, axis=-1)
+    value = match_last_dim_by_value_repeat(0.95 * np.sum(fmag, axis=-1), cum_fmag)
+    ind_mag = np.argmax(np.array(np.asarray(cum_fmag > value)), axis=-1)
+    ind_mag = np.expand_dims(ind_mag, axis=-1)
+    return np.squeeze(np.take(f, ind_mag), axis=-1)
 
 
 @set_domain("domain", "spectral")
@@ -1320,14 +1344,14 @@ def spectral_roll_on(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-    cum_ff = np.cumsum(fmag)
-    value = 0.05 * (np.sum(fmag))
-
-    return f[np.where(cum_ff >= value)[0][0]]
+    cum_fmag = np.cumsum(fmag, axis=-1)
+    value = match_last_dim_by_value_repeat(0.05 * np.sum(fmag, axis=-1), cum_fmag)
+    ind_mag = np.argmax(np.array(np.asarray(cum_fmag >= value)), axis=-1)
+    ind_mag = np.expand_dims(ind_mag, axis=-1)
+    return np.squeeze(np.take(f, ind_mag), axis=-1)
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "inertial")
 def human_range_energy(signal, fs):
     """Computes the human range energy ratio.
 
@@ -1351,21 +1375,16 @@ def human_range_energy(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
 
-    allenergy = np.sum(fmag ** 2)
+    allenergy = np.sum(fmag ** 2, axis=-1)
 
-    if allenergy == 0:
-        # For handling the occurrence of Nan values
-        return 0.0
+    hr_energy = np.sum(fmag[..., np.argmin(
+        np.abs(0.6 - f[..., :])):np.argmin(np.abs(2.5 - f[..., :]))] ** 2, axis=-1)
 
-    hr_energy = np.sum(fmag[np.argmin(np.abs(0.6 - f)):np.argmin(np.abs(2.5 - f))] ** 2)
-
-    ratio = hr_energy / allenergy
-
-    return ratio
+    return devide_keep_zero(hr_energy, allenergy)
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", ["audio", "emg"])
+@vectorize
 def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lifter=22):
     """Computes the MEL cepstral coefficients.
 
@@ -1417,6 +1436,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 
 
 @set_domain("domain", "spectral")
+@vectorize
 def power_bandwidth(signal, fs):
     """Computes power spectrum density bandwidth of the signal.
 
@@ -1485,16 +1505,13 @@ def fft_mean_coeff(signal, fs, nfreq=256):
         The mean value of each spectrogram frequency
 
     """
-    if nfreq > len(signal) // 2 + 1:
-        nfreq = len(signal) // 2 + 1
+    nfreq = min(nfreq, np.ma.size(signal, axis=-1) // 2 + 1)
 
-    fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
-
-    return tuple(fmag_mean)
+    return np.mean(scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2, axis=-1)[2], axis=-1)
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "audio")
+@vectorize
 def lpcc(signal, n_coeff=12):
     """Computes the linear prediction cepstral coefficients.
 
@@ -1529,8 +1546,37 @@ def lpcc(signal, n_coeff=12):
     return tuple(np.abs(lpcc_coeff))
 
 
+# @set_domain("domain", "spectral")
+# def spectral_entropy(signal, fs):
+#     """Computes the spectral entropy of the signal based on Fourier transform.
+
+#     Feature computational cost: 1
+
+#     Parameters
+#     ----------
+#     signal : nd-array
+#         Input from which spectral entropy is computed
+#     fs : int
+#         Sampling frequency
+
+#     Returns
+#     -------
+#     float
+#         The normalized spectral entropy value
+
+#     """
+#     # TODO: this norm is copied form original, but feels weird, check if necessary
+#     sig = signal - np.expand_dims(np.mean(signal, axis=-1), axis=-1)
+#     f, fmag = calc_fft(sig, fs)
+
+#     power = fmag ** 2
+#     prob = power / np.expand_dims(np.sum(power, axis=-1), axis=-1)
+
+#     return entropy_vectorized(prob)
+
+
 @set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
+@vectorize
 def spectral_entropy(signal, fs):
     """Computes the spectral entropy of the signal based on Fourier transform.
 
@@ -1571,7 +1617,7 @@ def spectral_entropy(signal, fs):
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
+@vectorize
 def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT entropy of the signal.
 
@@ -1610,7 +1656,7 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", ["eeg", "ecg"])
+@vectorize
 def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT absolute mean value of each wavelet scale.
 
@@ -1636,7 +1682,7 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
 
 
 @set_domain("domain", "spectral")
-@set_domain("domain", "eeg")
+@vectorize
 def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT std value of each wavelet scale.
 
@@ -1662,7 +1708,7 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
+@vectorize
 def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT variance value of each wavelet scale.
 
@@ -1688,7 +1734,7 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 
 
 @set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
+@vectorize
 def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT energy of each wavelet scale.
 
