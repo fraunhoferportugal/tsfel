@@ -484,16 +484,16 @@ def test_power_spec():
     np.testing.assert_almost_equal(max_power_spectrum(noiseWave, Fs), 0.6570878541643916, decimal=5)
 
 
-def test_total_energy():
-    np.testing.assert_almost_equal(total_energy(const0, Fs), 0.0)
-    np.testing.assert_almost_equal(total_energy(const1, Fs), 1052.6315789473686)
-    np.testing.assert_almost_equal(total_energy(constNeg, Fs), 1052.6315789473686)
-    np.testing.assert_almost_equal(total_energy(constF, Fs), 6578.9473684210525)
-    np.testing.assert_almost_equal(total_energy(lin, Fs), 130000.0)
-    np.testing.assert_almost_equal(total_energy(lin0, Fs), 38781.16343490305, decimal=5)
-    np.testing.assert_almost_equal(total_energy(wave, Fs), 500.5005005005005, decimal=5)
-    np.testing.assert_almost_equal(total_energy(offsetWave, Fs), 4504.504504504504, decimal=5)
-    np.testing.assert_almost_equal(total_energy(noiseWave, Fs), 508.6274641575148, decimal=5)
+def test_average_power():
+    np.testing.assert_almost_equal(average_power(const0, Fs), 0.0)
+    np.testing.assert_almost_equal(average_power(const1, Fs), 1052.6315789473686)
+    np.testing.assert_almost_equal(average_power(constNeg, Fs), 1052.6315789473686)
+    np.testing.assert_almost_equal(average_power(constF, Fs), 6578.9473684210525)
+    np.testing.assert_almost_equal(average_power(lin, Fs), 130000.0)
+    np.testing.assert_almost_equal(average_power(lin0, Fs), 38781.16343490305, decimal=5)
+    np.testing.assert_almost_equal(average_power(wave, Fs), 500.5005005005005, decimal=5)
+    np.testing.assert_almost_equal(average_power(offsetWave, Fs), 4504.504504504504, decimal=5)
+    np.testing.assert_almost_equal(average_power(noiseWave, Fs), 508.6274641575148, decimal=5)
 
 
 def test_spectral_centroid():

@@ -256,29 +256,6 @@ def zero_cross(signal):
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "audio")
-def total_energy(signal, fs):
-    """Computes the total energy of the signal.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Signal from which total energy is computed
-    fs : float
-        Sampling frequency
-
-    Returns
-    -------
-    float
-        Total energy
-
-    """
-    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1.0 / fs)
-
-
-@set_domain("domain", "temporal")
 @vectorize
 def slope(signal):
     """Computes the slope of the signal.
@@ -326,6 +303,36 @@ def auc(signal, fs):
 
 
 @set_domain("domain", "temporal")
+def neighbourhood_peaks(signal, n=10):
+    """Computes the number of peaks from a defined neighbourhood of the signal.
+
+    Reference: Christ, M., Braun, N., Neuffer, J. and Kempa-Liehr A.W. (2018). Time Series FeatuRe Extraction on basis
+     of Scalable Hypothesis tests (tsfresh -- A Python package). Neurocomputing 307 (2018) 72-77
+
+    Parameters
+    ----------
+    signal : nd-array
+         Input from which the number of neighbourhood peaks is computed
+    n :  int
+        Number of peak's neighbours to the left and to the right
+
+    Returns
+    -------
+    int
+        The number of peaks from a defined neighbourhood of the signal
+    """
+    signal = np.array(signal)
+    subsequence = signal[n:-n]
+    # initial iteration
+    peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
+    for i in range(2, n + 1):
+        peaks &= (subsequence > np.roll(signal, i)[n:-n])
+        peaks &= (subsequence > np.roll(signal, -i)[n:-n])
+    return np.sum(peaks)
+
+
+# ############################################ STATISTICAL DOMAIN #################################################### #
+@set_domain("domain", "statistical")
 @set_domain("tag", "audio")
 def abs_energy(signal):
     """Computes the absolute energy of the signal.
@@ -346,27 +353,30 @@ def abs_energy(signal):
     return np.sum(signal ** 2, axis=-1)
 
 
-@set_domain("domain", "temporal")
-def pk_pk_distance(signal):
-    """Computes the peak to peak distance.
+@set_domain("domain", "statistical")
+@set_domain("tag", "audio")
+def average_power(signal, fs):
+    """Computes the average power of the signal.
 
     Feature computational cost: 1
 
     Parameters
     ----------
     signal : nd-array
-        Input from which the area under the curve is computed
+        Signal from which average power is computed
+    fs : float
+        Sampling frequency
 
     Returns
     -------
     float
-        peak to peak distance
+        Average power
 
     """
-    return np.abs(np.max(signal, axis=-1) - np.min(signal, axis=-1))
+    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1.0 / fs)
 
 
-@set_domain("domain", "temporal")
+@set_domain("domain", "statistical")
 @set_domain("tag", "eeg")
 @vectorize
 def entropy(signal, prob="standard"):
@@ -718,7 +728,26 @@ def calc_var(signal):
 
 
 @set_domain("domain", "statistical")
-@vectorize
+def pk_pk_distance(signal):
+    """Computes the peak to peak distance.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which peak to peak is computed
+
+    Returns
+    -------
+    float
+        peak to peak distance
+
+    """
+    return np.ptp(signal, axis=-1)
+
+
+@set_domain("domain", "statistical")
 def ecdf(signal, d=10):
     """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
 
