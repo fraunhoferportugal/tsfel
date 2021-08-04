@@ -1214,7 +1214,8 @@ def spectral_slope(signal, fs):
         np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1)
     )
     denom_ = np.ma.size(f, axis=-1) * np.sum(f * f, axis=-1) - np.sum(f, axis=-1) ** 2
-    denom_ = np.tile(denom_, np.shape(signal)[0])
+    if len(np.shape(signal)) > 1:
+        denom_ = np.tile(denom_, np.shape(signal)[0])
     return devide_keep_zero(num_, denom_)
 
 

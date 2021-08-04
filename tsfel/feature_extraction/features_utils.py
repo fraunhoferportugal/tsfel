@@ -45,7 +45,7 @@ def compute_time(signal, fs):
 
     """
 
-    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal)
+    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal)[..., :np.shape(signal)[-1]]
 
 
 def devide_keep_zero(a, b, out=np.zeros_like):

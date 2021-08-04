@@ -261,6 +261,12 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
     if names is not None:
         names = list(names)
+    else:
+        # Name of each column to be concatenate with feature name
+        if isinstance(signal_windows, pd.DataFrame):
+            names = signal_windows.columns.values
+        elif isinstance(signal_windows[0], pd.DataFrame):
+            names = signal_windows[0].columns.values
 
     if window_size is not None:
         signal_windows = signal_window_splitter(signal_windows, window_size, overlap)
@@ -270,77 +276,69 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
     features_final = pd.DataFrame()
 
-    if isinstance(signal_windows, pd.DataFrame):
+    if isinstance(signal_windows, list) and isinstance(signal_windows[0], numbers.Real):
+        signal_windows = np.array(signal_windows)
+
+    # more than one window
+    if isinstance(signal_windows, list):
+        # Starting the display of progress bar for notebooks interfaces
+        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (
+            get_ipython().__class__.__name__ == "Shell"
+        ):
+
+            out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
+        else:
+            out = None
+
+        if isinstance(n_jobs, int):
+            # Multiprocessing use
+            if n_jobs == -1:
+                cpu_count = mp.cpu_count()
+            else:
+                cpu_count = n_jobs
+
+            pool = mp.Pool(cpu_count)
+            features = pool.imap(
+                partial(
+                    calc_features,
+                    dict_features=dict_features,
+                    fs=fs,
+                    features_path=features_path,
+                    header_names=names,
+                ),
+                signal_windows,
+            )
+
+            for i, feat in enumerate(features):
+                if verbose == 1:
+                    display_progress_bar(i, len(signal_windows), out)
+                features_final = features_final.append(feat)
+
+            pool.close()
+            pool.join()
+
+        elif n_jobs is None:
+            for i, feat in enumerate(signal_windows):
+                features_final = features_final.append(
+                    calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names)
+                )
+                if verbose == 1:
+                    display_progress_bar(i, len(signal_windows), out)
+        else:
+            raise SystemExit(
+                "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing."
+            )
+    # single window
+    else:
         features_final = calc_window_features(
             dict_features,
             signal_windows,
             fs,
             verbose=verbose,
-            single_window=True,
             features_path=features_path,
             header_names=names,
+            single_window=True,
         )
-    else:
-        if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(
-                dict_features,
-                signal_windows,
-                fs,
-                verbose=verbose,
-                single_window=True,
-                features_path=features_path,
-                header_names=names,
-            )
-            feat_val.reset_index(drop=True)
-            return feat_val
-        else:
-            # Starting the display of progress bar for notebooks interfaces
-            if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (
-                get_ipython().__class__.__name__ == "Shell"
-            ):
-
-                out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
-            else:
-                out = None
-
-            if isinstance(n_jobs, int):
-                # Multiprocessing use
-                if n_jobs == -1:
-                    cpu_count = mp.cpu_count()
-                else:
-                    cpu_count = n_jobs
-
-                pool = mp.Pool(cpu_count)
-                features = pool.imap(
-                    partial(
-                        calc_features,
-                        dict_features=dict_features,
-                        fs=fs,
-                        features_path=features_path,
-                        header_names=names,
-                    ),
-                    signal_windows,
-                )
-
-                for i, feat in enumerate(features):
-                    if verbose == 1:
-                        display_progress_bar(i, len(signal_windows), out)
-                    features_final = features_final.append(feat)
-
-                pool.close()
-                pool.join()
-
-            elif n_jobs is None:
-                for i, feat in enumerate(signal_windows):
-                    features_final = features_final.append(
-                        calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names)
-                    )
-                    if verbose == 1:
-                        display_progress_bar(i, len(signal_windows), out)
-            else:
-                raise SystemExit(
-                    "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing."
-                )
 
     if verbose == 1:
         print("\n" + "*** Feature extraction finished ***")
@@ -382,35 +380,21 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
     """
 
     features_path = kwargs.get("features_path", None)
-    names = kwargs.get("header_names", None)
+    header_names = kwargs.get("header_names", None)
 
-    if names is None:
-        # Name of each column to be concatenate with feature name
-        if isinstance(signal_window, pd.DataFrame):
-            header_names = signal_window.columns.values
-            header_names = np.arange(signal_window.shape[-1])
-            if single_window:
-                signal_window = np.array(signal_window).astype(float)
-                signal_window = np.swapaxes(signal_window, -1, -2)
+    # To handle object type signals
+    signal_window = np.array(signal_window).astype(float)
 
-        else:
-            signal_window = np.array(signal_window)
-            if len(signal_window.shape) == 1:
-                signal_window = np.array([signal_window])
-                header_names = np.array([0])
-            else:
-                header_names = np.arange(signal_window.shape[-1])
+    single_axis = True if len(signal_window.shape) == 1 else False
 
+    if header_names is None:
+        header_names = np.array([0]) if single_axis else np.arange(signal_window.shape[-1])
     else:
-        if len(names) != len(list(header_names)):
+        if (len(header_names) != signal_window.shape[-1] and not single_axis) or \
+                (len(header_names) != 1 and single_axis):
             raise Exception("header_names dimension does not match input columns.")
-        else:
-            header_names = names
 
-    if not single_window:
-        # To handle object type signals
-        signal_window = np.array(signal_window).astype(float)
-
+    if not single_axis:
         # Needed because the vectorization always uses the last axis, no matter the data depth
         signal_window = np.swapaxes(signal_window, -1, -2)
 
@@ -449,7 +433,7 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
             if verbose == 1 and single_window:
                 i_feat = i_feat + 1
-                display_progress_bar(i_feat, feat_nb, out)
+                display_progress_bar(i_feat, len(feat_nb), out)
 
             # Only returns used functions
             if dict_features[_type][feat]["use"] == "yes":
@@ -479,7 +463,8 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
                 # python expressions in google sheets is broken with this version as the eval was removed (also no objects as strings ie no {foo: '[0.2, 0.8]'})
                 # TODO: please consider removing that functionality for security reasons
                 eval_result = locals()[func_total](signal_window, **parameters_total)
-
+                if single_axis:
+                    eval_result = np.array([eval_result])
                 for ax in range(len(header_names)):
                     # Function returns more than one element
                     if len(eval_result[ax].shape) > 0:
