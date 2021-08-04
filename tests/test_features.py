@@ -342,9 +342,9 @@ def test_zerocross():
     np.testing.assert_almost_equal(zero_cross(const1), 0.0)
     np.testing.assert_almost_equal(zero_cross(constNeg), 0.0)
     np.testing.assert_almost_equal(zero_cross(constF), 0.0)
-    np.testing.assert_almost_equal(zero_cross(lin), 1.0)
+    np.testing.assert_almost_equal(zero_cross(lin), 0.0)
     np.testing.assert_almost_equal(zero_cross(lin0), 1.0, decimal=5)
-    np.testing.assert_almost_equal(zero_cross(wave), 10, decimal=5)
+    np.testing.assert_almost_equal(zero_cross(wave), 9, decimal=5)
     np.testing.assert_almost_equal(zero_cross(offsetWave), 0.0, decimal=5)
     np.testing.assert_almost_equal(zero_cross(noiseWave), 38, decimal=5)
 
