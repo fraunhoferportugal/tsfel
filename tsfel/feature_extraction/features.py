@@ -925,9 +925,9 @@ def max_power_spectrum(signal, fs):
 
     """
     if np.std(signal) == 0:
-        return float(max(scipy.signal.welch(signal, int(fs), nperseg=len(signal))[1]))
+        return float(max(scipy.signal.welch(signal, fs, nperseg=len(signal))[1]))
     else:
-        return float(max(scipy.signal.welch(signal / np.std(signal), int(fs), nperseg=len(signal))[1]))
+        return float(max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1]))
 
 
 @set_domain("domain", "spectral")
