@@ -52,7 +52,7 @@ Id     total_acc_x
 4      1.023680
 =====  ===========
 
-We have now a DataFrame composed by a unique column with associated column name. Note that TSFEL can also handle multidimensional datastreams. In that case, it will be necessary to pass the additional time series as additional collumns in the dataframe.
+We have now a DataFrame composed by a unique column with associated column name. Note that TSFEL can also handle multidimensional datastreams. In that case, it will be necessary to pass the additional time series as additional columns in the dataframe.
 
 Now that we have the input data we are ready for the feature extraction step. TSFEL relies on dictionaries to setup the configuration of the extractly. We provide a set of template configuration dictionaries that can be used out of the box. In this example we will use the example that extracts all the available features of TSFEL. We will configure TSFEL to divide our time series in windows of equal length of size 250 points (corresponding to 5 seconds).
 
@@ -77,7 +77,7 @@ TSFEL provides a method to increase flexibility when extracting features over mu
 
 * **Files store time series in delimited format**
 
-  * TSFEL expects that the first column must contain the timestamp and following collumns contain the time series values.
+  * TSFEL expects that the first column must contain the timestamp and following columns contain the time series values.
 
 
 * **Files might not be syncronised in time**
