@@ -158,7 +158,7 @@ def autocorr_norm(signal):
     return acf
 
 
-def create_symmetric_matrix(acf, n_coeff=12):
+def create_symmetric_matrix(acf, order=11):
     """Computes a symmetric matrix.
 
     Implementation details and description in:
@@ -168,8 +168,8 @@ def create_symmetric_matrix(acf, n_coeff=12):
     ----------
     acf : nd-array
         Input from which a symmetric matrix is computed
-    n_coeff : int
-        Number of coefficients
+    order : int
+        Order
 
     Returns
     -------
@@ -178,10 +178,10 @@ def create_symmetric_matrix(acf, n_coeff=12):
 
     """
 
-    smatrix = np.empty((n_coeff, n_coeff))
-    xx = np.arange(n_coeff)
-    j = np.tile(xx, n_coeff)
-    i = np.repeat(xx, n_coeff)
+    smatrix = np.empty((order, order))
+    xx = np.arange(order)
+    j = np.tile(xx, order)
+    i = np.repeat(xx, order)
     smatrix[i, j] = acf[np.abs(i - j)]
 
     return smatrix
@@ -212,18 +212,21 @@ def lpc(signal, n_coeff=12):
     if n_coeff > signal.size:
         raise ValueError("Input signal must have a length >= n_coeff")
 
+    # Calculate the order based on the number of coefficients
+    order = n_coeff - 1
+
     # Calculate LPC with Yule-Walker
     acf = np.correlate(signal, signal, 'full')
 
-    r = np.zeros(n_coeff+1, 'float32')
+    r = np.zeros(order+1, 'float32')
     # Assuring that works for all type of input lengths
-    nx = np.min([n_coeff+1, len(signal)])
-    r[:nx] = acf[len(signal)-1:len(signal)+n_coeff]
+    nx = np.min([order+1, len(signal)])
+    r[:nx] = acf[len(signal)-1:len(signal)+order]
 
-    smatrix = create_symmetric_matrix(r[:-1], n_coeff)
+    smatrix = create_symmetric_matrix(r[:-1], order)
 
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(n_coeff+1))
+        return tuple(np.zeros(order+1))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
