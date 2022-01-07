@@ -79,81 +79,97 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         csv file with the extracted features
 
     """
-    search_criteria = kwargs.get('search_criteria', None)
-    time_unit = kwargs.get('time_unit', 1e9)
-    resample_rate = kwargs.get('resample_rate', 30)
-    window_size = kwargs.get('window_size', 100)
-    overlap = kwargs.get('overlap', 0)
-    pre_process = kwargs.get('pre_process', None)
-    output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
-    features_path = kwargs.get('features_path', None)
-    names = kwargs.get('header_names', None)
+    search_criteria = kwargs.get("search_criteria", None)
+    time_unit = kwargs.get("time_unit", 1e9)
+    resample_rate = kwargs.get("resample_rate", 30)
+    window_size = kwargs.get("window_size", 100)
+    overlap = kwargs.get("overlap", 0)
+    pre_process = kwargs.get("pre_process", None)
+    output_directory = kwargs.get("output_directory", str(Path.home()) + "/tsfel_output")
+    features_path = kwargs.get("features_path", None)
+    names = kwargs.get("header_names", None)
 
     # Choosing default of n_jobs by operating system
-    if sys.platform[:-2] == 'win':
+    if sys.platform[:-2] == "win":
         n_jobs_default = None
     else:
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell' or \
-            get_ipython().__class__.__name__ == 'Shell':
+    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
         n_jobs_default = -1
 
-    n_jobs = kwargs.get('n_jobs', n_jobs_default)
+    n_jobs = kwargs.get("n_jobs", n_jobs_default)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory + os.sep
 
     folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
-    for fl in folders:
-        sensor_data = {}
-        if search_criteria:
-            for c in search_criteria:
-                if os.path.isfile(fl + c):
-                    key = c.split('.')[0]
-                    sensor_data[key] = pd.read_csv(fl + c, header=None)
-        else:
-            all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
-            for c in all_files:
-                key = c.split(os.sep)[-1].split('.')[0]
-                try:
-                    data_file = pd.read_csv(c, header=None)
-                except pd.io.common.CParserError:
-                    continue
+    if folders:
+        for fl in folders:
+            sensor_data = {}
+            if search_criteria:
+                for c in search_criteria:
+                    if os.path.isfile(fl + c):
+                        key = c.split(".")[0]
+                        sensor_data[key] = pd.read_csv(fl + c, header=None)
+            else:
+                all_files = np.concatenate((glob.glob(fl + "/*.txt"), glob.glob(fl + "/*.csv")))
+                for c in all_files:
+                    key = c.split(os.sep)[-1].split(".")[0]
+                    try:
+                        data_file = pd.read_csv(c, header=None)
+                    except pd.io.common.CParserError:
+                        continue
 
-                if np.dtype('O') in np.array(data_file.dtypes):
-                    continue
+                    if np.dtype("O") in np.array(data_file.dtypes):
+                        continue
 
-                sensor_data[key] = pd.read_csv(c, header=None)
+                    sensor_data[key] = pd.read_csv(c, header=None)
 
-        if not sensor_data:
-            continue
+            if not sensor_data:
+                continue
 
-        pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
+            pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
 
-        data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
+            if len(pp_sensor_data) == 1:  # dataset with only one sensor data
+                windows = signal_window_splitter(pp_sensor_data[list(pp_sensor_data.keys())[0]], window_size, overlap)
 
-        windows = signal_window_splitter(data_new, window_size, overlap)
+                print("Only one file data. Best alternative: use time_series_features_extractor function.")
+            else:
+                data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
 
-        if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      features_path=features_path, header_names=names, n_jobs=n_jobs)
-        else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      header_names=names, n_jobs=n_jobs)
+                windows = signal_window_splitter(data_new, window_size, overlap)
 
-        fl = '/'.join(fl.split(os.sep))
-        invalid_char = '<>:"\|?* '
-        for char in invalid_char:
-            fl = fl.replace(char, '')
+            if features_path:
+                features = time_series_features_extractor(
+                    feat_dict,
+                    windows,
+                    fs=resample_rate,
+                    verbose=0,
+                    features_path=features_path,
+                    header_names=names,
+                    n_jobs=n_jobs,
+                )
+            else:
+                features = time_series_features_extractor(
+                    feat_dict, windows, fs=resample_rate, verbose=0, header_names=names, n_jobs=n_jobs
+                )
 
-        pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
-        features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
+            fl = "/".join(fl.split(os.sep))
+            invalid_char = '<>:"\|?* '
+            for char in invalid_char:
+                fl = fl.replace(char, "")
 
-    if verbose == 1:
-        print('Features files saved in: ', output_directory)
+            pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
+            features.to_csv(output_directory + fl + "/Features.csv", sep=",", encoding="utf-8")
+
+        if verbose == 1:
+            print("Features files saved in: ", output_directory)
+
+    else:
+        raise FileNotFoundError("There is no folder(s) in directory: " + main_directory)
 
 
 def calc_features(wind_sig, dict_features, fs, **kwargs):
