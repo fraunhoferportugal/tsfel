@@ -19,7 +19,7 @@ main_directory = "tests_tools" + os.sep + "test_dataset" + os.sep
 # JSON DIR
 # tsfel_path_json = tsfel.__path__[0] + os.sep + "feature_extraction" + os.sep + "features.json"
 personal_path_json = "tests_tools" + os.sep + "test_features.json"
-# personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
+personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
 
 # DEFAULT PARAM for testing
 time_unit = 1e9  # seconds
@@ -69,14 +69,12 @@ features2 = tsfel.time_series_features_extractor(settings5, data_new.iloc[:, 0],
 # single window and multi axis
 # input: pd.DataFrame
 features3 = tsfel.time_series_features_extractor(settings5, data_new, fs=resample_rate, n_jobs=n_jobs)
-# input: np.array
-features4 = tsfel.time_series_features_extractor(settings4, data_new.values, fs=resample_rate, n_jobs=n_jobs)
 
 # single window and single axis
 # input: pd.Series
-features5 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs)
+features4 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, features_path=personal_features_path)
 # input: np.array
-features6 = tsfel.time_series_features_extractor(settings4, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
+features5 = tsfel.time_series_features_extractor(settings4, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
 
 # Dataset features extractor
 data = tsfel.dataset_features_extractor(
