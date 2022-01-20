@@ -62,9 +62,11 @@ features0 = tsfel.time_series_features_extractor(settings5, windows, fs=resample
 
 # multiple windows and single axis
 # input: np.array
-features1 = tsfel.time_series_features_extractor(settings5, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features1 = tsfel.time_series_features_extractor(settings5, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs,
+                                                 window_size=window_size, overlap=overlap)
 # input: pd.series
-features2 = tsfel.time_series_features_extractor(settings5, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features2 = tsfel.time_series_features_extractor(settings5, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs,
+                                                 window_size=window_size, overlap=overlap)
 
 # single window and multi axis
 # input: pd.DataFrame
@@ -72,7 +74,8 @@ features3 = tsfel.time_series_features_extractor(settings5, data_new, fs=resampl
 
 # single window and single axis
 # input: pd.Series
-features4 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, features_path=personal_features_path)
+features4 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs,
+                                                 features_path=personal_features_path)
 # input: np.array
 features5 = tsfel.time_series_features_extractor(settings4, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
 
