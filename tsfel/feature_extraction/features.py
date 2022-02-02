@@ -805,7 +805,7 @@ def ecdf_slope(signal, p_init=0.5, p_end=0.75):
 
 @set_domain("domain", "statistical")
 @vectorize
-def ecdf_percentile(signal, percentile=None):
+def ecdf_percentile(signal, percentile=[0.2, 0.8]):
     """Computes the percentile value of the ECDF.
 
     Feature computational cost: 1
@@ -827,8 +827,6 @@ def ecdf_percentile(signal, percentile=None):
         percentile = eval(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
-    if isinstance(percentile, (str)):
-        percentile = [float(percentile)]
 
     # calculate ecdf
     x, y = calc_ecdf(signal)
@@ -849,7 +847,7 @@ def ecdf_percentile(signal, percentile=None):
 
 @set_domain("domain", "statistical")
 @vectorize
-def ecdf_percentile_count(signal, percentile=None):
+def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
     """Computes the cumulative sum of samples that are less than the percentile.
 
     Feature computational cost: 1
@@ -1144,9 +1142,9 @@ def spectral_kurtosis(signal, fs):
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
     spread = spectral_spread(signal, fs)
-    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    spect_kurt = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4) * (fmag / summedFmag)
+    summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
+    spect_kurt = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4) * devide_keep_zero(fmag, summedFmag)
     return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread ** 4)
 
 
@@ -1177,7 +1175,7 @@ def spectral_skewness(signal, fs):
     spect_centr = spectral_centroid(signal, fs)
     summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    skew = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3) * (fmag / summedFmag)
+    skew = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3) * devide_keep_zero(fmag, summedFmag)
     return devide_keep_zero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
 
 
