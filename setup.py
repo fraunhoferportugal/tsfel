@@ -20,7 +20,11 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/fraunhoferportugal/tsfel/",
     package_data={'tsfel': ['feature_extraction/features.json', 'utils/client_secret.json']},
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages("tsfel")
+    extras_require={ # Optional
+    'docs': ['sphinx'],
+    'test': ['mypy', 'black'],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
