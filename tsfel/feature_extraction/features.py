@@ -1,4 +1,8 @@
+import hfda
 import scipy.signal
+import lempel_ziv_complexity
+import matplotlib.pyplot as plt
+from pyentrp import entropy as ent
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -329,6 +333,59 @@ def neighbourhood_peaks(signal, n=10):
         peaks &= (subsequence > np.roll(signal, i)[n:-n])
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
+
+
+@set_domain("domain", "temporal")
+def lz(signal, amp_thres=0):
+    """Computes the Lempel-Ziv's (LZ) algorithmic complexity. This measure compare each value of the signal with an
+    amplitude threshold.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal
+    amp_thres : float
+        Amplitude threshold
+
+    Returns
+    -------
+        Lempel-Ziv complexity value
+    """
+    binary_signal = np.ones(np.size(signal))
+
+    for i in range(np.size(signal)):
+        if signal[i] < amp_thres:
+            binary_signal[i] = 0
+
+    binary_signal = binary_signal.astype(int)
+    sequence = ''.join(str(e) for e in binary_signal)
+    patterns = lempel_ziv_complexity.lempel_ziv_complexity(sequence)
+    lz_value = (patterns * np.log2(np.size(signal))) / np.size(signal)
+
+    return lz_value
+
+
+@set_domain("domain", "temporal")
+def mse(signal, maxscale=2):
+    """Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time
+    scales.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal
+    maxscale : int
+        Maximum scale factor
+
+    Returns
+    -------
+        Average and standard deviation of the MSE value
+    """
+    mse_value = ent.multiscale_entropy(signal, sample_length=2, tolerance=0.15*np.std(signal), maxscale=maxscale)
+    mse_avg = np.mean(mse_value)
+    mse_std = np.std(mse_value)
+
+    return tuple(np.array([mse_avg, mse_std]))
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -1791,3 +1848,98 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
     energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
+
+
+# ############################################# FRACTAL DOMAIN ##################################################### #
+@set_domain("domain", "fractal")
+def dfa(signal, lim_min=4, lim_max=9, scale_dens=0.25, show=False):
+    """Computes the Detrended Fluctuation Analysis (DFA) of the signal.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal
+    lim_min : int
+        Minimum boundarie of the scale, where scale means windows among which RMS is calculated. Numbers are exponents
+        of 2 to the power of signal. If the signal is sampled with fs = 128 Hz, then the lowest considered scale would
+        be 2**5/128 = 32/128 = 0.25, so 250 ms.
+    lim_max : int
+        Maximum boundarie of the scale
+    scale_dens : float
+        Density of scale divisions, eg. for 0.25 we get 2**[5, 5.25, 5.5, ... ]
+    show : boolean
+        True shows the log-log plot
+
+    Returns
+    -------
+        DFA value
+    """
+    y = np.cumsum(signal - np.mean(signal))
+    scales = (2**np.arange(lim_min, lim_max, scale_dens)).astype(int)
+    fluct = np.zeros(len(scales))
+
+    for e, sc in enumerate(scales):
+        fluct[e] = np.sqrt(np.mean(calc_rms(y, sc)**2))
+    coeff = np.polyfit(np.log2(scales), np.log2(fluct), 1)
+
+    if show:
+        fluctfit = 2**np.polyval(coeff, np.log2(scales))
+        plt.loglog(scales, fluct, 'bo')
+        plt.loglog(scales, fluctfit, 'r', label=r'$\alpha$ = %0.2f' % coeff[0])
+        plt.title('DFA')
+        plt.xlabel(r'$\log_{10}$(time window)')
+        plt.ylabel(r'$\log_{10}$<F(t)>')
+        plt.legend()
+        plt.show()
+    dfa_value = coeff[0]
+
+    return dfa_value
+
+
+@set_domain("domain", "fractal")
+def mfl(signal, k_max=128):
+    """Computes the Maximum Fractal Length (MFL) of the signal, which is the signal’s length (over unit time) measured
+    from the logarithmic plot determining FD at the smallest scale.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal
+    k_max : integer
+        Maximum interval to consider for approximating the signal
+
+    Returns
+    -------
+        MFL value
+    """
+    calc_L_average_series = np.frompyfunc(lambda k: hfda.core.calc_L_average(signal, k), 1, 1)
+    k = np.arange(1, k_max + 1)
+    L = calc_L_average_series(k).astype(np.float64)
+    coefs = np.polyfit(np.log10(k), np.log10(L), 1)
+    trendpoly = np.poly1d(coefs)
+    mfl_value = trendpoly(0)
+
+    return mfl_value
+
+
+@set_domain("domain", "fractal")
+def hfd(signal, k_max=128):
+    """Computes the Fractal Dimension (FD) of the signal, as defined by Higuchi.
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal
+    k_max : integer
+        Maximum interval to consider for approximating the signal
+
+    Returns
+    -------
+        FD value
+    """
+    calc_L_average_series = np.frompyfunc(lambda k: hfda.core.calc_L_average(signal, k), 1, 1)
+    k = np.arange(1, k_max + 1)
+    L = calc_L_average_series(k).astype(np.float64)
+    fd_value, _ = - np.polyfit(np.log10(k), np.log10(L), 1)
+
+    return fd_value
