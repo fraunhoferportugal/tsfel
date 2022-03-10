@@ -378,3 +378,31 @@ def calc_ecdf(signal):
 
     """
     return np.sort(signal), np.arange(1, len(signal) + 1) / len(signal)
+
+
+def calc_rms(signal, scale):
+    """Windowed Root Mean Square (RMS) with linear detrending.
+
+    Parameters
+    ----------
+    signal: nd-array
+        Signal
+    scale : int
+        length of the window in which RMS will be calculated
+
+    Returns
+    -------
+        RMS data in each window with length len(signal)//scale
+    """
+    # Creating an array with data divided in windows
+    shape = (signal.shape[0] // scale, scale)
+    x = np.lib.stride_tricks.as_strided(signal, shape=shape)
+    # Vector of x-axis points to regression
+    scale_ax = np.arange(scale)
+    rms = np.zeros(x.shape[0])
+    for e, xcut in enumerate(x):
+        coeff = np.polyfit(scale_ax, xcut, 1)
+        xfit = np.polyval(coeff, scale_ax)
+        # Detrending and computing RMS of each window
+        rms[e] = np.sqrt(np.mean((xcut - xfit) ** 2))
+    return rms
