@@ -23,7 +23,7 @@ setuptools.setup(
     packages=setuptools.find_packages("tsfel"),
     extras_require={ # Optional
     'docs': ['sphinx'],
-    'test': ['mypy', 'black'],
+    'tests': ['mypy', 'black'],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
