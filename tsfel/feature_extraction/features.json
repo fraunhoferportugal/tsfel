@@ -597,6 +597,18 @@
         "audio",
         "emg"
       ]
+    },
+    "Lz": {
+      "complexity": "",
+      "description": "Computes the Lempel-Ziv's (LZ) algorithmic complexity of the signal.",
+      "function": "tsfel.lz",
+      "parameters": "",
+      "n_features": 1,
+      "use": "yes",
+      "tag": [
+        "audio",
+        "emg"
+      ]
     }
   }
 }
