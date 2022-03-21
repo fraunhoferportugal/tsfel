@@ -639,23 +639,23 @@
             "complexity": "",
             "description": "Computes the Lempel-Ziv's (LZ) algorithmic complexity of the signal.",
             "function": "tsfel.lz",
+            "n_features": 1,
             "parameters": {
                 "amp_thres": 0
             },
-            "n_features": 1,
-            "use": "yes",
-            "tag": "emg"
+            "tag": "emg",
+            "use": "yes"
         },
         "Multiscale entropy": {
             "complexity": "",
             "description": "Computes the multiscale entropy (MSE) of the signal of the signal.",
             "function": "tsfel.mse",
+            "n_features": 2,
             "parameters": {
                 "maxscale": 2
             },
-            "n_features": 2,
-            "use": "yes",
-            "tag": "emg"
+            "tag": "emg",
+            "use": "yes"
         }
     },
     "fractal": {
@@ -663,37 +663,37 @@
             "complexity": "",
             "description": "Computes the Detrended Fluctuation Analysis (DFA) of the signal.",
             "function": "tsfel.dfa",
+            "n_features": 1,
             "parameters": {
                 "lim_min": 4,
                 "lim_max": 9,
                 "scale_dens": 0.25,
                 "show": 0
             },
-            "n_features": 1,
-            "use": "yes",
-            "tag": "emg"
+            "tag": "emg",
+            "use": "yes"
         },
         "Maximum Fractal Length": {
             "complexity": "",
             "description": "Computes the Maximum Fractal Length (MFL) of the signal.",
             "function": "tsfel.mfl",
+            "n_features": 1,
             "parameters": {
                 "k_max": 128
             },
-            "n_features": 1,
-            "use": "yes",
-            "tag": "emg"
+            "tag": "emg",
+            "use": "yes"
         },
         "Fractal Dimension": {
             "complexity": "",
             "description": "Computes the Higuchi's Fractal Dimension (FD) of the signal.",
             "function": "tsfel.hfd",
+            "n_features": 1,
             "parameters": {
                 "k_max": 128
             },
-            "n_features": 1,
-            "use": "yes",
-            "tag": "emg"
+            "tag": "emg",
+            "use": "yes"
         }
     }
 }
