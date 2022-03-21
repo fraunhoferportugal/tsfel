@@ -336,6 +336,7 @@ def neighbourhood_peaks(signal, n=10):
 
 
 @set_domain("domain", "temporal")
+@vectorize
 def lz(signal, amp_thres=0):
     """Computes the Lempel-Ziv's (LZ) algorithmic complexity. This measure compare each value of the signal with an
     amplitude threshold.
@@ -366,6 +367,7 @@ def lz(signal, amp_thres=0):
 
 
 @set_domain("domain", "temporal")
+@vectorize
 def mse(signal, maxscale=2):
     """Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time
     scales.
@@ -1852,6 +1854,7 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
 
 # ############################################# FRACTAL DOMAIN ##################################################### #
 @set_domain("domain", "fractal")
+@vectorize
 def dfa(signal, lim_min=4, lim_max=9, scale_dens=0.25, show=False):
     """Computes the Detrended Fluctuation Analysis (DFA) of the signal.
 
@@ -1897,6 +1900,7 @@ def dfa(signal, lim_min=4, lim_max=9, scale_dens=0.25, show=False):
 
 
 @set_domain("domain", "fractal")
+@vectorize
 def mfl(signal, k_max=128):
     """Computes the Maximum Fractal Length (MFL) of the signal, which is the signal’s length (over unit time) measured
     from the logarithmic plot determining FD at the smallest scale.
@@ -1923,6 +1927,7 @@ def mfl(signal, k_max=128):
 
 
 @set_domain("domain", "fractal")
+@vectorize
 def hfd(signal, k_max=128):
     """Computes the Fractal Dimension (FD) of the signal, as defined by Higuchi.
 
