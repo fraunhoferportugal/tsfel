@@ -634,6 +634,66 @@
                 "emg"
             ],
             "use": "yes"
+        },
+        "Lempel Ziv complexity": {
+            "complexity": "",
+            "description": "Computes the Lempel-Ziv's (LZ) algorithmic complexity of the signal.",
+            "function": "tsfel.lz",
+            "parameters": {
+                "amp_thres": 0
+            },
+            "n_features": 1,
+            "use": "yes",
+            "tag": "emg"
+        },
+        "Multiscale entropy": {
+            "complexity": "",
+            "description": "Computes the multiscale entropy (MSE) of the signal of the signal.",
+            "function": "tsfel.mse",
+            "parameters": {
+                "maxscale": 2
+            },
+            "n_features": 2,
+            "use": "yes",
+            "tag": "emg"
+        }
+    },
+    "fractal": {
+        "Detrended Fluctuation Analysis": {
+            "complexity": "",
+            "description": "Computes the Detrended Fluctuation Analysis (DFA) of the signal.",
+            "function": "tsfel.dfa",
+            "parameters": {
+                "lim_min": 4,
+                "lim_max": 9,
+                "scale_dens": 0.25,
+                "show": 0
+            },
+            "n_features": 1,
+            "use": "yes",
+            "tag": "emg"
+        },
+        "Maximum Fractal Length": {
+            "complexity": "",
+            "description": "Computes the Maximum Fractal Length (MFL) of the signal.",
+            "function": "tsfel.mfl",
+            "parameters": {
+                "k_max": 128
+            },
+            "n_features": 1,
+            "use": "yes",
+            "tag": "emg"
+        },
+        "Fractal Dimension": {
+            "complexity": "",
+            "description": "Computes the Higuchi's Fractal Dimension (FD) of the signal.",
+            "function": "tsfel.hfd",
+            "parameters": {
+                "k_max": 128
+            },
+            "n_features": 1,
+            "use": "yes",
+            "tag": "emg"
         }
     }
 }
