@@ -19,7 +19,7 @@ main_directory = "tests_tools" + os.sep + "test_dataset" + os.sep
 # JSON DIR
 # tsfel_path_json = tsfel.__path__[0] + os.sep + "feature_extraction" + os.sep + "features.json"
 personal_path_json = "tests_tools" + os.sep + "test_features.json"
-# personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
+personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
 
 # DEFAULT PARAM for testing
 time_unit = 1e9  # seconds
@@ -43,10 +43,11 @@ settings1 = json.load(open(personal_path_json))
 settings2 = tsfel.get_features_by_domain("statistical")
 settings3 = tsfel.get_features_by_domain("temporal")
 settings4 = tsfel.get_features_by_domain("spectral")
-settings5 = tsfel.get_features_by_domain()
-# settings6 = tsfel.extract_sheet("Features")
-# settings7 = tsfel.extract_sheet("Features_test", path_json=personal_path_json)
-# settings8 = tsfel.get_features_by_tag("inertial")
+settings5 = tsfel.get_features_by_domain("fractal")
+settings6 = tsfel.get_features_by_domain()
+# settings7 = tsfel.extract_sheet("Features")
+# settings8 = tsfel.extract_sheet("Features_test", path_json=personal_path_json)
+# settings9 = tsfel.get_features_by_tag("inertial")
 # settings10 = tsfel.get_features_by_tag()
 
 # Signal processing
@@ -56,27 +57,27 @@ windows = tsfel.signal_window_splitter(data_new, window_size, overlap)
 n_jobs = -1
 # time_series_features_extractor
 
-# multi windows and multi axis
+# multiple windows and multi axis
 # input: list
-features0 = tsfel.time_series_features_extractor(settings5, windows, fs=resample_rate, n_jobs=n_jobs)
+features0 = tsfel.time_series_features_extractor(settings2, windows, fs=resample_rate, n_jobs=n_jobs)
 
 # multiple windows and single axis
 # input: np.array
-features1 = tsfel.time_series_features_extractor(settings5, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features1 = tsfel.time_series_features_extractor(settings3, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
 # input: pd.series
-features2 = tsfel.time_series_features_extractor(settings5, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features2 = tsfel.time_series_features_extractor(settings3, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
 
 # single window and multi axis
 # input: pd.DataFrame
 features3 = tsfel.time_series_features_extractor(settings5, data_new, fs=resample_rate, n_jobs=n_jobs)
 # input: np.array
-features4 = tsfel.time_series_features_extractor(settings4, data_new.values, fs=resample_rate, n_jobs=n_jobs)
+features4 = tsfel.time_series_features_extractor(settings5, data_new.values, fs=resample_rate, n_jobs=n_jobs)
 
 # single window and single axis
 # input: pd.Series
-features5 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs)
+features5 = tsfel.time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, features_path=personal_features_path)
 # input: np.array
-features6 = tsfel.time_series_features_extractor(settings4, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
+features6 = tsfel.time_series_features_extractor(settings6, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
 
 # Dataset features extractor
 data = tsfel.dataset_features_extractor(
