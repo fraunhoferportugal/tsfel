@@ -433,6 +433,30 @@ def test_neighbourhood_peaks():
     np.testing.assert_almost_equal(neighbourhood_peaks(noiseWave), 14.0)
 
 
+def test_lempel_ziv_complexity():
+    np.testing.assert_almost_equal(lz(const0), 1.08048202)
+    np.testing.assert_almost_equal(lz(const1), 1.08048202)
+    np.testing.assert_almost_equal(lz(constNeg), 1.08048202)
+    np.testing.assert_almost_equal(lz(constF), 1.08048202)
+    np.testing.assert_almost_equal(lz(lin), 1.08048202)
+    np.testing.assert_almost_equal(lz(lin0), 1.72877124)
+    np.testing.assert_almost_equal(lz(wave), 0.65774176)
+    np.testing.assert_almost_equal(lz(offsetWave), 0.43849451)
+    np.testing.assert_almost_equal(lz(noiseWave), 0.78729696)
+
+
+def test_multiscale_entropy():
+    np.testing.assert_almost_equal(mse(const0), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(const1), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(constNeg), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(constF), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(lin), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(lin0), [np.nan, np.nan])
+    np.testing.assert_almost_equal(mse(wave), [0.13892145, 0.05018679])
+    np.testing.assert_almost_equal(mse(offsetWave), [0.13892145, 0.05018679])
+    np.testing.assert_almost_equal(mse(noiseWave), [0.70375461, 0.10490905])
+
+
 # ################################################ SPECTRAL FEATURES ################################################# #
 def test_max_fre():
     np.testing.assert_almost_equal(max_frequency(const0, Fs), 0.0)
@@ -1534,6 +1558,43 @@ def test_wavelet_energy():
             0.37226945502166053,
         ),
     )
+
+
+# ################################################# FRACTAL FEATURES ################################################# #
+def test_detrended_fluctuation_analysis():
+    np.testing.assert_almost_equal(dfa(const0), np.nan)
+    np.testing.assert_almost_equal(dfa(const1), np.nan)
+    np.testing.assert_almost_equal(dfa(constNeg), np.nan)
+    np.testing.assert_almost_equal(dfa(constF), np.nan)
+    np.testing.assert_almost_equal(dfa(lin), np.nan)
+    np.testing.assert_almost_equal(dfa(lin0), np.nan)
+    np.testing.assert_almost_equal(dfa(wave), 1.53143414)
+    np.testing.assert_almost_equal(dfa(offsetWave), 1.53143414)
+    np.testing.assert_almost_equal(dfa(noiseWave), 1.52244929)
+
+
+def test_maximum_fractal_length():
+    np.testing.assert_almost_equal(mfl(const0), np.nan)
+    np.testing.assert_almost_equal(mfl(const1), np.nan)
+    np.testing.assert_almost_equal(mfl(constNeg), np.nan)
+    np.testing.assert_almost_equal(mfl(constF), np.nan)
+    np.testing.assert_almost_equal(mfl(lin), np.nan)
+    np.testing.assert_almost_equal(mfl(lin0), np.nan)
+    np.testing.assert_almost_equal(mfl(wave), 1.49921803)
+    np.testing.assert_almost_equal(mfl(offsetWave), 1.49921803)
+    np.testing.assert_almost_equal(mfl(noiseWave), 1.75093234)
+
+
+def test_fractal_dimension():
+    np.testing.assert_almost_equal(hfd(const0), np.nan)
+    np.testing.assert_almost_equal(hfd(const1), np.nan)
+    np.testing.assert_almost_equal(hfd(constNeg), np.nan)
+    np.testing.assert_almost_equal(hfd(constF), np.nan)
+    np.testing.assert_almost_equal(hfd(lin), np.nan)
+    np.testing.assert_almost_equal(hfd(lin0), np.nan)
+    np.testing.assert_almost_equal(hfd(wave), 1.18492265)
+    np.testing.assert_almost_equal(hfd(offsetWave), 1.18492265)
+    np.testing.assert_almost_equal(hfd(noiseWave), 1.32308441)
 
 
 run_module_suite()
