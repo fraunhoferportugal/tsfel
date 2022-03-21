@@ -10,18 +10,20 @@ settings2 = tsfel.get_features_by_domain("temporal")
 
 settings3 = tsfel.get_features_by_domain("spectral")
 
-settings4 = tsfel.get_features_by_domain(None)
+settings4 = tsfel.get_features_by_domain("fractal")
 
-settings5 = tsfel.extract_sheet("Features")
+settings5 = tsfel.get_features_by_domain(None)
 
-settings6 = tsfel.get_features_by_tag("audio")
+settings6 = tsfel.extract_sheet("Features")
 
-settings7 = tsfel.get_features_by_tag("inertial")
+settings7 = tsfel.get_features_by_tag("audio")
 
-settings8 = tsfel.get_features_by_tag("ecg")
+settings8 = tsfel.get_features_by_tag("inertial")
 
-settings9 = tsfel.get_features_by_tag("eeg")
+settings9 = tsfel.get_features_by_tag("ecg")
 
-settings10 = tsfel.get_features_by_tag("emg")
+settings10 = tsfel.get_features_by_tag("eeg")
 
-settings11 = tsfel.get_features_by_tag(None)
+settings11 = tsfel.get_features_by_tag("emg")
+
+settings12 = tsfel.get_features_by_tag(None)
