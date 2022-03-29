@@ -28,11 +28,11 @@ def compute_time(signal, fs):
 
     """
 
-    return np.arange(0, len(signal))/fs
+    return np.arange(0, len(signal)) / fs
 
 
 def calc_fft(signal, fs):
-    """ This functions computes the fft of a signal.
+    """This functions computes the fft of a signal.
 
     Parameters
     ----------
@@ -53,7 +53,7 @@ def calc_fft(signal, fs):
     fmag = np.abs(np.fft.fft(signal))
     f = np.linspace(0, fs // 2, len(signal) // 2)
 
-    return f[:len(signal) // 2].copy(), fmag[:len(signal) // 2].copy()
+    return f[: len(signal) // 2].copy(), fmag[: len(signal) // 2].copy()
 
 
 def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
@@ -92,17 +92,23 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # pre-emphasis filter to amplify the high frequencies
 
-    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]))
+    emphasized_signal = np.append(
+        np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1])
+    )
 
     # Fourier transform and Power spectrum
-    mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
+    mag_frames = np.absolute(
+        np.fft.rfft(emphasized_signal, nfft)
+    )  # Magnitude of the FFT
 
-    pow_frames = ((1.0 / nfft) * (mag_frames ** 2))  # Power Spectrum
+    pow_frames = (1.0 / nfft) * (mag_frames**2)  # Power Spectrum
 
     low_freq_mel = 0
-    high_freq_mel = (2595 * np.log10(1 + (fs / 2) / 700))  # Convert Hz to Mel
-    mel_points = np.linspace(low_freq_mel, high_freq_mel, nfilt + 2)  # Equally spaced in Mel scale
-    hz_points = (700 * (10 ** (mel_points / 2595) - 1))  # Convert Mel to Hz
+    high_freq_mel = 2595 * np.log10(1 + (fs / 2) / 700)  # Convert Hz to Mel
+    mel_points = np.linspace(
+        low_freq_mel, high_freq_mel, nfilt + 2
+    )  # Equally spaced in Mel scale
+    hz_points = 700 * (10 ** (mel_points / 2595) - 1)  # Convert Mel to Hz
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
@@ -113,17 +119,23 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
         f_m_plus = int(filter_bin[m + 1])  # right
 
         for k in range(f_m_minus, f_m):
-            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (filter_bin[m] - filter_bin[m - 1])
+            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (
+                filter_bin[m] - filter_bin[m - 1]
+            )
         for k in range(f_m, f_m_plus):
-            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (filter_bin[m + 1] - filter_bin[m])
+            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (
+                filter_bin[m + 1] - filter_bin[m]
+            )
 
     # Area Normalization
     # If we don't normalize the noise will increase with frequency because of the filter width.
-    enorm = 2.0 / (hz_points[2:nfilt + 2] - hz_points[:nfilt])
+    enorm = 2.0 / (hz_points[2 : nfilt + 2] - hz_points[:nfilt])
     fbank *= enorm[:, np.newaxis]
 
     filter_banks = np.dot(pow_frames, fbank.T)
-    filter_banks = np.where(filter_banks == 0, np.finfo(float).eps, filter_banks)  # Numerical Stability
+    filter_banks = np.where(
+        filter_banks == 0, np.finfo(float).eps, filter_banks
+    )  # Numerical Stability
     filter_banks = 20 * np.log10(filter_banks)  # dB
 
     return filter_banks
@@ -149,7 +161,7 @@ def autocorr_norm(signal):
 
     variance = np.var(signal)
     signal = np.copy(signal - signal.mean())
-    r = scipy.signal.correlate(signal, signal)[-len(signal):]
+    r = scipy.signal.correlate(signal, signal)[-len(signal) :]
 
     if (signal == 0).all():
         return np.zeros(len(signal))
@@ -217,21 +229,21 @@ def lpc(signal, n_coeff=12):
     order = n_coeff - 1
 
     # Calculate LPC with Yule-Walker
-    acf = np.correlate(signal, signal, 'full')
+    acf = np.correlate(signal, signal, "full")
 
-    r = np.zeros(order+1, 'float32')
+    r = np.zeros(order + 1, "float32")
     # Assuring that works for all type of input lengths
-    nx = np.min([order+1, len(signal)])
-    r[:nx] = acf[len(signal)-1:len(signal)+order]
+    nx = np.min([order + 1, len(signal)])
+    r[:nx] = acf[len(signal) - 1 : len(signal) + order]
 
     smatrix = create_symmetric_matrix(r[:-1], order)
 
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(order+1))
+        return tuple(np.zeros(order + 1))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
-    return tuple(np.concatenate(([1.], lpc_coeffs)))
+    return tuple(np.concatenate(([1.0], lpc_coeffs)))
 
 
 def create_xx(features):
@@ -252,7 +264,7 @@ def create_xx(features):
     features_ = np.copy(features)
 
     if max(features_) < 0:
-        max_f = - max(features_)
+        max_f = -max(features_)
         min_f = min(features_)
     else:
         min_f = min(features_)
@@ -287,7 +299,7 @@ def kde(features):
         noise = np.random.randn(len(features_)) * 0.0001
         features_ = np.copy(features_ + noise)
 
-    kernel = scipy.stats.gaussian_kde(features_, bw_method='silverman')
+    kernel = scipy.stats.gaussian_kde(features_, bw_method="silverman")
 
     return np.array(kernel(xx) / np.sum(kernel(xx)))
 
@@ -354,15 +366,14 @@ def wavelet(signal, function=ricker, widths=np.arange(1, 10)):
 def calc_ecdf(signal):
     """Computes the ECDF of the signal.
 
-      Parameters
-      ----------
-      signal : nd-array
-          Input from which ECDF is computed
-      Returns
-      -------
-      nd-array
-        Sorted signal and computed ECDF.
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    Returns
+    -------
+    nd-array
+      Sorted signal and computed ECDF.
 
-      """
-    return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
-
+    """
+    return np.sort(signal), np.arange(1, len(signal) + 1) / len(signal)

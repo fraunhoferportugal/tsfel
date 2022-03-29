@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 ROOT = Path(__file__).parent
 
 
-with open("README.md", "r") as fh:
+with open("README.md") as fh:
     long_description = fh.read()
 
 
@@ -21,6 +21,7 @@ def find_requirements(filename):
 install_reqs = find_requirements("requirements.txt")
 docs_require = find_requirements("requirements-docs.txt")
 test_requires = find_requirements("requirements-test.txt")
+dev_requires = find_requirements("requirements-dev.txt")
 
 setup(
     name="tsfel",
@@ -30,9 +31,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fraunhoferportugal/tsfel",
-    package_data={
-        "tsfel": ["feature_extraction/features.json"]
-    },
+    package_data={"tsfel": ["feature_extraction/features.json"]},
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -43,5 +42,6 @@ setup(
     extras_require={
         "docs": docs_require,
         "test": test_requires,
+        "dev": dev_requires,
     },
 )

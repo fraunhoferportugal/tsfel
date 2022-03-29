@@ -28,10 +28,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        set -xe
+        python -VV
         python -m pip install --upgrade pip setuptools
         pip install -r requirements/requirements.txt
         pip install -r requirements/requirements-test.txt
         python setup.py install
     - name: Run pytest
       run: |
-        python -m pytest -v tests
+        python -m pytest -vvv tests
