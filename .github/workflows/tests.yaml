@@ -18,6 +18,8 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
+    - name: Extract branch name
+      run: echo running on branch ${GITHUB_REF##*/}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
