@@ -9,11 +9,11 @@ constF = np.ones(20) * 2.5
 lin = np.arange(20)
 lin0 = np.linspace(-10, 10, 20)
 f = 5.0
-sample = 1000
+sample = 1000.0
 x = np.arange(0, sample, 1)
 Fs = 1000.0
 pi = 3.141592653589793
-wave = np.sin(2.0 * pi * f * x / Fs)
+wave = np.sin(2.0 * pi * f * x / Fs, dtype=np.float64)
 np.random.seed(seed=10)
 noiseWave = wave + np.random.normal(0, 0.1, 1000)
 offsetWave = wave + 2
@@ -26,15 +26,15 @@ def test_hist():
     np.testing.assert_almost_equal(hist(constNeg, 10, 5), (0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     np.testing.assert_almost_equal(hist(constF, 10, 5), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0))
     np.testing.assert_almost_equal(hist(lin, 10, 5), (0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 2))
-    np.testing.assert_almost_equal(hist(wave, 10, 5), (0.0, 0.0, 0.0, 0.0, 499, 496, 5, 0.0, 0.0, 0.0), decimal=5)
+    np.testing.assert_almost_equal(hist(wave, 10, 5), (0.0, 0.0, 0.0, 0.0, 499.0, 496.0, 5.0, 0.0, 0.0, 0.0), decimal=5)
     np.testing.assert_almost_equal(
         hist(offsetWave, 10, 5),
-        (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 499, 496, 5, 0.0),
+        (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 499.0, 496.0, 5.0, 0.0),
         decimal=5,
     )
     np.testing.assert_almost_equal(
         hist(noiseWave, 10, 5),
-        (0.0, 0.0, 0.0, 48, 446, 450, 56, 0.0, 0.0, 0.0),
+        (0.0, 0.0, 0.0, 48.0, 446.0, 450.0, 56.0, 0.0, 0.0, 0.0),
         decimal=5,
     )
 
