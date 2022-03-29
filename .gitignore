@@ -91,6 +91,8 @@ celerybeat-schedule
 # Environments
 .env
 .venv
+.venv-test
+.venv-docs
 env/
 venv/
 ENV/
@@ -115,6 +117,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
+
+# Notebooks
 notebooks/UCI HAR Dataset
 notebooks/__MACOSX
 notebooks/CorrelationReport.html
@@ -122,5 +126,7 @@ notebooks/orange_input_test.csv
 notebooks/orange_input_train.csv
 notebooks/UCI HAR Dataset.zip
 
+# Test outputs
+output/
 
 

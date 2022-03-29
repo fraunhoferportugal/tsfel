@@ -1,8 +1,10 @@
+import numpy as np
 import scipy.signal
-from tsfel.feature_extraction.features_utils import *
 
-
-# ############################################# TEMPORAL DOMAIN ##################################################### #
+from tsfel.feature_extraction.features_utils import (calc_ecdf, calc_fft,
+                                                     compute_time, filterbank,
+                                                     gaussian, kde, lpc,
+                                                     set_domain, wavelet)
 
 
 @set_domain("domain", "temporal")
@@ -48,9 +50,7 @@ def calc_centroid(signal, fs):
     """
 
     time = compute_time(signal, fs)
-
     energy = np.array(signal) ** 2
-
     t_energy = np.dot(np.array(time), np.array(energy))
     energy_sum = np.sum(energy)
 
@@ -105,9 +105,7 @@ def positive_turning(signal):
 
     """
     diff_sig = np.diff(signal)
-
     array_signal = np.arange(len(diff_sig[:-1]))
-
     positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
@@ -198,7 +196,7 @@ def distance(signal):
     """Computes signal traveled distance.
 
     Calculates the total distance traveled by the signal
-    using the hipotenusa between 2 datapoints.
+    using the hipotenusa between 2 data points.
 
    Feature computational cost: 1
 
@@ -658,7 +656,7 @@ def median_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return scipy.stats.median_absolute_deviation(signal, scale=1)
+    return scipy.stats.median_abs_deviation(signal, scale=1)
 
 
 @set_domain("domain", "statistical")

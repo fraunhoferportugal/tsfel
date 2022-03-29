@@ -23,7 +23,6 @@ def add_feature_json(features_path, json_path):
         New customised features will be added to file in this directory.
 
     """
-
     sys.path.append(features_path[:-len(features_path.split(os.sep)[-1]) - 1])
     exec("import " + features_path.split(os.sep)[-1][:-3])
 

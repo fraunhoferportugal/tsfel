@@ -1,5 +1,5 @@
-from IPython.display import HTML
 from IPython import get_ipython
+from IPython.display import HTML
 
 
 def progress_bar_terminal(iteration, total, prefix='', suffix='', decimals=0, length=100, fill='█', printend="\r"):

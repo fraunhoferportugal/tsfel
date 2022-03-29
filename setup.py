@@ -1,5 +1,6 @@
-import setuptools
 from pathlib import Path
+
+from setuptools import find_packages, setup
 
 ROOT = Path(__file__).parent
 
@@ -19,19 +20,20 @@ def find_requirements(filename):
 
 install_reqs = find_requirements("requirements.txt")
 docs_require = find_requirements("requirements-docs.txt")
+test_requires = find_requirements("requirements-test.txt")
 
-setuptools.setup(
+setup(
     name="tsfel",
-    version="0.1.4",
+    version="0.1.5",
     author="Fraunhofer Portugal",
-    description="Library for time series feature extraction",
+    description="Library for time series feature extraction.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/fraunhoferportugal/tsfel/",
+    url="https://github.com/fraunhoferportugal/tsfel",
     package_data={
         "tsfel": ["feature_extraction/features.json", "utils/client_secret.json"]
     },
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
@@ -40,5 +42,6 @@ setuptools.setup(
     install_requires=install_reqs,
     extras_require={
         "docs": docs_require,
+        "test": test_requires,
     },
 )

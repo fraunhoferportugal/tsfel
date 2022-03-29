@@ -1,6 +1,6 @@
-import scipy
 import numpy as np
-
+import scipy
+from scipy.signal import ricker, cwt
 
 def set_domain(key, value):
     def decorate_func(func):
@@ -318,7 +318,7 @@ def gaussian(features):
     return np.array(pdf_gauss / np.sum(pdf_gauss))
 
 
-def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet(signal, function=ricker, widths=np.arange(1, 10)):
     """Computes CWT (continuous wavelet transform) of the signal.
 
     Parameters
@@ -345,9 +345,9 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     if isinstance(widths, str):
         widths = eval(widths)
 
-    cwt = scipy.signal.cwt(signal, function, widths)
+    _cwt = cwt(signal, function, widths)
 
-    return cwt
+    return _cwt
 
 
 def calc_ecdf(signal):

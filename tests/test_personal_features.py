@@ -1,5 +1,6 @@
-from tsfel.feature_extraction.features_utils import set_domain
 import numpy as np
+
+from tsfel.feature_extraction.features_utils import set_domain
 
 
 @set_domain("domain", "statistical")
@@ -15,7 +16,7 @@ def new_feature(signal):
     float
         new feature
     """
-    return np.mean(signal)-np.std(signal)
+    return np.mean(signal) - np.std(signal)
 
 
 @set_domain("domain", "statistical")
@@ -32,7 +33,7 @@ def new_feature_with_parameter(signal, weight=0.5):
     float
         new feature with parameter
     """
-    return np.mean(signal)-np.std(signal)*weight
+    return np.mean(signal) - np.std(signal) * weight
 
 
 @set_domain("domain", "new_domain")
@@ -50,7 +51,7 @@ def new_feature_with_tag(signal):
     float
         new feature with parameter
     """
-    return np.mean(signal)-np.std(signal)
+    return np.mean(signal) - np.std(signal)
 
 
 @set_domain("domain", "new_domain")
@@ -68,5 +69,4 @@ def new_feature_with_multiple_tag(signal):
     float
         new feature with parameter
     """
-    return np.mean(signal)-np.std(signal)
-
+    return np.mean(signal) - np.std(signal)

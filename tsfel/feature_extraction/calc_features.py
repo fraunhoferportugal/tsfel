@@ -11,12 +11,13 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 from IPython import get_ipython
 from IPython.display import display
 
-from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
-from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
+from tsfel.utils.progress_bar import (display_progress_bar,
+                                      progress_bar_notebook)
+from tsfel.utils.signal_processing import (merge_time_series,
+                                           signal_window_splitter)
 
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
@@ -132,9 +133,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
             continue
 
         pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
-
         data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
-
         windows = signal_window_splitter(data_new, window_size, overlap)
 
         if features_path:
@@ -297,7 +296,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                 for i, feat in enumerate(features):
                     if verbose == 1:
                         display_progress_bar(i, signal_windows, out)
-                    features_final = features_final.append(feat)
+                    features_final = features_final.from_records(feat)
 
                 pool.close()
                 pool.join()
@@ -305,7 +304,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             elif n_jobs is None:
                 # Without multiprocessing
                 for i, feat in enumerate(signal_windows):
-                    features_final = features_final.append(
+                    features_final = features_final.from_records(
                         calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
                     if verbose == 1:
                         display_progress_bar(i, signal_windows, out)
@@ -361,9 +360,9 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
     if features_path:
         sys.path.append(features_path[:-len(features_path.split(os.sep)[-1])-1])
-        exec("import "+features_path.split(os.sep)[-1][:-3])
+        exec("import " + features_path.split(os.sep)[-1][:-3])
         importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
-        exec("from " + features_path.split(os.sep)[-1][:-3]+" import *")
+        exec("from " + features_path.split(os.sep)[-1][:-3] + " import *")
 
     # Create global arrays
     func_total = []

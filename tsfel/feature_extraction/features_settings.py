@@ -1,6 +1,6 @@
 import json
+
 import tsfel
-import numpy as np
 
 
 def load_json(json_path):

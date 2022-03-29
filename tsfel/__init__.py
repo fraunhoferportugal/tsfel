@@ -1,2 +1,3 @@
-from tsfel.utils import *
-from tsfel.feature_extraction import *
+from tsfel.utils.add_personal_features import add_feature_json
+
+__version__ = "0.1.5"
