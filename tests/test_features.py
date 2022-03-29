@@ -1,8 +1,6 @@
 import numpy as np
 from numpy.testing import run_module_suite
-
 from tsfel.feature_extraction.features import *
-
 
 const0 = np.zeros(20)
 const1 = np.ones(20)

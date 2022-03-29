@@ -4,12 +4,14 @@ import os
 from pathlib import Path
 
 import pandas as pd
-
 import tsfel
-from tsfel.feature_extraction.calc_features import dataset_features_extractor, time_series_features_extractor
-from tsfel.feature_extraction.features_settings import get_features_by_domain, get_features_by_tag
+from tsfel.feature_extraction.calc_features import (
+    dataset_features_extractor, time_series_features_extractor)
+from tsfel.feature_extraction.features_settings import (get_features_by_domain,
+                                                        get_features_by_tag)
 from tsfel.utils.add_personal_features import add_feature_json
-from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
+from tsfel.utils.signal_processing import (merge_time_series,
+                                           signal_window_splitter)
 
 # from tsfel.utils.gSheetsFilters import extract_sheet
 

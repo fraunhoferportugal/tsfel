@@ -1,5 +1,7 @@
 import tsfel
-from tsfel.feature_extraction.features_settings import get_features_by_domain, get_features_by_tag, load_json
+from tsfel.feature_extraction.features_settings import (get_features_by_domain,
+                                                        get_features_by_tag,
+                                                        load_json)
 
 FEATURES_JSON = tsfel.__path__[0] + "/feature_extraction/features.json"
 
