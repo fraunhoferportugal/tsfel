@@ -1,4 +1,4 @@
-name: Tests
+name: "Tests"
 
 on:
   push:
@@ -28,7 +28,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        set -xe
         python -VV
         python -m pip install --upgrade pip setuptools
         pip install -r requirements/requirements.txt
