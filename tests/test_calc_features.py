@@ -13,7 +13,6 @@ from tsfel.utils.add_personal_features import add_feature_json
 from tsfel.utils.signal_processing import (merge_time_series,
                                            signal_window_splitter)
 
-# from tsfel.utils.gSheetsFilters import extract_sheet
 
 # Example of user preprocess sensor data
 def pre_process(sensor_data):

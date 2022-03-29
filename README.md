@@ -7,14 +7,12 @@
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
-This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers on exploratory feature extraction tasks on time series without requiring significant programming effort.
+This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers on
+exploratory feature extraction tasks on time series without requiring significant programming effort.
 
-Users can interact with TSFEL using two methods:
-##### Online
-It does not requires installation as it relies on Google Colabs and a user interface provided by Google Sheets
 
-##### Offline
-Advanced users can take full potential of TSFEL by installing as a python package
+## Installation
+
 ```python
 pip install tsfel
 ```
@@ -40,10 +38,10 @@ import pandas as pd
 df = pd.read_csv('Dataset.txt')
 
 # Retrieves a pre-defined feature configuration file to extract all available features
-cfg = tsfel.get_features_by_domain()
+cfg = tsfel.feature_extraction.features_settings.py.get_features_by_domain()
 
 # Extract features
-X = tsfel.time_series_features_extractor(cfg, df)
+X = tsfel.feature_extraction.calc_features.time_series_features_extractor(cfg, df)
 ```
 
 ## Available features
@@ -129,4 +127,7 @@ When using TSFEL please cite the following publication:
 Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
 
 ## Acknowledgements
-We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
+We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing 
+System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme 
+Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), 
+with operation code POCI-01-0247-FEDER-038436.

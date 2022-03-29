@@ -1,6 +1,7 @@
 import numpy as np
 import scipy
-from scipy.signal import ricker, cwt
+from scipy.signal import cwt, ricker
+
 
 def set_domain(key, value):
     def decorate_func(func):

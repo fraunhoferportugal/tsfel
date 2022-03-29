@@ -31,7 +31,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/fraunhoferportugal/tsfel",
     package_data={
-        "tsfel": ["feature_extraction/features.json", "utils/client_secret.json"]
+        "tsfel": ["feature_extraction/features.json"]
     },
     packages=find_packages(),
     classifiers=[
