@@ -1,18 +1,20 @@
 name: Tests
 
-on: [push]
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
+    name: Run template tests
     strategy:
       max-parallel: 4
       fail-fast: false
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-        platform: [ubuntu-18.04, ubuntu-20.04]
-
+        platform: ['ubuntu-18.04', 'ubuntu-20.04', 'macos-latest', 'windows-latest']
     runs-on: ${{ matrix.platform }}
-
     steps:
     - name: Git Checkout
       uses: actions/checkout@v3
@@ -24,12 +26,12 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install other dependencies
+    - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools
         pip install -r requirements/requirements.txt
         pip install -r requirements/requirements-test.txt
         python setup.py install
-    - name: Test with pytest
+    - name: Run pytest
       run: |
-        python -m pytest tests
+        python -m pytest -v tests

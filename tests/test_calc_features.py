@@ -54,12 +54,8 @@ settings2 = get_features_by_domain("statistical")
 settings3 = get_features_by_domain("temporal")
 settings4 = get_features_by_domain("spectral")
 settings5 = get_features_by_domain()
-# settings6 = extract_sheet('Features')
-# settings7 = extract_sheet('Features_test', path_json=personal_path_json)
-settings8 = get_features_by_tag("inertial")
-settings10 = get_features_by_tag()
-
-# print(settings4)
+settings6 = get_features_by_tag("inertial")
+settings7 = get_features_by_tag()
 
 # Signal processing
 data_new = merge_time_series(sensor_data, resample_rate, time_unit)

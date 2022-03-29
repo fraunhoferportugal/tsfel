@@ -19,6 +19,3 @@ pandas >= 0.25.3
 # tsfel/utils/calculate_complexity.py: 4
 # tsfel/utils/signal_processing.py: 3
 scipy >= 1.5.1
-
-# tsfel/setup.py: 1
-setuptools >= 47.1.1

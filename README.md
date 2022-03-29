@@ -38,7 +38,7 @@ import pandas as pd
 df = pd.read_csv('Dataset.txt')
 
 # Retrieves a pre-defined feature configuration file to extract all available features
-cfg = tsfel.feature_extraction.features_settings.py.get_features_by_domain()
+cfg = tsfel.feature_extraction.features_settings.get_features_by_domain()
 
 # Extract features
 X = tsfel.feature_extraction.calc_features.time_series_features_extractor(cfg, df)

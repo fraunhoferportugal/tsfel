@@ -26,7 +26,7 @@ def test_hist():
     np.testing.assert_almost_equal(hist(constNeg, 10, 5), (0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     np.testing.assert_almost_equal(hist(constF, 10, 5), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0))
     np.testing.assert_almost_equal(hist(lin, 10, 5), (0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 2))
-    #np.testing.assert_almost_equal(hist(wave, 10, 5), (0.0, 0.0, 0.0, 0.0, 499.0, 496.0, 5.0, 0.0, 0.0, 0.0), decimal=5)
+    np.testing.assert_almost_equal(hist(wave, 10, 5), (0.0, 0.0, 0.0, 0.0, 499.0, 496.0, 5.0, 0.0, 0.0, 0.0), decimal=5)
     np.testing.assert_almost_equal(
         hist(offsetWave, 10, 5),
         (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 499.0, 496.0, 5.0, 0.0),
