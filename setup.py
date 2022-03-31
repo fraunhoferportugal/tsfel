@@ -33,6 +33,8 @@ setup(
     url="https://github.com/fraunhoferportugal/tsfel",
     package_data={"tsfel": ["feature_extraction/features.json"]},
     packages=find_packages(),
+    setup_requires=["setuptools>=47.1.1"],
+    python_requires=">=3.6",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
