@@ -14,6 +14,8 @@ sample = 1000
 x = np.arange(0, sample, 1)
 Fs = 1000
 pi = 3.141592653589793
+# https://pythonnumericalmethods.berkeley.edu/notebooks/chapter09.03-Roundoff-Errors.html
+# https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html
 wave = np.sin(2.0 * pi * f * x / Fs, dtype=np.float64)
 # https://numpy.org/doc/stable/reference/random/index.html
 np.random.seed(seed=10)
@@ -23,6 +25,7 @@ noiseWave = wave + np.random.normal(mu, sigma, sample)
 # noiseWave = wave + np.random.default_rng(seed).normal(mu, sigma, sample)
 offsetWave = wave + 2.0
 
+# np.savetxt("wave_float64.txt", wave)
 
 # ############################################### STATISTICAL FEATURES ############################################### #
 def test_hist():

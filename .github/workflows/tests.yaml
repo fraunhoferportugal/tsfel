@@ -37,4 +37,6 @@ jobs:
         python -m pip install .
     - name: Run pytest
       run: |
+        python -c "import numpy as np; np.show_config()"
+        python -c "import scipy as sp; sp.show_config()"
         python -m pytest -vvv tests
