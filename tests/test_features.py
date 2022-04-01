@@ -10,14 +10,18 @@ constF = np.ones(20) * 2.5
 lin = np.arange(20)
 lin0 = np.linspace(-10, 10, 20)
 f = 5.0
-sample = 1000.0
+sample = 1000
 x = np.arange(0, sample, 1)
-Fs = 1000.0
+Fs = 1000
 pi = 3.141592653589793
 wave = np.sin(2.0 * pi * f * x / Fs, dtype=np.float64)
+# https://numpy.org/doc/stable/reference/random/index.html
 np.random.seed(seed=10)
-noiseWave = wave + np.random.normal(0, 0.1, 1000)
-offsetWave = wave + 2
+seed = 10
+mu, sigma = 0, 0.1  # mean and standard deviation
+noiseWave = wave + np.random.normal(mu, sigma, sample)
+# noiseWave = wave + np.random.default_rng(seed).normal(mu, sigma, sample)
+offsetWave = wave + 2.0
 
 
 # ############################################### STATISTICAL FEATURES ############################################### #

@@ -8,14 +8,14 @@ ipython >= 7.4.0
 # tsfel/feature_extraction/features_utils.py: 2
 # tsfel/utils/calculate_complexity.py: 3
 # tsfel/utils/signal_processing.py: 1
-numpy >= 1.18.5
+numpy==1.22.3
 
 # tsfel/feature_extraction/calc_features.py: 13
 # tsfel/utils/signal_processing.py: 2
-pandas >= 0.25.3
+pandas==1.4.1
 
 # tsfel/feature_extraction/features.py: 1
 # tsfel/feature_extraction/features_utils.py: 1
 # tsfel/utils/calculate_complexity.py: 4
 # tsfel/utils/signal_processing.py: 3
-scipy >= 1.5.1
+scipy==1.8.0
