@@ -16,7 +16,8 @@ Fs = 1000
 pi = 3.141592653589793
 # https://pythonnumericalmethods.berkeley.edu/notebooks/chapter09.03-Roundoff-Errors.html
 # https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html
-wave = np.sin(2.0 * pi * f * x / Fs, dtype=np.float64)
+# wave = np.sin(2.0 * pi * f * x / Fs, dtype=np.float64)
+wave = np.loadtxt("tests/tests_tools/wave_float64.txt")
 # https://numpy.org/doc/stable/reference/random/index.html
 np.random.seed(seed=10)
 seed = 10

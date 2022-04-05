@@ -35,8 +35,10 @@ jobs:
         pip install -r requirements/requirements.txt
         pip install -r requirements/requirements-test.txt
         python -m pip install .
-    - name: Run pytest
+    - name: Check numpy and scipy flags
       run: |
         python -c "import numpy as np; np.show_config()"
         python -c "import scipy as sp; sp.show_config()"
+    - name: Run pytest
+      run: |
         python -m pytest -vvv tests
