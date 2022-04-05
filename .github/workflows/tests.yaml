@@ -12,7 +12,7 @@ jobs:
       max-parallel: 4
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9']
         platform: ['ubuntu-18.04', 'ubuntu-20.04', 'macos-latest', 'windows-latest']
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 30
