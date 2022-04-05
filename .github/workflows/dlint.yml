@@ -5,5 +5,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Dlint
         steps:
-            - uses: actions/checkout@master
+            - uses: actions/checkout@v3
+              with:
+                ref: ${{ github.head_ref }}
             - uses: dlint-py/dlint-action@master
