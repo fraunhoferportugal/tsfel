@@ -73,7 +73,6 @@ def find_best_curve(t, signal):
         all_curves.append(nexp)
 
     idx_best = np.argmin(all_chisq)
-
     curve_name = str(list_curves[idx_best])
     idx1 = curve_name.find("n_")
     idx2 = curve_name.find("at")
@@ -108,7 +107,6 @@ def compute_complexity(feature, domain, json_path, **kwargs):
     """
 
     dictionary = load_json(json_path)
-
     features_path = kwargs.get("features_path", None)
 
     # The inputs from this function should be replaced by a dictionary
@@ -128,8 +126,8 @@ def compute_complexity(feature, domain, json_path, **kwargs):
             calc_window_features(
                 one_feat_dict, wave[: int(ti)], fs, features_path=features_path
             )
-            end = time.time()
 
+            end = time.time()
             s += [end - start]
 
         signal += [np.mean(s)]

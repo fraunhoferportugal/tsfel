@@ -43,7 +43,7 @@ def progress_bar_terminal(
         print()
 
 
-def progress_bar_notebook(iteration, total=100):
+def progress_bar_notebook(iteration, total: int = 100):
     """Progress bar for notebooks.
 
     Parameters

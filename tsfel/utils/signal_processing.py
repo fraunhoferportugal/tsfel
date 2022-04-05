@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-def signal_window_splitter(signal, window_size, overlap=0):
+def signal_window_splitter(signal, window_size: int, overlap: float = 0.0):
     """Splits the signal into windows
     Parameters
     ----------
@@ -82,7 +82,7 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlated_features(features, threshold=0.95):
+def correlated_features(features, threshold: float = 0.95):
     """Compute pairwise correlation of features using pearson method
 
     Parameters

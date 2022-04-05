@@ -34,7 +34,7 @@ setup(
     package_data={"tsfel": ["feature_extraction/features.json"]},
     packages=find_packages(),
     setup_requires=["setuptools>=47.1.1"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
@@ -42,8 +42,8 @@ setup(
     ],
     install_requires=install_reqs,
     extras_require={
+        "dev": dev_requires,
         "docs": docs_require,
         "test": test_requires,
-        "dev": dev_requires,
     },
 )

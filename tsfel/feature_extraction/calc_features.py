@@ -18,7 +18,7 @@ from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
 
-def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
+def dataset_features_extractor(main_directory, feat_dict, verbose: int = 1, **kwargs):
     r"""Extracts features from a dataset.
 
     Parameters
@@ -211,7 +211,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
 
 
 def time_series_features_extractor(
-    dict_features, signal_windows, fs=None, verbose=1, **kwargs
+    dict_features, signal_windows, fs=None, verbose: int = 1, **kwargs
 ):
     r"""Extraction of time series features.
 
@@ -384,7 +384,7 @@ def time_series_features_extractor(
 
 
 def calc_window_features(
-    dict_features, signal_window, fs, verbose=1, single_window=False, **kwargs
+    dict_features, signal_window, fs, verbose: int = 1, single_window=False, **kwargs
 ):
     r"""This function computes features matrix for one window.
 
@@ -467,7 +467,6 @@ def calc_window_features(
 
                 # Read Function Name (generic name)
                 func_names = [feat]
-
                 # Read Function (real name of function)
                 func_total = [dict_features[_type][feat]["function"]]
 

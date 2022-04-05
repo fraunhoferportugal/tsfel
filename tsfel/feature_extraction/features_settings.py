@@ -80,6 +80,7 @@ def get_features_by_tag(tag=None, json_path=None):
             )
     features_tag = {}
     dict_features = load_json(json_path)
+
     if tag is None:
         return dict_features
     else:
@@ -108,7 +109,7 @@ def get_features_by_tag(tag=None, json_path=None):
         }
 
 
-def get_number_features(dict_features):
+def get_number_features(dict_features) -> int:
     """Count the total number of features based on input parameters of each feature
 
     Parameters

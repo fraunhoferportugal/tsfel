@@ -16,7 +16,7 @@ from tsfel.feature_extraction.features_utils import (
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "inertial")
-def autocorr(signal):
+def autocorr(signal) -> float:
     """Computes autocorrelation of the signal.
 
     Feature computational cost: 1
@@ -37,7 +37,7 @@ def autocorr(signal):
 
 
 @set_domain("domain", "temporal")
-def calc_centroid(signal, fs):
+def calc_centroid(signal, fs: int) -> float:
     """Computes the centroid along the time axis.
 
     Feature computational cost: 1
@@ -71,7 +71,7 @@ def calc_centroid(signal, fs):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "emg")
-def negative_turning(signal):
+def negative_turning(signal) -> float:
     """Computes number of negative turning points of the signal.
 
     Feature computational cost: 1
@@ -97,7 +97,7 @@ def negative_turning(signal):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "emg")
-def positive_turning(signal):
+def positive_turning(signal) -> int:
     """Computes number of positive turning points of the signal.
 
     Feature computational cost: 1
@@ -109,7 +109,7 @@ def positive_turning(signal):
 
     Returns
     -------
-    float
+    int
         Number of positive turning points
 
     """
@@ -123,7 +123,7 @@ def positive_turning(signal):
 
 
 @set_domain("domain", "temporal")
-def mean_abs_diff(signal):
+def mean_abs_diff(signal) -> float:
     """Computes mean absolute differences of the signal.
 
     Feature computational cost: 1
@@ -143,7 +143,7 @@ def mean_abs_diff(signal):
 
 
 @set_domain("domain", "temporal")
-def mean_diff(signal):
+def mean_diff(signal) -> float:
     """Computes mean of differences of the signal.
 
     Feature computational cost: 1
@@ -163,7 +163,7 @@ def mean_diff(signal):
 
 
 @set_domain("domain", "temporal")
-def median_abs_diff(signal):
+def median_abs_diff(signal) -> float:
     """Computes median absolute differences of the signal.
 
     Feature computational cost: 1
@@ -183,7 +183,7 @@ def median_abs_diff(signal):
 
 
 @set_domain("domain", "temporal")
-def median_diff(signal):
+def median_diff(signal) -> float:
     """Computes median of differences of the signal.
 
     Feature computational cost: 1
@@ -203,7 +203,7 @@ def median_diff(signal):
 
 
 @set_domain("domain", "temporal")
-def distance(signal):
+def distance(signal) -> float:
     """Computes signal traveled distance.
 
      Calculates the total distance traveled by the signal
@@ -227,7 +227,7 @@ def distance(signal):
 
 
 @set_domain("domain", "temporal")
-def sum_abs_diff(signal):
+def sum_abs_diff(signal) -> float:
     """Computes sum of absolute differences of the signal.
 
     Feature computational cost: 1
@@ -248,7 +248,7 @@ def sum_abs_diff(signal):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", ["audio", "emg"])
-def zero_cross(signal):
+def zero_cross(signal) -> int:
     """Computes Zero-crossing rate of the signal.
 
     Corresponds to the total number of times that the signal changes from
@@ -272,7 +272,7 @@ def zero_cross(signal):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "audio")
-def total_energy(signal, fs):
+def total_energy(signal, fs: int) -> float:
     """Computes the total energy of the signal.
 
     Feature computational cost: 1
@@ -320,7 +320,7 @@ def slope(signal):
 
 
 @set_domain("domain", "temporal")
-def auc(signal, fs):
+def auc(signal, fs: int) -> float:
     """Computes the area under the curve of the signal computed with trapezoid rule.
 
     Feature computational cost: 1
@@ -346,7 +346,7 @@ def auc(signal, fs):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "audio")
-def abs_energy(signal):
+def abs_energy(signal) -> float:
     """Computes the absolute energy of the signal.
 
     Feature computational cost: 1
@@ -366,7 +366,7 @@ def abs_energy(signal):
 
 
 @set_domain("domain", "temporal")
-def pk_pk_distance(signal):
+def pk_pk_distance(signal) -> float:
     """Computes the peak to peak distance.
 
     Feature computational cost: 1
@@ -387,7 +387,7 @@ def pk_pk_distance(signal):
 
 @set_domain("domain", "temporal")
 @set_domain("tag", "eeg")
-def entropy(signal, prob="standard"):
+def entropy(signal, prob: str = "standard") -> float:
     """Computes the entropy of the signal using the Shannon Entropy.
 
     Description in Article:
@@ -434,7 +434,7 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "temporal")
-def neighbourhood_peaks(signal, n=10):
+def neighbourhood_peaks(signal, n: int = 10) -> float:
     """Computes the number of peaks from a defined neighbourhood of the signal.
 
     Reference: Christ, M., Braun, N., Neuffer, J. and Kempa-Liehr A.W. (2018). Time Series FeatuRe Extraction on basis
@@ -449,7 +449,7 @@ def neighbourhood_peaks(signal, n=10):
 
     Returns
     -------
-    int
+    float
         The number of peaks from a defined neighbourhood of the signal
     """
     signal = np.array(signal)
@@ -468,7 +468,7 @@ def neighbourhood_peaks(signal, n=10):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10, r=1):
+def hist(signal, nbins: int = 10, r: int = 1):
     """Computes histogram of the signal.
 
     Feature computational cost: 1
@@ -516,7 +516,7 @@ def interq_range(signal):
 
 
 @set_domain("domain", "statistical")
-def kurtosis(signal):
+def kurtosis(signal) -> float:
     """Computes kurtosis of the signal.
 
     Feature computational cost: 1
@@ -536,7 +536,7 @@ def kurtosis(signal):
 
 
 @set_domain("domain", "statistical")
-def skewness(signal):
+def skewness(signal) -> int:
     """Computes skewness of the signal.
 
     Feature computational cost: 1
@@ -556,7 +556,7 @@ def skewness(signal):
 
 
 @set_domain("domain", "statistical")
-def calc_max(signal):
+def calc_max(signal) -> float:
     """Computes the maximum value of the signal.
 
     Feature computational cost: 1
@@ -576,7 +576,7 @@ def calc_max(signal):
 
 
 @set_domain("domain", "statistical")
-def calc_min(signal):
+def calc_min(signal) -> float:
     """Computes the minimum value of the signal.
 
     Feature computational cost: 1
@@ -597,7 +597,7 @@ def calc_min(signal):
 
 @set_domain("domain", "statistical")
 @set_domain("tag", "inertial")
-def calc_mean(signal):
+def calc_mean(signal) -> float:
     """Computes mean value of the signal.
 
     Feature computational cost: 1
@@ -617,7 +617,7 @@ def calc_mean(signal):
 
 
 @set_domain("domain", "statistical")
-def calc_median(signal):
+def calc_median(signal) -> float:
     """Computes median of the signal.
 
     Feature computational cost: 1
@@ -637,7 +637,7 @@ def calc_median(signal):
 
 
 @set_domain("domain", "statistical")
-def mean_abs_deviation(signal):
+def mean_abs_deviation(signal) -> float:
     """Computes mean absolute deviation of the signal.
 
     Feature computational cost: 1
@@ -657,7 +657,7 @@ def mean_abs_deviation(signal):
 
 
 @set_domain("domain", "statistical")
-def median_abs_deviation(signal):
+def median_abs_deviation(signal) -> float:
     """Computes median absolute deviation of the signal.
 
     Feature computational cost: 1
@@ -678,7 +678,7 @@ def median_abs_deviation(signal):
 
 @set_domain("domain", "statistical")
 @set_domain("tag", ["inertial", "emg"])
-def rms(signal):
+def rms(signal) -> float:
     """Computes root mean square of the signal.
 
     Square root of the arithmetic mean (average) of the squares of the original values.
@@ -700,7 +700,7 @@ def rms(signal):
 
 
 @set_domain("domain", "statistical")
-def calc_std(signal):
+def calc_std(signal) -> float:
     """Computes standard deviation (std) of the signal.
 
     Feature computational cost: 1
@@ -720,7 +720,7 @@ def calc_std(signal):
 
 
 @set_domain("domain", "statistical")
-def calc_var(signal):
+def calc_var(signal) -> float:
     """Computes variance of the signal.
 
     Feature computational cost: 1
@@ -740,7 +740,7 @@ def calc_var(signal):
 
 
 @set_domain("domain", "statistical")
-def ecdf(signal, d=10):
+def ecdf(signal, d: int = 10):
     """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
 
     Feature computational cost: 1
@@ -765,7 +765,7 @@ def ecdf(signal, d=10):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile(signal, percentile=[0.2, 0.8]):
+def ecdf_percentile(signal, percentile=[0.2, 0.8]) -> float:
     """Computes the percentile values of the ECDF.
 
     Feature computational cost: 1
@@ -806,7 +806,7 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
+def ecdf_percentile_count(signal, percentile=[0.2, 0.8]) -> float:
     """Computes the cumulative sum of samples that are less than the percentile.
 
     Feature computational cost: 1
@@ -850,7 +850,7 @@ def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
 
 
 @set_domain("domain", "spectral")
-def spectral_distance(signal, fs):
+def spectral_distance(signal, fs: int) -> float:
     """Computes the signal spectral distance.
 
     Distance of the signal's cumulative sum of the FFT elements to
@@ -882,7 +882,7 @@ def spectral_distance(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def fundamental_frequency(signal, fs):
+def fundamental_frequency(signal, fs: int) -> float:
     """Computes fundamental frequency of the signal.
 
     The fundamental frequency integer multiple best explain
@@ -907,10 +907,9 @@ def fundamental_frequency(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     # Finding big peaks, not considering noise peaks with low amplitude
-
     bp = scipy.signal.find_peaks(fmag, height=max(fmag) * 0.3)[0]
 
-    # # Condition for offset removal, since the offset generates a peak at frequency zero
+    # Condition for offset removal, since the offset generates a peak at frequency zero
     bp = bp[bp != 0]
     if not list(bp):
         f0 = 0
@@ -949,7 +948,7 @@ def max_power_spectrum(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def max_frequency(signal, fs):
+def max_frequency(signal, fs) -> float:
     """Computes maximum frequency of the signal.
 
     Feature computational cost: 2
@@ -978,7 +977,7 @@ def max_frequency(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def median_frequency(signal, fs):
+def median_frequency(signal, fs: int) -> int:
     """Computes median frequency of the signal.
 
     Feature computational cost: 1
@@ -997,6 +996,7 @@ def median_frequency(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     cum_fmag = np.cumsum(fmag)
+
     try:
         ind_mag = np.where(cum_fmag > cum_fmag[-1] * 0.50)[0][0]
     except IndexError:
@@ -1008,7 +1008,7 @@ def median_frequency(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "audio")
-def spectral_centroid(signal, fs):
+def spectral_centroid(signal, fs: int) -> float:
     """Barycenter of the spectrum.
 
     Description and formula in Article:
@@ -1038,7 +1038,7 @@ def spectral_centroid(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def spectral_decrease(signal, fs):
+def spectral_decrease(signal, fs: int) -> float:
     """Represents the amount of decreasing of the spectra amplitude.
 
     Description and formula in Article:
@@ -1061,7 +1061,6 @@ def spectral_decrease(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-
     fmag_band = fmag[1:]
     len_fmag_band = np.arange(2, len(fmag) + 1)
 
@@ -1069,7 +1068,7 @@ def spectral_decrease(signal, fs):
     soma_num = np.sum((fmag_band - fmag[0]) / (len_fmag_band - 1), axis=0)
 
     if not np.sum(fmag_band):
-        return 0
+        return 0.0
     else:
         # Sum of denominator
         soma_den = 1 / np.sum(fmag_band)
@@ -1079,7 +1078,7 @@ def spectral_decrease(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def spectral_kurtosis(signal, fs):
+def spectral_kurtosis(signal, fs: int) -> float:
     """Measures the flatness of a distribution around its mean value.
 
     Description and formula in Article:
@@ -1103,14 +1102,14 @@ def spectral_kurtosis(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
     if not spectral_spread(signal, fs):
-        return 0
+        return 0.0
     else:
         spect_kurt = ((f - spectral_centroid(signal, fs)) ** 4) * (fmag / np.sum(fmag))
         return np.sum(spect_kurt) / (spectral_spread(signal, fs) ** 4)
 
 
 @set_domain("domain", "spectral")
-def spectral_skewness(signal, fs):
+def spectral_skewness(signal, fs: int) -> float:
     """Measures the asymmetry of a distribution around its mean value.
 
     Description and formula in Article:
@@ -1143,7 +1142,7 @@ def spectral_skewness(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def spectral_spread(signal, fs):
+def spectral_spread(signal, fs: int) -> float:
     """Measures the spread of the spectrum around its mean value.
 
     Description and formula in Article:
@@ -1169,13 +1168,13 @@ def spectral_spread(signal, fs):
     spect_centroid = spectral_centroid(signal, fs)
 
     if not np.sum(fmag):
-        return 0
+        return 0.0
     else:
         return np.dot(((f - spect_centroid) ** 2), (fmag / np.sum(fmag))) ** 0.5
 
 
 @set_domain("domain", "spectral")
-def spectral_slope(signal, fs):
+def spectral_slope(signal, fs: int) -> float:
     """Computes the spectral slope.
 
     Spectral slope is computed by finding constants m and b of the function aFFT = mf + b, obtained by linear regression
@@ -1207,18 +1206,18 @@ def spectral_slope(signal, fs):
     len_f = len(f)
 
     if not ([f]) or (sum_fmag == 0):
-        return 0
+        return 0.0
     else:
         if not (len_f * dot_ff - sum_f**2):
-            return 0
+            return 0.0
         else:
-            num_ = (1 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
+            num_ = (1.0 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
             denom_ = len_f * dot_ff - sum_f**2
             return num_ / denom_
 
 
 @set_domain("domain", "spectral")
-def spectral_variation(signal, fs):
+def spectral_variation(signal, fs: int) -> float:
     """Computes the amount of variation of the spectrum along time.
 
     Spectral variation is computed from the normalized cross-correlation between two consecutive amplitude spectra.
@@ -1243,21 +1242,20 @@ def spectral_variation(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-
     sum1 = np.sum(np.array(fmag)[:-1] * np.array(fmag)[1:])
     sum2 = np.sum(np.array(fmag)[1:] ** 2)
     sum3 = np.sum(np.array(fmag)[:-1] ** 2)
 
     if not sum2 or not sum3:
-        variation = 1
+        variation = 1.0
     else:
-        variation = 1 - (sum1 / ((sum2**0.5) * (sum3**0.5)))
+        variation = 1.0 - (sum1 / ((sum2**0.5) * (sum3**0.5)))
 
     return variation
 
 
 @set_domain("domain", "spectral")
-def spectral_positive_turning(signal, fs):
+def spectral_positive_turning(signal, fs: int) -> int:
     """Computes number of positive turning points of the fft magnitude signal.
 
     Feature computational cost: 1
@@ -1271,7 +1269,7 @@ def spectral_positive_turning(signal, fs):
 
     Returns
     -------
-    float
+    int
         Number of positive turning points
 
     """
@@ -1289,7 +1287,7 @@ def spectral_positive_turning(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "audio")
-def spectral_roll_off(signal, fs):
+def spectral_roll_off(signal, fs: int) -> float:
     """Computes the spectral roll-off of the signal.
 
     The spectral roll-off corresponds to the frequency where 95% of the signal magnitude is contained
@@ -1318,7 +1316,7 @@ def spectral_roll_off(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def spectral_roll_on(signal, fs):
+def spectral_roll_on(signal, fs: int):
     """Computes the spectral roll-on of the signal.
 
     The spectral roll-on corresponds to the frequency where 5% of the signal magnitude is contained
@@ -1348,7 +1346,7 @@ def spectral_roll_on(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "inertial")
-def human_range_energy(signal, fs):
+def human_range_energy(signal, fs: int) -> float:
     """Computes the human range energy ratio.
 
     The human range energy ratio is given by the ratio between the energy
@@ -1370,7 +1368,6 @@ def human_range_energy(signal, fs):
 
     """
     f, fmag = calc_fft(signal, fs)
-
     allenergy = np.sum(fmag**2)
 
     if allenergy == 0:
@@ -1388,7 +1385,15 @@ def human_range_energy(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", ["audio", "emg"])
-def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lifter=22):
+def mfcc(
+    signal,
+    fs: int,
+    pre_emphasis: float = 0.97,
+    nfft: int = 512,
+    nfilt: int = 40,
+    num_ceps: int = 12,
+    cep_lifter: int = 22,
+):
     """Computes the MEL cepstral coefficients.
 
     It provides the information about the power in each frequency band.
@@ -1443,7 +1448,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 
 
 @set_domain("domain", "spectral")
-def power_bandwidth(signal, fs):
+def power_bandwidth(signal, fs: int):
     """Computes power spectrum density bandwidth of the signal.
 
     It corresponds to the width of the frequency band in which 95% of its power is located.
@@ -1487,12 +1492,11 @@ def power_bandwidth(signal, fs):
     ]
 
     # Returning the bandwidth in terms of frequency
-
     return np.abs(f_upper - f_lower)
 
 
 @set_domain("domain", "spectral")
-def fft_mean_coeff(signal, fs, nfreq=256):
+def fft_mean_coeff(signal, fs: int, nfreq: int = 256):
     """Computes the mean value of each spectrogram frequency.
 
     nfreq can not be higher than half signal length plus one.
@@ -1525,7 +1529,7 @@ def fft_mean_coeff(signal, fs, nfreq=256):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "audio")
-def lpcc(signal, n_coeff=12):
+def lpcc(signal, n_coeff: int = 12):
     """Computes the linear prediction cepstral coefficients.
 
     Implementation details and description in:
@@ -1561,7 +1565,7 @@ def lpcc(signal, n_coeff=12):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def spectral_entropy(signal, fs):
+def spectral_entropy(signal, fs: int):
     """Computes the spectral entropy of the signal based on Fourier transform.
 
     Feature computational cost: 1
@@ -1581,16 +1585,13 @@ def spectral_entropy(signal, fs):
     """
     # Removing DC component
     sig = signal - np.mean(signal)
-
     f, fmag = calc_fft(sig, fs)
-
     power = fmag**2
 
     if power.sum() == 0:
         return 0.0
 
     prob = np.divide(power, power.sum())
-
     prob = prob[prob != 0]
 
     # If probability all in one value, there is no entropy

@@ -56,7 +56,9 @@ def calc_fft(signal, fs):
     return f[: len(signal) // 2].copy(), fmag[: len(signal) // 2].copy()
 
 
-def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
+def filterbank(
+    signal, fs, pre_emphasis: float = 0.97, nfft: int = 512, nfilt: int = 40
+):
     """Computes the MEL-spaced filterbank.
 
     It provides the information about the power in each frequency band.
@@ -91,7 +93,6 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     # as the application of a hann window will overshadow the windows signal edges.
 
     # pre-emphasis filter to amplify the high frequencies
-
     emphasized_signal = np.append(
         np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1])
     )
@@ -171,7 +172,7 @@ def autocorr_norm(signal):
     return acf
 
 
-def create_symmetric_matrix(acf, order=11):
+def create_symmetric_matrix(acf, order: int = 11):
     """Computes a symmetric matrix.
 
     Implementation details and description in:
@@ -200,7 +201,7 @@ def create_symmetric_matrix(acf, order=11):
     return smatrix
 
 
-def lpc(signal, n_coeff=12):
+def lpc(signal, n_coeff: int = 12):
     """Computes the linear prediction coefficients.
 
     Implementation details and description in:
