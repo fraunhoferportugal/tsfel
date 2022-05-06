@@ -1,17 +1,15 @@
-import json
 import time
-
+import json
 import numpy as np
 from scipy.optimize import curve_fit
-
-from tsfel.feature_extraction.calc_features import calc_window_features
 from tsfel.feature_extraction.features_settings import load_json
+from tsfel.feature_extraction.calc_features import calc_window_features
 
 
 # curves
 def n_squared(x, no):
     """The model function"""
-    return no * x**2
+    return no * x ** 2
 
 
 def n_nlog(x, no):
@@ -61,9 +59,7 @@ def find_best_curve(t, signal):
     # Fit the curve
     for curve in list_curves:
         start = 1
-        popt, pcov = curve_fit(
-            curve, t, signal, sigma=sig, p0=start, absolute_sigma=True
-        )
+        popt, pcov = curve_fit(curve, t, signal, sigma=sig, p0=start, absolute_sigma=True)
 
         # Compute chi square
         nexp = curve(t, *popt)
@@ -73,6 +69,7 @@ def find_best_curve(t, signal):
         all_curves.append(nexp)
 
     idx_best = np.argmin(all_chisq)
+
     curve_name = str(list_curves[idx_best])
     idx1 = curve_name.find("n_")
     idx2 = curve_name.find("at")
@@ -82,7 +79,7 @@ def find_best_curve(t, signal):
 
 
 def compute_complexity(feature, domain, json_path, **kwargs):
-    r"""Computes the feature complexity.
+    """Computes the feature complexity.
 
     Parameters
     ----------
@@ -107,6 +104,7 @@ def compute_complexity(feature, domain, json_path, **kwargs):
     """
 
     dictionary = load_json(json_path)
+
     features_path = kwargs.get("features_path", None)
 
     # The inputs from this function should be replaced by a dictionary
@@ -117,17 +115,15 @@ def compute_complexity(feature, domain, json_path, **kwargs):
     f = 0.05
     x = np.arange(0, t[-1] + 1, 1)
     fs = 100
-    wave = np.sin(2 * np.pi * f * x / fs)
+    wave = np.expand_dims(np.sin(2 * np.pi * f * x / fs), axis=-1)
 
     for ti in t:
         for _ in range(20):
 
             start = time.time()
-            calc_window_features(
-                one_feat_dict, wave[: int(ti)], fs, features_path=features_path
-            )
-
+            calc_window_features(one_feat_dict, wave[: int(ti)], fs, features_path=features_path)
             end = time.time()
+
             s += [end - start]
 
         signal += [np.mean(s)]

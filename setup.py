@@ -25,7 +25,7 @@ dev_requires = find_requirements("requirements-dev.txt")
 
 setup(
     name="tsfel",
-    version="0.1.5",
+    version="0.2.0",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction.",
     long_description=long_description,

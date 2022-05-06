@@ -1,7 +1,7 @@
 [tool.black]
 line-length = 88
 color = true
-target-version = ['py37', 'py38', 'py39']
+target-version = ['py37', 'py38']
 include = '\.pyi?$'
 exclude = '''
 

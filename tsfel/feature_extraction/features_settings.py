@@ -1,6 +1,6 @@
 import json
-
 import tsfel
+import numpy as np
 
 
 def load_json(json_path):
@@ -75,12 +75,9 @@ def get_features_by_tag(tag=None, json_path=None):
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
         if tag not in ["audio", "inertial", "ecg", "eeg", "emg", None]:
-            raise SystemExit(
-                "No valid tag. Choose: audio, inertial, ecg, eeg, emg or None."
-            )
+            raise SystemExit("No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.")
     features_tag = {}
     dict_features = load_json(json_path)
-
     if tag is None:
         return dict_features
     else:
@@ -94,22 +91,16 @@ def get_features_by_tag(tag=None, json_path=None):
                     js_tag = dict_features[domain][feat]["tag"]
                     if isinstance(js_tag, list):
                         if any([tag in js_t for js_t in js_tag]):
-                            features_tag[domain].update(
-                                {feat: dict_features[domain][feat]}
-                            )
+                            features_tag[domain].update({feat: dict_features[domain][feat]})
                     elif js_tag == tag:
                         features_tag[domain].update({feat: dict_features[domain][feat]})
                 except KeyError:
                     continue
         # To remove empty dicts
-        return {
-            d: features_tag[d]
-            for d in list(features_tag.keys())
-            if bool(features_tag[d])
-        }
+        return dict([[d, features_tag[d]] for d in list(features_tag.keys()) if bool(features_tag[d])])
 
 
-def get_number_features(dict_features) -> int:
+def get_number_features(dict_features):
     """Count the total number of features based on input parameters of each feature
 
     Parameters

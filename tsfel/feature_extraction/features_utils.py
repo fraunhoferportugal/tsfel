@@ -1,6 +1,6 @@
-import numpy as np
 import scipy
-from scipy.signal import cwt, ricker
+import numpy as np
+from decorator import decorator
 
 
 def set_domain(key, value):
@@ -9,6 +9,23 @@ def set_domain(key, value):
         return func
 
     return decorate_func
+
+
+@decorator
+def vectorize(fn, signal, *args, **kwargs):
+    res = np.array([fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])])
+    if res.size == np.prod(signal.shape[:-1]):
+        return res.reshape(signal.shape[:-1])
+    else:
+        return res.reshape((*signal.shape[:-1], -1))
+
+
+def match_last_dim_by_value_repeat(values, wts):
+    return np.repeat(np.expand_dims(values, axis=-1), np.ma.size(wts, axis=-1), axis=-1)
+
+
+def tile_last_dim_to_match_shape(arr, targetArr):
+    return np.tile(arr, np.shape(targetArr)[:-1] + (1,))
 
 
 def compute_time(signal, fs):
@@ -28,17 +45,21 @@ def compute_time(signal, fs):
 
     """
 
-    return np.arange(0, len(signal)) / fs
+    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal)[..., :np.shape(signal)[-1]]
 
 
-def calc_fft(signal, fs):
+def devide_keep_zero(a, b, out=np.zeros_like):
+    return np.divide(a, b, out=out(b), where=b != 0)
+
+
+def calc_fft(signal, sf):
     """This functions computes the fft of a signal.
 
     Parameters
     ----------
     signal : nd-array
         The input signal from which fft is computed
-    fs : int
+    sf : int
         Sampling frequency
 
     Returns
@@ -50,15 +71,14 @@ def calc_fft(signal, fs):
 
     """
 
-    fmag = np.abs(np.fft.fft(signal))
-    f = np.linspace(0, fs // 2, len(signal) // 2)
+    fmag = np.abs(np.fft.rfft(signal))
+    len_signal = len(signal[-1, ...]) if len(np.shape(signal)) > 1 else len(signal)
+    f = np.fft.rfftfreq(len_signal, d=1 / sf)
 
-    return f[: len(signal) // 2].copy(), fmag[: len(signal) // 2].copy()
+    return f.copy(), fmag.copy()
 
 
-def filterbank(
-    signal, fs, pre_emphasis: float = 0.97, nfft: int = 512, nfilt: int = 40
-):
+def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     """Computes the MEL-spaced filterbank.
 
     It provides the information about the power in each frequency band.
@@ -71,7 +91,7 @@ def filterbank(
     ----------
     signal : nd-array
         Input from which filterbank is computed
-    fs : int
+    fs : float
         Sampling frequency
     pre_emphasis : float
         Pre-emphasis coefficient for pre-emphasis filter application
@@ -93,22 +113,17 @@ def filterbank(
     # as the application of a hann window will overshadow the windows signal edges.
 
     # pre-emphasis filter to amplify the high frequencies
-    emphasized_signal = np.append(
-        np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1])
-    )
+
+    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]))
 
     # Fourier transform and Power spectrum
-    mag_frames = np.absolute(
-        np.fft.rfft(emphasized_signal, nfft)
-    )  # Magnitude of the FFT
+    mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
 
-    pow_frames = (1.0 / nfft) * (mag_frames**2)  # Power Spectrum
+    pow_frames = (1.0 / nfft) * (mag_frames ** 2)  # Power Spectrum
 
     low_freq_mel = 0
     high_freq_mel = 2595 * np.log10(1 + (fs / 2) / 700)  # Convert Hz to Mel
-    mel_points = np.linspace(
-        low_freq_mel, high_freq_mel, nfilt + 2
-    )  # Equally spaced in Mel scale
+    mel_points = np.linspace(low_freq_mel, high_freq_mel, nfilt + 2)  # Equally spaced in Mel scale
     hz_points = 700 * (10 ** (mel_points / 2595) - 1)  # Convert Mel to Hz
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
@@ -120,13 +135,9 @@ def filterbank(
         f_m_plus = int(filter_bin[m + 1])  # right
 
         for k in range(f_m_minus, f_m):
-            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (
-                filter_bin[m] - filter_bin[m - 1]
-            )
+            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (filter_bin[m] - filter_bin[m - 1])
         for k in range(f_m, f_m_plus):
-            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (
-                filter_bin[m + 1] - filter_bin[m]
-            )
+            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (filter_bin[m + 1] - filter_bin[m])
 
     # Area Normalization
     # If we don't normalize the noise will increase with frequency because of the filter width.
@@ -134,9 +145,7 @@ def filterbank(
     fbank *= enorm[:, np.newaxis]
 
     filter_banks = np.dot(pow_frames, fbank.T)
-    filter_banks = np.where(
-        filter_banks == 0, np.finfo(float).eps, filter_banks
-    )  # Numerical Stability
+    filter_banks = np.where(filter_banks == 0, np.finfo(float).eps, filter_banks)  # Numerical Stability
     filter_banks = 20 * np.log10(filter_banks)  # dB
 
     return filter_banks
@@ -172,7 +181,7 @@ def autocorr_norm(signal):
     return acf
 
 
-def create_symmetric_matrix(acf, order: int = 11):
+def create_symmetric_matrix(acf, n_coeff=12):
     """Computes a symmetric matrix.
 
     Implementation details and description in:
@@ -182,8 +191,8 @@ def create_symmetric_matrix(acf, order: int = 11):
     ----------
     acf : nd-array
         Input from which a symmetric matrix is computed
-    order : int
-        Order
+    n_coeff : int
+        Number of coefficients
 
     Returns
     -------
@@ -192,16 +201,16 @@ def create_symmetric_matrix(acf, order: int = 11):
 
     """
 
-    smatrix = np.empty((order, order))
-    xx = np.arange(order)
-    j = np.tile(xx, order)
-    i = np.repeat(xx, order)
+    smatrix = np.empty((n_coeff, n_coeff))
+    xx = np.arange(n_coeff)
+    j = np.tile(xx, n_coeff)
+    i = np.repeat(xx, n_coeff)
     smatrix[i, j] = acf[np.abs(i - j)]
 
     return smatrix
 
 
-def lpc(signal, n_coeff: int = 12):
+def lpc(signal, n_coeff=12):
     """Computes the linear prediction coefficients.
 
     Implementation details and description in:
@@ -226,21 +235,18 @@ def lpc(signal, n_coeff: int = 12):
     if n_coeff > signal.size:
         raise ValueError("Input signal must have a length >= n_coeff")
 
-    # Calculate the order based on the number of coefficients
-    order = n_coeff - 1
-
     # Calculate LPC with Yule-Walker
     acf = np.correlate(signal, signal, "full")
 
-    r = np.zeros(order + 1, "float32")
+    r = np.zeros(n_coeff + 1, "float32")
     # Assuring that works for all type of input lengths
-    nx = np.min([order + 1, len(signal)])
-    r[:nx] = acf[len(signal) - 1 : len(signal) + order]
+    nx = np.min([n_coeff + 1, len(signal)])
+    r[:nx] = acf[len(signal) - 1 : len(signal) + n_coeff]
 
-    smatrix = create_symmetric_matrix(r[:-1], order)
+    smatrix = create_symmetric_matrix(r[:-1], n_coeff)
 
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(order + 1))
+        return tuple(np.zeros(n_coeff + 1))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
@@ -249,34 +255,21 @@ def lpc(signal, n_coeff: int = 12):
 
 def create_xx(features):
     """Computes the range of features amplitude for the probability density function calculus.
-
     Parameters
     ----------
     features : nd-array
         Input features
-
     Returns
     -------
     nd-array
         range of features amplitude
-
     """
 
-    features_ = np.copy(features)
+    min_f = np.min(features, axis=-1)
+    max_f = np.abs(np.max(features, axis=-1))
+    max_f = np.where(min_f != max_f, max_f, max_f + 10)
 
-    if max(features_) < 0:
-        max_f = -max(features_)
-        min_f = min(features_)
-    else:
-        min_f = min(features_)
-        max_f = max(features_)
-
-    if min(features_) == max(features_):
-        xx = np.linspace(min_f, min_f + 10, len(features_))
-    else:
-        xx = np.linspace(min_f, max_f, len(features_))
-
-    return xx
+    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)).transpose(np.append(np.arange(1, features.ndim), 0))
 
 
 def kde(features):
@@ -307,7 +300,6 @@ def kde(features):
 
 def gaussian(features):
     """Computes the probability density function of the input signal using a Gaussian function
-
     Parameters
     ----------
     features : nd-array
@@ -316,23 +308,31 @@ def gaussian(features):
     -------
     nd-array
         probability density values
-
     """
 
-    features_ = np.copy(features)
+    xx = create_xx(features)
+    std_value = np.expand_dims(np.std(features, axis=-1), axis=-1)
+    mean_value = np.expand_dims(np.mean(features, axis=-1), axis=-1)
 
-    xx = create_xx(features_)
-    std_value = np.std(features_)
-    mean_value = np.mean(features_)
-
-    if std_value == 0:
-        return 0.0
     pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
 
-    return np.array(pdf_gauss / np.sum(pdf_gauss))
+    return np.where(std_value == 0, 0.0, np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
 
 
-def wavelet(signal, function=ricker, widths=np.arange(1, 10)):
+def entropy_vectorized(p):
+    normTerm = np.log2(np.count_nonzero(p, axis=-1))
+
+    # this is the vectorized form of the if sum == 0 case used by tsfel
+    # unfortunately only the parts where the condition is met is not feasable,
+    #     as we would need to use list comprehension and the like
+    return np.where(
+        np.sum(p, axis=-1) == 0,
+        0,  # calculate entropy
+        -np.sum(np.where(p == 0, 0, p * np.log2(p)), axis=-1) / normTerm,
+    )
+
+
+def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     """Computes CWT (continuous wavelet transform) of the signal.
 
     Parameters
@@ -359,9 +359,9 @@ def wavelet(signal, function=ricker, widths=np.arange(1, 10)):
     if isinstance(widths, str):
         widths = eval(widths)
 
-    _cwt = cwt(signal, function, widths)
+    cwt = scipy.signal.cwt(signal, function, widths)
 
-    return _cwt
+    return cwt
 
 
 def calc_ecdf(signal):

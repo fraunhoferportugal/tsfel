@@ -1,17 +1,8 @@
-from IPython import get_ipython
 from IPython.display import HTML
+from IPython import get_ipython
 
 
-def progress_bar_terminal(
-    iteration,
-    total,
-    prefix="",
-    suffix="",
-    decimals=0,
-    length=100,
-    fill="█",
-    printend="\r",
-):
+def progress_bar_terminal(iteration, total, prefix="", suffix="", decimals=0, length=100, fill="█", printend="\r"):
     """Call in a loop to create terminal progress bar.
 
     Parameters
@@ -37,13 +28,13 @@ def progress_bar_terminal(
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledlength = int(length * iteration // total)
     bar = fill * filledlength + "-" * (length - filledlength)
-    print(f"\r{prefix} |{bar}| {percent}% {suffix}", end=printend)
+    print("\r%s |%s| %s%% %s" % (prefix, bar, percent, suffix), end=printend)
     # Print New Line on Complete
     if iteration == total:
         print()
 
 
-def progress_bar_notebook(iteration, total: int = 100):
+def progress_bar_notebook(iteration, total=100):
     """Progress bar for notebooks.
 
     Parameters
@@ -96,9 +87,7 @@ def display_progress_bar(iteration, total, out):
         or (get_ipython().__class__.__name__ == "Shell")
         and out is not None
     ):
-        out.update(progress_bar_notebook(iteration + 1, len(total)))
+        out.update(progress_bar_notebook(iteration + 1, total))
     else:
-        progress_bar_terminal(
-            iteration + 1, len(total), prefix="Progress:", suffix="Complete", length=50
-        )
+        progress_bar_terminal(iteration + 1, total, prefix="Progress:", suffix="Complete", length=50)
     return

@@ -23,6 +23,7 @@ def add_feature_json(features_path, json_path):
         New customised features will be added to file in this directory.
 
     """
+
     sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
     exec("import " + features_path.split(os.sep)[-1][:-3])
 
@@ -81,12 +82,7 @@ def add_feature_json(features_path, json_path):
                 defaults = ""
 
             # Settings of new feature
-            new_feature = {
-                "description": descrip,
-                "parameters": defaults,
-                "function": fname,
-                "use": use,
-            }
+            new_feature = {"description": descrip, "parameters": defaults, "function": fname, "use": use}
 
             # Check if domain exists
             try:
@@ -107,6 +103,4 @@ def add_feature_json(features_path, json_path):
             print("Feature " + str(fname) + " was added.")
 
     if vset_domain is False:
-        warnings.warn(
-            "No features were added. Please declare @set_domain.", stacklevel=2
-        )
+        warnings.warn("No features were added. Please declare @set_domain.", stacklevel=2)
