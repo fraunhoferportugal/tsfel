@@ -110,7 +110,7 @@ features4 = time_series_features_extractor(settings4, data_new.values, fs=resamp
 
 # single window and single axis
 # input: pd.Series
-features5 = time_series_features_extractor(settings1, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs)
+features5 = time_series_features_extractor(settings2, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs)
 # input: np.array
 features6 = time_series_features_extractor(settings4, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs)
 
