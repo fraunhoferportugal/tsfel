@@ -1,24 +1,4 @@
 {
- "new_domain": {
-  "new_feature_with_multiple_tag": {
-   "complexity": "constant",
-   "description": "A new feature with multiple tags",
-   "function": "new_feature_with_multiple_tag",
-   "parameters": "",
-   "tag": [
-    "inertial",
-    "emg"
-   ],
-   "use": "yes"
-  },
-  "new_feature_with_tag": {
-   "description": "A new feature with a tag",
-   "parameters": "",
-   "function": "new_feature_with_tag",
-   "use": "yes",
-   "tag": "inertial"
-  }
- },
  "spectral": {
   "FFT mean coefficient": {
    "complexity": "constant",
