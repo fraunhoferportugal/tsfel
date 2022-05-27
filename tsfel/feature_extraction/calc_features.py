@@ -282,9 +282,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     # more than one window
     if isinstance(signal_windows, list):
         # Starting the display of progress bar for notebooks interfaces
-        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (
-            get_ipython().__class__.__name__ == "Shell"
-        ):
+        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
 
             out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
         else:
@@ -312,22 +310,19 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             for i, feat in enumerate(features):
                 if verbose == 1:
                     display_progress_bar(i, len(signal_windows), out)
-                features_final = features_final.from_records(feat)
+                features_final = pd.concat([features_final, feat])
 
             pool.close()
             pool.join()
 
         elif n_jobs is None:
             for i, feat in enumerate(signal_windows):
-                features_final = features_final.from_records(
-                    calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names)
-                )
+                feat = calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names)
+                features_final = pd.concat([features_final, feat])
                 if verbose == 1:
                     display_progress_bar(i, len(signal_windows), out)
         else:
-            raise SystemExit(
-                "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing."
-            )
+            raise SystemExit("n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing.")
     # single window
     else:
         features_final = calc_window_features(
@@ -390,8 +385,9 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
     if header_names is None:
         header_names = np.array([0]) if single_axis else np.arange(signal_window.shape[-1])
     else:
-        if (len(header_names) != signal_window.shape[-1] and not single_axis) or \
-                (len(header_names) != 1 and single_axis):
+        if (len(header_names) != signal_window.shape[-1] and not single_axis) or (
+            len(header_names) != 1 and single_axis
+        ):
             raise Exception("header_names dimension does not match input columns.")
 
     if not single_axis:

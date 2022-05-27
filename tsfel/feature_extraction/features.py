@@ -324,10 +324,10 @@ def neighbourhood_peaks(signal, n=10):
     signal = np.array(signal)
     subsequence = signal[n:-n]
     # initial iteration
-    peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
+    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n])
     for i in range(2, n + 1):
-        peaks &= (subsequence > np.roll(signal, i)[n:-n])
-        peaks &= (subsequence > np.roll(signal, -i)[n:-n])
+        peaks &= subsequence > np.roll(signal, i)[n:-n]
+        peaks &= subsequence > np.roll(signal, -i)[n:-n]
     return np.sum(peaks)
 
 
@@ -748,6 +748,7 @@ def pk_pk_distance(signal):
 
 
 @set_domain("domain", "statistical")
+@vectorize
 def ecdf(signal, d=10):
     """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
 
@@ -766,9 +767,13 @@ def ecdf(signal, d=10):
         The values of the ECDF along the time axis
     """
     _, y = calc_ecdf(signal)
+    print("\n", signal, "\n")
+    print(len(signal))
     if len(signal) <= d:
+        print("A", d)
         return tuple(y)
     else:
+        print("B", d)
         return tuple(y[:d])
 
 
