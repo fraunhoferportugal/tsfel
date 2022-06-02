@@ -767,13 +767,9 @@ def ecdf(signal, d=10):
         The values of the ECDF along the time axis
     """
     _, y = calc_ecdf(signal)
-    print("\n", signal, "\n")
-    print(len(signal))
     if len(signal) <= d:
-        print("A", d)
         return tuple(y)
     else:
-        print("B", d)
         return tuple(y[:d])
 
 
