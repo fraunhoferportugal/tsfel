@@ -9,7 +9,7 @@
         "nfreq": 256
       },
       "n_features": "nfreq",
-      "use": "yes"
+      "use": "no"
     },
     "Fundamental frequency": {
       "complexity": "log",
