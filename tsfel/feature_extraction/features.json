@@ -40,7 +40,7 @@
         "n_coeff": 12
       },
       "n_features": "n_coeff",
-      "use": "yes",
+      "use": "no",
       "tag": "audio"
     },
     "MFCC": {
@@ -56,7 +56,7 @@
         "pre_emphasis": 0.97
       },
       "n_features": "num_ceps",
-      "use": "yes",
+      "use": "no",
       "tag": [
         "audio",
         "emg"
@@ -234,7 +234,7 @@
         "widths": "np.arange(1,10)"
       },
       "n_features": "widths",
-      "use": "yes",
+      "use": "no",
       "tag": [
         "eeg",
         "ecg"
@@ -249,7 +249,7 @@
         "widths": "np.arange(1,10)"
       },
       "n_features": "widths",
-      "use": "yes",
+      "use": "no",
       "tag": "eeg"
     },
     "Wavelet entropy": {
@@ -273,7 +273,7 @@
         "widths": "np.arange(1,10)"
       },
       "n_features": "widths",
-      "use": "yes",
+      "use": "nos",
       "tag": "eeg"
     },
     "Wavelet variance": {
@@ -285,7 +285,7 @@
         "widths": "np.arange(1,10)"
       },
       "n_features": "widths",
-      "use": "yes",
+      "use": "no",
       "tag": "eeg"
     }
   },
