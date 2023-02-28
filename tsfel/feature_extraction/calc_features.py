@@ -297,7 +297,7 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
                 for i, feat in enumerate(features):
                     if verbose == 1:
                         display_progress_bar(i, signal_windows, out)
-                    features_final = features_final.append(feat)
+                    features_final = pd.concat([features_final, feat], axis=0)
 
                 pool.close()
                 pool.join()
@@ -305,8 +305,12 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
             elif n_jobs is None:
                 # Without multiprocessing
                 for i, feat in enumerate(signal_windows):
-                    features_final = features_final.append(
-                        calc_window_features(dict_features, feat, fs, features_path=features_path, header_names=names))
+                    features_final = pd.concat(
+                        [
+                            features_final,
+                            calc_window_features(
+                                dict_features, feat, fs, features_path=features_path, header_names=names)
+                        ], axis=0)
                     if verbose == 1:
                         display_progress_bar(i, signal_windows, out)
             else:
