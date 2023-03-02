@@ -13,7 +13,7 @@ with open('requirements.txt', 'r') as f:
 
 setuptools.setup(
     name="tsfel",
-    version="0.1.4",
+    version="0.1.5",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,

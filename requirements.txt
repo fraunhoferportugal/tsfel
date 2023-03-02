@@ -22,13 +22,13 @@ oauth2client >= 4.1.3
 
 # tsfel/feature_extraction/calc_features.py: 13
 # tsfel/utils/signal_processing.py: 2
-pandas >= 0.25.3
+pandas >= 1.5.3
 
 # tsfel/feature_extraction/features.py: 1
 # tsfel/feature_extraction/features_utils.py: 1
 # tsfel/utils/calculate_complexity.py: 4
 # tsfel/utils/signal_processing.py: 3
-scipy >= 1.5.1
+scipy >= 1.7.3
 
 # tsfel/__init__.py: 2
 # tsfel/setup.py: 1
