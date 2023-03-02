@@ -14,12 +14,12 @@ def pre_process(sensor_data):
 
 
 # DATASET DIR
-main_directory = "tests_tools" + os.sep + "test_dataset" + os.sep
+main_directory = "tests" + os.sep + "tests_tools" + os.sep + "test_dataset" + os.sep
 
 # JSON DIR
 tsfel_path_json = tsfel.__path__[0] + os.sep + 'feature_extraction' + os.sep + 'features.json'
-personal_path_json = 'tests_tools' + os.sep + 'test_features.json'
-personal_features_path = "tests_tools" + os.sep + "test_personal_features.py"
+personal_path_json = 'tests' + os.sep + 'tests_tools' + os.sep + 'test_features.json'
+personal_features_path = 'tests' + os.sep + "tests_tools" + os.sep + "test_personal_features.py"
 
 # DEFAULT PARAM for testing
 time_unit = 1e9  # seconds
@@ -35,7 +35,7 @@ folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 sensor_data[key] = pd.read_csv(folders[-1] + key + '.txt', header=None)
 
 # add personal feature
-tsfel.add_feature_json(personal_features_path, personal_path_json)
+# tsfel.add_feature_json(personal_features_path, personal_path_json)
 
 # Features Dictionary
 settings0 = json.load(open(tsfel_path_json))
@@ -44,8 +44,8 @@ settings2 = tsfel.get_features_by_domain('statistical')
 settings3 = tsfel.get_features_by_domain('temporal')
 settings4 = tsfel.get_features_by_domain('spectral')
 settings5 = tsfel.get_features_by_domain()
-settings6 = tsfel.extract_sheet('Features')
-settings7 = tsfel.extract_sheet('Features_test', path_json=personal_path_json)
+# settings6 = tsfel.extract_sheet('Features')
+# settings7 = tsfel.extract_sheet('Features_test', path_json=personal_path_json)
 settings8 = tsfel.get_features_by_tag('inertial')
 settings10 = tsfel.get_features_by_tag()
 

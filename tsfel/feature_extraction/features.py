@@ -658,7 +658,7 @@ def median_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return scipy.stats.median_absolute_deviation(signal, scale=1)
+    return scipy.stats.median_abs_deviation(signal, scale=1)
 
 
 @set_domain("domain", "statistical")
