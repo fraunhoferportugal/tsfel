@@ -19,15 +19,15 @@ from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
 
-def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
+def dataset_features_extractor(dict_features, main_directory, verbose=1, **kwargs):
     """Extracts features from a dataset.
 
     Parameters
     ----------
+    dict_features : dict
+        Dictionary with features
     main_directory : String
         Input directory
-    feat_dict : dict
-        Dictionary with features
     verbose : int
         Verbosity mode. 0 = silent, 1 = progress bar.
         (0 or 1 (Default))
@@ -138,10 +138,10 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         windows = signal_window_splitter(data_new, window_size, overlap)
 
         if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+            features = time_series_features_extractor(dict_features, windows, fs=resample_rate, verbose=0,
                                                       features_path=features_path, header_names=names, n_jobs=n_jobs)
         else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+            features = time_series_features_extractor(dict_features, windows, fs=resample_rate, verbose=0,
                                                       header_names=names, n_jobs=n_jobs)
 
         fl = '/'.join(fl.split(os.sep))
