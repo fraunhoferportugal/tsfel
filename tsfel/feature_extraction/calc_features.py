@@ -89,6 +89,12 @@ def dataset_features_extractor(dict_features, main_directory, verbose=1, **kwarg
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
 
+    list_kwargs = ['search_criteria', 'time_unit', 'resample_rate', 'window_size', 'overlap', 'pre_process',
+                   'output_directory', 'features_path', 'header_names']
+    for k in kwargs.keys():
+        if k not in list_kwargs:
+            raise ValueError(f"{k} is not a valid kwarg.")
+
     # Choosing default of n_jobs by operating system
     if sys.platform[:-2] == 'win':
         n_jobs_default = None
@@ -182,6 +188,12 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
 
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
+
+    list_kwargs = ['features_path', 'header_names']
+    for k in kwargs.keys():
+        if k not in list_kwargs:
+            raise ValueError(f"{k} is not a valid kwarg.")
+
     feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path, header_names=names)
     feat_val.reset_index(drop=True)
 
@@ -236,6 +248,11 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
     overlap = kwargs.get('overlap', 0)
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
+
+    list_kwargs = ['window_size', 'overlap', 'features_path', 'header_names']
+    for k in kwargs.keys():
+        if k not in list_kwargs:
+            raise ValueError(f"{k} is not a valid kwarg.")
 
     # Choosing default of n_jobs by operating system
     if sys.platform[:-2] == 'win':
@@ -358,6 +375,11 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
     features_path = kwargs.get('features_path', None)
     names = kwargs.get('header_names', None)
+
+    list_kwargs = ['features_path', 'header_names']
+    for k in kwargs.keys():
+        if k not in list_kwargs:
+            raise ValueError(f"{k} is not a valid kwarg.")
 
     # Execute imports
     exec("import tsfel")
