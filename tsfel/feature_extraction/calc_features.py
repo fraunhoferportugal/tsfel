@@ -79,28 +79,27 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         csv file with the extracted features
 
     """
-    search_criteria = kwargs.get('search_criteria', None)
-    time_unit = kwargs.get('time_unit', 1e9)
-    resample_rate = kwargs.get('resample_rate', 30)
-    window_size = kwargs.get('window_size', 100)
-    overlap = kwargs.get('overlap', 0)
-    pre_process = kwargs.get('pre_process', None)
-    output_directory = kwargs.get('output_directory', str(Path.home()) + '/tsfel_output')
-    features_path = kwargs.get('features_path', None)
-    names = kwargs.get('header_names', None)
+    search_criteria = kwargs.get("search_criteria", None)
+    time_unit = kwargs.get("time_unit", 1e9)
+    resample_rate = kwargs.get("resample_rate", 30)
+    window_size = kwargs.get("window_size", 100)
+    overlap = kwargs.get("overlap", 0)
+    pre_process = kwargs.get("pre_process", None)
+    output_directory = kwargs.get("output_directory", str(Path.home()) + "/tsfel_output")
+    features_path = kwargs.get("features_path", None)
+    names = kwargs.get("header_names", None)
 
     # Choosing default of n_jobs by operating system
-    if sys.platform[:-2] == 'win':
+    if sys.platform[:-2] == "win":
         n_jobs_default = None
     else:
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell' or \
-            get_ipython().__class__.__name__ == 'Shell':
+    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
         n_jobs_default = -1
 
-    n_jobs = kwargs.get('n_jobs', n_jobs_default)
+    n_jobs = kwargs.get("n_jobs", n_jobs_default)
 
     if main_directory[-1] != os.sep:
         main_directory = main_directory + os.sep
@@ -112,18 +111,18 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         if search_criteria:
             for c in search_criteria:
                 if os.path.isfile(fl + c):
-                    key = c.split('.')[0]
+                    key = c.split(".")[0]
                     sensor_data[key] = pd.read_csv(fl + c, header=None)
         else:
-            all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
+            all_files = np.concatenate((glob.glob(fl + "/*.txt"), glob.glob(fl + "/*.csv")))
             for c in all_files:
-                key = c.split(os.sep)[-1].split('.')[0]
+                key = c.split(os.sep)[-1].split(".")[0]
                 try:
                     data_file = pd.read_csv(c, header=None)
                 except pd.io.common.CParserError:
                     continue
 
-                if np.dtype('O') in np.array(data_file.dtypes):
+                if np.dtype("O") in np.array(data_file.dtypes):
                     continue
 
                 sensor_data[key] = pd.read_csv(c, header=None)
@@ -138,22 +137,30 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         windows = signal_window_splitter(data_new, window_size, overlap)
 
         if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      features_path=features_path, header_names=names, n_jobs=n_jobs)
+            features = time_series_features_extractor(
+                feat_dict,
+                windows,
+                fs=resample_rate,
+                verbose=0,
+                features_path=features_path,
+                header_names=names,
+                n_jobs=n_jobs,
+            )
         else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      header_names=names, n_jobs=n_jobs)
+            features = time_series_features_extractor(
+                feat_dict, windows, fs=resample_rate, verbose=0, header_names=names, n_jobs=n_jobs
+            )
 
-        fl = '/'.join(fl.split(os.sep))
+        fl = "/".join(fl.split(os.sep))
         invalid_char = '<>:"\|?* '
         for char in invalid_char:
-            fl = fl.replace(char, '')
+            fl = fl.replace(char, "")
 
         pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
-        features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
+        features.to_csv(output_directory + fl + "/Features.csv", sep=",", encoding="utf-8")
 
     if verbose == 1:
-        print('Features files saved in: ', output_directory)
+        print("Features files saved in: ", output_directory)
 
 
 def calc_features(wind_sig, dict_features, fs, **kwargs):
@@ -165,7 +172,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
         Input from which features are computed, window
     dict_features : dict
         Dictionary with features
-    fs : int or None
+    fs : float or None
         Sampling frequency
     \**kwargs:
         * *features_path* (``string``) --
@@ -180,8 +187,8 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
 
     """
 
-    features_path = kwargs.get('features_path', None)
-    names = kwargs.get('header_names', None)
+    features_path = kwargs.get("features_path", None)
+    names = kwargs.get("header_names", None)
     feat_val = calc_window_features(dict_features, wind_sig, fs, features_path=features_path, header_names=names)
     feat_val.reset_index(drop=True)
 
@@ -334,7 +341,7 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
         Dictionary with features
     signal_window: pandas DataFrame
         Input from which features are computed, window
-    fs : int
+    fs : float
         Sampling frequency
     verbose : int
         Level of function communication
@@ -356,24 +363,37 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
     """
 
-    features_path = kwargs.get('features_path', None)
-    names = kwargs.get('header_names', None)
+    features_path = kwargs.get("features_path", None)
+    header_names = kwargs.get("header_names", None)
+
+    # To handle object type signals
+    signal_window = np.array(signal_window).astype(float)
+
+    single_axis = True if len(signal_window.shape) == 1 else False
+
+    if header_names is None:
+        header_names = np.array([0]) if single_axis else np.arange(signal_window.shape[-1])
+    else:
+        if (len(header_names) != signal_window.shape[-1] and not single_axis) or (
+            len(header_names) != 1 and single_axis
+        ):
+            raise Exception("header_names dimension does not match input columns.")
+
+    if not single_axis:
+        # Needed because the vectorization always uses the last axis, no matter the data depth
+        signal_window = np.swapaxes(signal_window, -1, -2)
 
     # Execute imports
-    exec("import tsfel")
+    exec("from tsfel import *")
     domain = dict_features.keys()
 
     if features_path:
-        sys.path.append(features_path[:-len(features_path.split(os.sep)[-1])-1])
-        exec("import "+features_path.split(os.sep)[-1][:-3])
+        sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
+        exec("import " + features_path.split(os.sep)[-1][:-3])
         importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
-        exec("from " + features_path.split(os.sep)[-1][:-3]+" import *")
+        exec("from " + features_path.split(os.sep)[-1][:-3] + " import *")
 
     # Create global arrays
-    func_total = []
-    func_names = []
-    imports_total = []
-    parameters_total = []
     feature_results = []
     feature_names = []
 
@@ -383,8 +403,7 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
         feat_nb = np.hstack([list(dict_features[_type].keys()) for _type in domain])
 
-        if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
-                get_ipython().__class__.__name__ == 'Shell'):
+        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
             print(len(feat_nb))
             out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
         else:
@@ -399,84 +418,52 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
             if verbose == 1 and single_window:
                 i_feat = i_feat + 1
-                display_progress_bar(i_feat, feat_nb, out)
+                display_progress_bar(i_feat, len(feat_nb), out)
 
             # Only returns used functions
-            if dict_features[_type][feat]['use'] == 'yes':
-
-                # Read Function Name (generic name)
-                func_names = [feat]
-
+            if dict_features[_type][feat]["use"] == "yes":
                 # Read Function (real name of function)
-                func_total = [dict_features[_type][feat]['function']]
+                func_total = dict_features[_type][feat]["function"]
+
+                if func_total.find("tsfel.") == 0:
+                    func_total = func_total.replace("tsfel.", "")
 
                 # Check for parameters
-                if dict_features[_type][feat]['parameters'] != '':
-                    param = dict_features[_type][feat]['parameters']
+                parameters_total = {}
+
+                if dict_features[_type][feat]["parameters"] != "":
+                    parameters_total = dict_features[_type][feat]["parameters"]
 
                     # Check assert fs parameter:
-                    if 'fs' in param:
+                    if "fs" in parameters_total:
 
                         # Select which fs to use
                         if fs is None:
-
                             # Check if features dict has default sampling frequency value
-                            if type(param['fs']) is int or type(param['fs']) is float:
-                                parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
-                            else:
-                                raise Exception('No sampling frequency assigned.')
+                            if not (type(parameters_total["fs"]) is int or type(parameters_total["fs"]) is float):
+                                raise Exception("No sampling frequency assigned.")
                         else:
-                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
-                                                if key not in 'fs']
-                            parameters_total += ['fs =' + str(fs)]
+                            parameters_total["fs"] = fs
 
-                    # feature has no fs parameter
-                    else:
-                        parameters_total = []
-                        for key, value in param.items():
-                            if type(value) is str:
-                                value = '"'+value+'"'
-                            parameters_total.append([str(key) + '=' + str(value)])
-                else:
-                    parameters_total = ''
-
-                # To handle object type signals
-                signal_window = np.array(signal_window).astype(float)
-
-                # Name of each column to be concatenate with feature name
-                if not isinstance(signal_window, pd.DataFrame):
-                    signal_window = pd.DataFrame(data=signal_window)
-
-                if names is not None:
-                    if len(names) != len(list(signal_window.columns.values)):
-                        raise Exception('header_names dimension does not match input columns.')
-                    else:
-                        header_names = names
-                else:
-                    header_names = signal_window.columns.values
-
+                # python expressions in google sheets is broken with this version as the eval was removed (also no objects as strings ie no {foo: '[0.2, 0.8]'})
+                # TODO: please consider removing that functionality for security reasons
+                eval_result = locals()[func_total](signal_window, **parameters_total)
+                if single_axis:
+                    eval_result = np.array([eval_result])
                 for ax in range(len(header_names)):
-                    window = signal_window.iloc[:, ax]
-                    execf = func_total[0] + '(window'
-
-                    if parameters_total != '':
-                        execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
-
-                    execf += ')'
-                    eval_result = eval(execf, locals())
-
                     # Function returns more than one element
-                    if type(eval_result) == tuple:
-                        if np.isnan(eval_result[0]):
-                            eval_result = np.zeros(len(eval_result))
-                        for rr in range(len(eval_result)):
-                            feature_results += [eval_result[rr]]
-                            feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
+                    if len(eval_result[ax].shape) > 0:
+                        if np.isnan(eval_result[ax][0]):
+                            eval_result[ax] = np.zeros(len(eval_result[ax]))
+                        for rr in range(len(eval_result[ax])):
+                            feature_results += [eval_result[ax][rr]]
+                            feature_names += [str(header_names[ax]) + "_" + feat + "_" + str(rr)]
                     else:
-                        feature_results += [eval_result]
-                        feature_names += [str(header_names[ax]) + '_' + func_names[0]]
+                        feature_results += [eval_result[ax]]
+                        feature_names += [str(header_names[ax]) + "_" + feat]
 
-    features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
-                            columns=np.array(feature_names))
+    features = pd.DataFrame(
+        data=np.array(feature_results).reshape(1, len(feature_results)), columns=np.array(feature_names)
+    )
 
     return features

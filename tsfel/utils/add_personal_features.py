@@ -24,7 +24,7 @@ def add_feature_json(features_path, json_path):
 
     """
 
-    sys.path.append(features_path[:-len(features_path.split(os.sep)[-1]) - 1])
+    sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
     exec("import " + features_path.split(os.sep)[-1][:-3])
 
     # Reload module containing the new features
@@ -32,13 +32,13 @@ def add_feature_json(features_path, json_path):
     exec("import " + features_path.split(os.sep)[-1][:-3] + " as pymodule")
 
     # Functions from module containing the new features
-    functions_list = [o for o in getmembers(locals()['pymodule']) if isfunction(o[1])]
+    functions_list = [o for o in getmembers(locals()["pymodule"]) if isfunction(o[1])]
     function_names = [fname[0] for fname in functions_list]
 
     # Check if @set_domain was declared on features module
     vset_domain = False
 
-    for fname, f in list(locals()['pymodule'].__dict__.items()):
+    for fname, f in list(locals()["pymodule"].__dict__.items()):
 
         if getattr(f, "domain", None) is not None:
 
@@ -71,7 +71,7 @@ def add_feature_json(features_path, json_path):
 
                 for p in args_name[1:]:
                     if p not in list(defaults.keys()):
-                        if p == 'fs':
+                        if p == "fs":
                             # Assigning a default value for fs if not given
                             defaults[p] = 100
                         else:
@@ -82,11 +82,7 @@ def add_feature_json(features_path, json_path):
                 defaults = ""
 
             # Settings of new feature
-            new_feature = {"description": descrip,
-                           "parameters": defaults,
-                           "function": fname,
-                           "use": use
-                           }
+            new_feature = {"description": descrip, "parameters": defaults, "function": fname, "use": use}
 
             # Check if domain exists
             try:
@@ -96,7 +92,7 @@ def add_feature_json(features_path, json_path):
 
             # Insert tag if it is declared
             if tag is not None:
-                feat_json[domain][fname]['tag'] = tag
+                feat_json[domain][fname]["tag"] = tag
 
             # Write new feature on json file
             with open(json_path, "w") as fout:
@@ -104,9 +100,7 @@ def add_feature_json(features_path, json_path):
 
             # Calculate feature complexity
             compute_complexity(fname, domain, json_path, features_path=features_path)
-            print('Feature '+str(fname)+' was added.')
+            print("Feature " + str(fname) + " was added.")
 
     if vset_domain is False:
-        warnings.warn('No features were added. Please declare @set_domain.', stacklevel=2)
-
-
+        warnings.warn("No features were added. Please declare @set_domain.", stacklevel=2)

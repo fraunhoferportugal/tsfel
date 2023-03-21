@@ -1,0 +1,44 @@
+name: "Tests"
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    name: Run template tests
+    strategy:
+      max-parallel: 4
+      fail-fast: false
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+        platform: ['ubuntu-18.04', 'ubuntu-20.04', 'macos-latest', 'windows-latest']
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 30
+
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+    - name: Extract branch name
+      run: echo running on branch ${GITHUB_REF##*/}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -VV
+        python -m pip install --upgrade pip setuptools
+        pip install -r requirements/requirements.txt
+        pip install -r requirements/requirements-test.txt
+        python -m pip install .
+    - name: Check numpy and scipy flags
+      run: |
+        python -c "import numpy as np; np.show_config()"
+        python -c "import scipy as sp; sp.show_config()"
+    - name: Run pytest
+      run: |
+        python -m pytest -vvv tests

@@ -42,9 +42,10 @@ def get_features_by_domain(domain=None, json_path=None):
     if json_path is None:
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
-        if domain not in ['statistical', 'temporal', 'spectral', None]:
+        if domain not in ["statistical", "temporal", "spectral", None]:
             raise SystemExit(
-                'No valid domain. Choose: statistical, temporal, spectral or None (for all feature settings).')
+                "No valid domain. Choose: statistical, temporal, spectral or None (for all feature settings)."
+            )
 
     dict_features = load_json(json_path)
     if domain is None:
@@ -74,8 +75,7 @@ def get_features_by_tag(tag=None, json_path=None):
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
         if tag not in ["audio", "inertial", "ecg", "eeg", "emg", None]:
-            raise SystemExit(
-                "No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.")
+            raise SystemExit("No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.")
     features_tag = {}
     dict_features = load_json(json_path)
     if tag is None:

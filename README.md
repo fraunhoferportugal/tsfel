@@ -7,14 +7,12 @@
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
-This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers on exploratory feature extraction tasks on time series without requiring significant programming effort.
+This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers on
+exploratory feature extraction tasks on time series without requiring significant programming effort.
 
-Users can interact with TSFEL using two methods:
-##### Online
-It does not requires installation as it relies on Google Colabs and a user interface provided by Google Sheets
 
-##### Offline
-Advanced users can take full potential of TSFEL by installing as a python package
+## Installation
+
 ```python
 pip install tsfel
 ```
@@ -40,10 +38,10 @@ import pandas as pd
 df = pd.read_csv('Dataset.txt')
 
 # Retrieves a pre-defined feature configuration file to extract all available features
-cfg = tsfel.get_features_by_domain()
+cfg = tsfel.feature_extraction.features_settings.get_features_by_domain()
 
 # Extract features
-X = tsfel.time_series_features_extractor(cfg, df)
+X = tsfel.feature_extraction.calc_features.time_series_features_extractor(cfg, df)
 ```
 
 ## Available features
@@ -51,9 +49,12 @@ X = tsfel.time_series_features_extractor(cfg, df)
 #### Statistical domain
 | Features                   | Computational Cost |
 |----------------------------|:------------------:|
+| Absolute energy            |          1         |
+| Average power              |          1         |
 | ECDF                       |          1         |
 | ECDF Percentile            |          1         |
 | ECDF Percentile Count      |          1         |
+| Entropy                    |          1         |
 | Histogram                  |          1         |
 | Interquartile range        |          1         |
 | Kurtosis                   |          1         |
@@ -72,11 +73,9 @@ X = tsfel.time_series_features_extractor(cfg, df)
 #### Temporal domain
 | Features                   | Computational Cost |
 |----------------------------|:------------------:|
-| Absolute energy            |          1         |
 | Area under the curve       |          1         |
 | Autocorrelation            |          1         |
 | Centroid                   |          1         |
-| Entropy                    |          1         |
 | Mean absolute diff         |          1         |
 | Mean diff                  |          1         |
 | Median absolute diff       |          1         |
@@ -87,7 +86,6 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Signal distance            |          1         |
 | Slope                      |          1         |
 | Sum absolute diff          |          1         |
-| Total energy               |          1         |
 | Zero crossing rate         |          1         |
 | Neighbourhood peaks        |          1         |
 
@@ -129,4 +127,7 @@ When using TSFEL please cite the following publication:
 Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
 
 ## Acknowledgements
-We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme  Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU), with operation code POCI-01-0247-FEDER-038436.
+We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive Manufacturing
+System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational Programme
+Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (EU),
+with operation code POCI-01-0247-FEDER-038436.
