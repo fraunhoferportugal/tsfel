@@ -21,13 +21,20 @@ def signal_window_splitter(signal, window_size, overlap=0):
     """
     if not isinstance(window_size, int):
         raise SystemExit("window_size must be an integer.")
-    step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
+    step = (
+        int(round(window_size))
+        if overlap == 0
+        else int(round(window_size * (1 - overlap)))
+    )
     if step == 0:
         raise SystemExit("Invalid overlap. " "Choose a lower overlap value.")
     if len(signal) % window_size == 0 and overlap == 0:
         return [signal[i : i + window_size] for i in range(0, len(signal), step)]
     else:
-        return [signal[i : i + window_size] for i in range(0, len(signal) - window_size + 1, step)]
+        return [
+            signal[i : i + window_size]
+            for i in range(0, len(signal) - window_size + 1, step)
+        ]
 
 
 def merge_time_series(data, fs_resample, time_unit):
@@ -61,7 +68,15 @@ def merge_time_series(data, fs_resample, time_unit):
     for k, dn in data.items():
         header_values += [k + str(i) for i in range(1, np.shape(dn)[1])]
         data_new = np.hstack(
-            (data_new, np.array([interp1d(dn.iloc[:, 0], dn.iloc[:, ax])(x_new) for ax in range(1, np.shape(dn)[1])]).T)
+            (
+                data_new,
+                np.array(
+                    [
+                        interp1d(dn.iloc[:, 0], dn.iloc[:, ax])(x_new)
+                        for ax in range(1, np.shape(dn)[1])
+                    ]
+                ).T,
+            )
         )
 
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])

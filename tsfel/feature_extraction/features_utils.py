@@ -1,5 +1,5 @@
-import scipy
 import numpy as np
+import scipy
 from decorator import decorator
 
 
@@ -13,7 +13,9 @@ def set_domain(key, value):
 
 @decorator
 def vectorize(fn, signal, *args, **kwargs):
-    res = np.array([fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])])
+    res = np.array(
+        [fn(ts, *args, **kwargs) for ts in signal.reshape(-1, signal.shape[-1])]
+    )
     if res.size == np.prod(signal.shape[:-1]):
         return res.reshape(signal.shape[:-1])
     else:
@@ -45,9 +47,9 @@ def compute_time(signal, fs):
 
     """
 
-    return tile_last_dim_to_match_shape(np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal)[
-        ..., : np.shape(signal)[-1]
-    ]
+    return tile_last_dim_to_match_shape(
+        np.arange(0, np.ma.size(signal, axis=-1) / fs, 1.0 / fs), signal
+    )[..., : np.shape(signal)[-1]]
 
 
 def devide_keep_zero(a, b, out=np.zeros_like):
@@ -116,16 +118,22 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # pre-emphasis filter to amplify the high frequencies
 
-    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]))
+    emphasized_signal = np.append(
+        np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1])
+    )
 
     # Fourier transform and Power spectrum
-    mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
+    mag_frames = np.absolute(
+        np.fft.rfft(emphasized_signal, nfft)
+    )  # Magnitude of the FFT
 
-    pow_frames = (1.0 / nfft) * (mag_frames ** 2)  # Power Spectrum
+    pow_frames = (1.0 / nfft) * (mag_frames**2)  # Power Spectrum
 
     low_freq_mel = 0
     high_freq_mel = 2595 * np.log10(1 + (fs / 2) / 700)  # Convert Hz to Mel
-    mel_points = np.linspace(low_freq_mel, high_freq_mel, nfilt + 2)  # Equally spaced in Mel scale
+    mel_points = np.linspace(
+        low_freq_mel, high_freq_mel, nfilt + 2
+    )  # Equally spaced in Mel scale
     hz_points = 700 * (10 ** (mel_points / 2595) - 1)  # Convert Mel to Hz
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
@@ -137,9 +145,13 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
         f_m_plus = int(filter_bin[m + 1])  # right
 
         for k in range(f_m_minus, f_m):
-            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (filter_bin[m] - filter_bin[m - 1])
+            fbank[m - 1, k] = (k - filter_bin[m - 1]) / (
+                filter_bin[m] - filter_bin[m - 1]
+            )
         for k in range(f_m, f_m_plus):
-            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (filter_bin[m + 1] - filter_bin[m])
+            fbank[m - 1, k] = (filter_bin[m + 1] - k) / (
+                filter_bin[m + 1] - filter_bin[m]
+            )
 
     # Area Normalization
     # If we don't normalize the noise will increase with frequency because of the filter width.
@@ -147,7 +159,9 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     fbank *= enorm[:, np.newaxis]
 
     filter_banks = np.dot(pow_frames, fbank.T)
-    filter_banks = np.where(filter_banks == 0, np.finfo(float).eps, filter_banks)  # Numerical Stability
+    filter_banks = np.where(
+        filter_banks == 0, np.finfo(float).eps, filter_banks
+    )  # Numerical Stability
     filter_banks = 20 * np.log10(filter_banks)  # dB
 
     return filter_banks
@@ -271,7 +285,9 @@ def create_xx(features):
     max_f = np.abs(np.max(features, axis=-1))
     max_f = np.where(min_f != max_f, max_f, max_f + 10)
 
-    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)).transpose(np.append(np.arange(1, features.ndim), 0))
+    return np.linspace(min_f, max_f, np.ma.size(features, axis=-1)).transpose(
+        np.append(np.arange(1, features.ndim), 0)
+    )
 
 
 def kde(features):
@@ -318,7 +334,11 @@ def gaussian(features):
 
     pdf_gauss = scipy.stats.norm.pdf(xx, mean_value, std_value)
 
-    return np.where(std_value == 0, 0.0, np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)))
+    return np.where(
+        std_value == 0,
+        0.0,
+        np.array(pdf_gauss / np.expand_dims(np.sum(pdf_gauss, axis=-1), axis=-1)),
+    )
 
 
 def entropy_vectorized(p):

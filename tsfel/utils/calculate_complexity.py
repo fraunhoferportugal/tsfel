@@ -1,15 +1,17 @@
-import time
 import json
+import time
+
 import numpy as np
 from scipy.optimize import curve_fit
-from tsfel.feature_extraction.features_settings import load_json
+
 from tsfel.feature_extraction.calc_features import calc_window_features
+from tsfel.feature_extraction.features_settings import load_json
 
 
 # curves
 def n_squared(x, no):
     """The model function"""
-    return no * x ** 2
+    return no * x**2
 
 
 def n_nlog(x, no):
@@ -59,7 +61,9 @@ def find_best_curve(t, signal):
     # Fit the curve
     for curve in list_curves:
         start = 1
-        popt, pcov = curve_fit(curve, t, signal, sigma=sig, p0=start, absolute_sigma=True)
+        popt, pcov = curve_fit(
+            curve, t, signal, sigma=sig, p0=start, absolute_sigma=True
+        )
 
         # Compute chi square
         nexp = curve(t, *popt)
@@ -79,7 +83,7 @@ def find_best_curve(t, signal):
 
 
 def compute_complexity(feature, domain, json_path, **kwargs):
-    """Computes the feature complexity.
+    r"""Computes the feature complexity.
 
     Parameters
     ----------
@@ -121,7 +125,9 @@ def compute_complexity(feature, domain, json_path, **kwargs):
         for _ in range(20):
 
             start = time.time()
-            calc_window_features(one_feat_dict, wave[: int(ti)], fs, features_path=features_path)
+            calc_window_features(
+                one_feat_dict, wave[: int(ti)], fs, features_path=features_path
+            )
             end = time.time()
 
             s += [end - start]

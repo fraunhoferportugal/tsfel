@@ -1,4 +1,5 @@
 import scipy.signal
+
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -48,7 +49,7 @@ def calc_centroid(signal, fs):
 
     time = compute_time(signal, fs)
 
-    energy = signal ** 2
+    energy = signal**2
 
     t_energy = np.sum(time * energy, axis=-1)
     energy_sum = np.array(np.sum(energy, axis=-1), dtype=float)
@@ -75,7 +76,9 @@ def negative_turning(signal):
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
+    negative_turning_pts = np.where(
+        (diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0)
+    )[0]
 
     return len(negative_turning_pts)
 
@@ -103,7 +106,9 @@ def positive_turning(signal):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where(
+        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0)
+    )[0]
 
     return len(positive_turning_pts)
 
@@ -299,7 +304,9 @@ def auc(signal, fs):
 
     """
     t = compute_time(signal, fs)
-    return np.sum(0.5 * np.diff(t, axis=-1) * np.abs(signal[..., :-1] + signal[..., 1:]), axis=-1)
+    return np.sum(
+        0.5 * np.diff(t, axis=-1) * np.abs(signal[..., :-1] + signal[..., 1:]), axis=-1
+    )
 
 
 @set_domain("domain", "temporal")
@@ -324,7 +331,9 @@ def neighbourhood_peaks(signal, n=10):
     signal = np.array(signal)
     subsequence = signal[n:-n]
     # initial iteration
-    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n])
+    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (
+        subsequence > np.roll(signal, -1)[n:-n]
+    )
     for i in range(2, n + 1):
         peaks &= subsequence > np.roll(signal, i)[n:-n]
         peaks &= subsequence > np.roll(signal, -i)[n:-n]
@@ -350,7 +359,7 @@ def abs_energy(signal):
         Absolute energy
 
     """
-    return np.sum(signal ** 2, axis=-1)
+    return np.sum(signal**2, axis=-1)
 
 
 @set_domain("domain", "statistical")
@@ -373,7 +382,7 @@ def average_power(signal, fs):
         Average power
 
     """
-    return np.sum(signal ** 2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1.0 / fs)
+    return np.sum(signal**2, axis=-1) / (np.ma.size(signal, axis=-1) / fs - 1.0 / fs)
 
 
 @set_domain("domain", "statistical")
@@ -448,7 +457,9 @@ def neighbourhood_peaks(signal, n=10):
     signal = np.array(signal)
     subsequence = signal[n:-n]
     # initial iteration
-    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n])
+    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (
+        subsequence > np.roll(signal, -1)[n:-n]
+    )
     for i in range(2, n + 1):
         peaks &= subsequence > np.roll(signal, i)[n:-n]
         peaks &= subsequence > np.roll(signal, -i)[n:-n]
@@ -478,7 +489,9 @@ def hist(signal, nbins=10, r=1):
         The values of the histogram
 
     """
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(
+        signal, bins=nbins, range=[-r, r]
+    )  # TODO:subsampling parameter
 
     return tuple(histsig)
 
@@ -641,7 +654,12 @@ def mean_abs_deviation(signal):
         Mean absolute deviation result
 
     """
-    return np.mean(np.abs(signal - match_last_dim_by_value_repeat(np.mean(signal, axis=-1), signal)), axis=-1)
+    return np.mean(
+        np.abs(
+            signal - match_last_dim_by_value_repeat(np.mean(signal, axis=-1), signal)
+        ),
+        axis=-1,
+    )
 
 
 @set_domain("domain", "statistical")
@@ -837,7 +855,7 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
         if np.sum(np.diff(signal)) == 0:
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
-            return tuple([x[y <= p].max() for p in percentile])
+            return tuple(x[y <= p].max() for p in percentile)
     else:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
@@ -879,7 +897,7 @@ def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
         if np.sum(np.diff(signal)) == 0:
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
-            return tuple([x[y <= p].shape[0] for p in percentile])
+            return tuple(x[y <= p].shape[0] for p in percentile)
     else:
         # check if signal is constant
         if np.sum(np.diff(signal)) == 0:
@@ -987,7 +1005,9 @@ def max_power_spectrum(signal, fs):
     if np.std(signal) == 0:
         return float(max(scipy.signal.welch(signal, fs, nperseg=len(signal))[1]))
     else:
-        return float(max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1]))
+        return float(
+            max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1])
+        )
 
 
 @set_domain("domain", "spectral")
@@ -1112,7 +1132,11 @@ def spectral_decrease(signal, fs):
     len_fmag_band = np.arange(1, np.ma.size(fmag, axis=-1))
 
     # Sum of numerator
-    soma_num = np.sum((fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band)) / len_fmag_band, axis=-1)
+    soma_num = np.sum(
+        (fmag_band - match_last_dim_by_value_repeat(fmag[..., 0], fmag_band))
+        / len_fmag_band,
+        axis=-1,
+    )
 
     return devide_keep_zero(1, np.sum(fmag_band, axis=-1)) * soma_num
 
@@ -1145,8 +1169,10 @@ def spectral_kurtosis(signal, fs):
     spread = spectral_spread(signal, fs)
 
     summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
-    spect_kurt = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4) * devide_keep_zero(fmag, summedFmag)
-    return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread ** 4)
+    spect_kurt = (
+        (f - match_last_dim_by_value_repeat(spect_centr, f)) ** 4
+    ) * devide_keep_zero(fmag, summedFmag)
+    return devide_keep_zero(np.sum(spect_kurt, axis=-1), spread**4)
 
 
 @set_domain("domain", "spectral")
@@ -1176,7 +1202,9 @@ def spectral_skewness(signal, fs):
     spect_centr = spectral_centroid(signal, fs)
     summedFmag = match_last_dim_by_value_repeat(np.sum(fmag, axis=-1), fmag)
 
-    skew = ((f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3) * devide_keep_zero(fmag, summedFmag)
+    skew = (
+        (f - match_last_dim_by_value_repeat(spect_centr, f)) ** 3
+    ) * devide_keep_zero(fmag, summedFmag)
     return devide_keep_zero(np.sum(skew, axis=-1), spectral_spread(signal, fs) ** 3)
 
 
@@ -1239,7 +1267,8 @@ def spectral_slope(signal, fs):
     f, fmag = calc_fft(signal, fs)
 
     num_ = devide_keep_zero(1, np.sum(fmag, axis=-1)) * (
-        np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1) - np.sum(f, axis=-1) * np.sum(fmag, axis=-1)
+        np.ma.size(f, axis=-1) * np.sum(f * fmag, axis=-1)
+        - np.sum(f, axis=-1) * np.sum(fmag, axis=-1)
     )
     denom_ = np.ma.size(f, axis=-1) * np.sum(f * f, axis=-1) - np.sum(f, axis=-1) ** 2
     if len(np.shape(signal)) > 1:
@@ -1278,7 +1307,7 @@ def spectral_variation(signal, fs):
     sum2 = np.sum(fmag[..., 1:] ** 2, axis=-1)
     sum3 = np.sum(fmag[..., :-1] ** 2, axis=-1)
 
-    return 1 - devide_keep_zero(sum1, ((sum2 ** 0.5) * (sum3 ** 0.5)))
+    return 1 - devide_keep_zero(sum1, ((sum2**0.5) * (sum3**0.5)))
 
 
 @set_domain("domain", "spectral")
@@ -1306,7 +1335,9 @@ def spectral_positive_turning(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where(
+        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0)
+    )[0]
 
     return len(positive_turning_pts)
 
@@ -1397,9 +1428,15 @@ def human_range_energy(signal, fs):
     """
     f, fmag = calc_fft(signal, fs)
 
-    allenergy = np.sum(fmag ** 2, axis=-1)
+    allenergy = np.sum(fmag**2, axis=-1)
 
-    hr_energy = np.sum(fmag[..., np.argmin(np.abs(0.6 - f[..., :])) : np.argmin(np.abs(2.5 - f[..., :]))] ** 2, axis=-1)
+    hr_energy = np.sum(
+        fmag[
+            ..., np.argmin(np.abs(0.6 - f[..., :])) : np.argmin(np.abs(2.5 - f[..., :]))
+        ]
+        ** 2,
+        axis=-1,
+    )
 
     return devide_keep_zero(hr_energy, allenergy)
 
@@ -1443,14 +1480,18 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     """
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm="ortho")[1 : (num_ceps + 1)]  # Keep 2-13
+    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm="ortho")[
+        1 : (num_ceps + 1)
+    ]  # Keep 2-13
 
     mel_coeff -= np.mean(mel_coeff, axis=0) + 1e-8
 
     # liftering
     ncoeff = len(mel_coeff)
     n = np.arange(ncoeff)
-    lift = 1 + (cep_lifter / 2) * np.sin(np.pi * n / cep_lifter)  # cep_lifter = 22 from python_speech_features library
+    lift = 1 + (cep_lifter / 2) * np.sin(
+        np.pi * n / cep_lifter
+    )  # cep_lifter = 22 from python_speech_features library
 
     mel_coeff *= lift
 
@@ -1486,7 +1527,9 @@ def power_bandwidth(signal, fs):
     if np.std(signal) == 0:
         freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
     else:
-        freq, power = scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))
+        freq, power = scipy.signal.welch(
+            signal / np.std(signal), fs, nperseg=len(signal)
+        )
 
     if np.sum(power) == 0:
         return 0.0
@@ -1496,7 +1539,9 @@ def power_bandwidth(signal, fs):
     f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
 
     cum_power_inv = np.cumsum(power[::-1])
-    f_upper = freq[np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
+    f_upper = freq[
+        np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)
+    ]
 
     # Returning the bandwidth in terms of frequency
 
@@ -1529,7 +1574,9 @@ def fft_mean_coeff(signal, fs, nfreq=256):
     """
     nfreq = min(nfreq, np.ma.size(signal, axis=-1) // 2 + 1)
 
-    return np.mean(scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2, axis=-1)[2], axis=-1)
+    return np.mean(
+        scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2, axis=-1)[2], axis=-1
+    )
 
 
 @set_domain("domain", "spectral")
@@ -1624,7 +1671,7 @@ def spectral_entropy(signal, fs):
 
     f, fmag = calc_fft(sig, fs)
 
-    power = fmag ** 2
+    power = fmag**2
 
     if power.sum() == 0:
         return 0.0
@@ -1731,7 +1778,7 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
         CWT std
 
     """
-    return tuple((np.std(wavelet(signal, function, widths), axis=1)))
+    return tuple(np.std(wavelet(signal, function, widths), axis=1))
 
 
 @set_domain("domain", "spectral")
@@ -1758,7 +1805,7 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
         CWT variance
 
     """
-    return tuple((np.var(wavelet(signal, function, widths), axis=1)))
+    return tuple(np.var(wavelet(signal, function, widths), axis=1))
 
 
 @set_domain("domain", "spectral")
@@ -1789,6 +1836,6 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
 
     """
     cwt = wavelet(signal, function, widths)
-    energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
+    energy = np.sqrt(np.sum(cwt**2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
