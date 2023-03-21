@@ -1,0 +1,11 @@
+name: Dlint
+on: [push, pull_request]
+jobs:
+    dlint:
+        runs-on: ubuntu-latest
+        name: Dlint
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                ref: ${{ github.head_ref }}
+            - uses: dlint-py/dlint-action@master

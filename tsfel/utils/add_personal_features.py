@@ -82,7 +82,12 @@ def add_feature_json(features_path, json_path):
                 defaults = ""
 
             # Settings of new feature
-            new_feature = {"description": descrip, "parameters": defaults, "function": fname, "use": use}
+            new_feature = {
+                "description": descrip,
+                "parameters": defaults,
+                "function": fname,
+                "use": use,
+            }
 
             # Check if domain exists
             try:
@@ -103,4 +108,6 @@ def add_feature_json(features_path, json_path):
             print("Feature " + str(fname) + " was added.")
 
     if vset_domain is False:
-        warnings.warn("No features were added. Please declare @set_domain.", stacklevel=2)
+        warnings.warn(
+            "No features were added. Please declare @set_domain.", stacklevel=2
+        )

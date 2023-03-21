@@ -1,0 +1,37 @@
+# EditorConfig helps developers define and maintain consistent coding styles between different editors and IDEs
+# More information at https://EditorConfig.org
+
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+
+# Python: PEP8 defines 4 spaces for indentation
+[*.{py,java,r,R,sh}]
+indent_size = 4
+
+# The JSON files contain newlines inconsistently
+[*.json]
+indent_size = 2
+insert_final_newline = false
+
+[*.{md,Rmd,rst}]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# Tabs matter for Makefile and .gitmodules
+[{makefile*,Makefile*,*.mk,*.mak,*.makefile,*.Makefile,GNUmakefile,BSDmakefile,make.bat,Makevars*,*.gitmodules}]
+indent_style = tab
+insert_final_newline = false
+
+# Placeholder files
+[{*.gitkeep,__init__.py}]
+insert_final_newline = false
+
+[{LICENSE, VERSION*, requirements*}]
+insert_final_newline = false

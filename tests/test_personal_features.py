@@ -1,5 +1,6 @@
-from tsfel.feature_extraction.features_utils import set_domain, vectorize
 import numpy as np
+
+from tsfel.feature_extraction.features_utils import set_domain, vectorize
 
 
 @set_domain("domain", "statistical")

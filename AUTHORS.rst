@@ -2,7 +2,7 @@ Authors
 ==========
 This package is being developed and maintained by `Fraunhofer AICOS <https://www.aicos.fraunhofer.pt/en/home.html>`_.
 
-.. image:: imgs/fhp_logo.png
+.. image:: docs/imgs/fhp_logo.png
     :align: center
     :scale: 25 %
     :alt: FhP-AICOS
