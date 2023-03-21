@@ -67,6 +67,7 @@ repos:
           - id: detect-aws-credentials
             name: detect-aws-credentials
             description: Checks for the existence of AWS/Minio secrets that you have set up.
+            args: [--allow-missing-credentials]
           - id: detect-private-key
             name: detect-private-key
             description: Checks for the existence of private keys.
