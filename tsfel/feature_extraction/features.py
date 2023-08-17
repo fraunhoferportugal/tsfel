@@ -262,31 +262,6 @@ def zero_cross(signal):
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "audio")
-def total_energy(signal, fs):
-    """Computes the total energy of the signal.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Signal from which total energy is computed
-    fs : int
-        Sampling frequency
-
-    Returns
-    -------
-    float
-        Total energy
-
-    """
-    time = compute_time(signal, fs)
-
-    return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
-
-
-@set_domain("domain", "temporal")
 def slope(signal):
     """Computes the slope of the signal.
 
@@ -320,7 +295,7 @@ def auc(signal, fs):
     ----------
     signal : nd-array
         Input from which the area under the curve is computed
-    fs : int
+    fs : float
         Sampling Frequency
     Returns
     -------
@@ -331,95 +306,6 @@ def auc(signal, fs):
     t = compute_time(signal, fs)
 
     return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
-
-
-@set_domain("domain", "temporal")
-@set_domain("tag", "audio")
-def abs_energy(signal):
-    """Computes the absolute energy of the signal.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which the area under the curve is computed
-
-    Returns
-    -------
-    float
-        Absolute energy
-
-    """
-    return np.sum(np.abs(signal) ** 2)
-
-
-@set_domain("domain", "temporal")
-def pk_pk_distance(signal):
-    """Computes the peak to peak distance.
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which the area under the curve is computed
-
-    Returns
-    -------
-    float
-        peak to peak distance
-
-    """
-    return np.abs(np.max(signal) - np.min(signal))
-
-
-@set_domain("domain", "temporal")
-@set_domain("tag", "eeg")
-def entropy(signal, prob='standard'):
-    """Computes the entropy of the signal using the Shannon Entropy.
-
-    Description in Article:
-    Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
-    Authors: Crutchfield J. Feldman David
-
-    Feature computational cost: 1
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which entropy is computed
-    prob : string
-        Probability function (kde or gaussian functions are available)
-
-    Returns
-    -------
-    float
-        The normalized entropy value
-
-    """
-
-    if prob == 'standard':
-        value, counts = np.unique(signal, return_counts=True)
-        p = counts / counts.sum()
-    elif prob == 'kde':
-        p = kde(signal)
-    elif prob == 'gauss':
-        p = gaussian(signal)
-
-    if np.sum(p) == 0:
-        return 0.0
-
-    # Handling zero probability values
-    p = p[np.where(p != 0)]
-
-    # If probability all in one value, there is no entropy
-    if np.log2(len(signal)) == 1:
-        return 0.0
-    elif np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
-        return 0.0
-    else:
-        return - np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 @set_domain("domain", "temporal")
@@ -452,6 +338,98 @@ def neighbourhood_peaks(signal, n=10):
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
+@set_domain("domain", "statistical")
+@set_domain("tag", "audio")
+def abs_energy(signal):
+    """Computes the absolute energy of the signal.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which the area under the curve is computed
+
+    Returns
+    -------
+    float
+        Absolute energy
+
+    """
+    return np.sum(np.abs(signal) ** 2)
+
+
+@set_domain("domain", "statistical")
+@set_domain("tag", "audio")
+def average_power(signal, fs):
+    """Computes the average power of the signal.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Signal from which average power is computed
+    fs : float
+        Sampling frequency
+
+    Returns
+    -------
+    float
+        Average power
+
+    """
+    time = compute_time(signal, fs)
+
+    return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
+
+
+@set_domain("domain", "statistical")
+@set_domain("tag", "eeg")
+def entropy(signal, prob="standard"):
+    """Computes the entropy of the signal using the Shannon Entropy.
+
+    Description in Article:
+    Regularities Unseen, Randomness Observed: Levels of Entropy Convergence
+    Authors: Crutchfield J. Feldman David
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which entropy is computed
+    prob : string
+        Probability function (kde or gaussian functions are available)
+
+    Returns
+    -------
+    float
+        The normalized entropy value
+
+    """
+
+    if prob == "standard":
+        value, counts = np.unique(signal, return_counts=True)
+        p = counts / counts.sum()
+    elif prob == "kde":
+        p = kde(signal)
+    elif prob == "gauss":
+        p = gaussian(signal)
+
+    if np.sum(p) == 0:
+        return 0.0
+
+    # Handling zero probability values
+    p = p[np.where(p != 0)]
+
+    # If probability all in one value, there is no entropy
+    if np.log2(len(signal)) == 1:
+        return 0.0
+    elif np.sum(p * np.log2(p)) / np.log2(len(signal)) == 0:
+        return 0.0
+    else:
+        return -np.sum(p * np.log2(p)) / np.log2(len(signal))
 
 
 @set_domain("domain", "statistical")
@@ -725,6 +703,26 @@ def calc_var(signal):
 
 
 @set_domain("domain", "statistical")
+def pk_pk_distance(signal):
+    """Computes the peak to peak distance.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which peak to peak is computed
+
+    Returns
+    -------
+    float
+        peak to peak distance
+
+    """
+    return np.abs(np.max(signal) - np.min(signal))
+
+
+@set_domain("domain", "statistical")
 def ecdf(signal, d=10):
     """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
 
@@ -750,8 +748,38 @@ def ecdf(signal, d=10):
 
 
 @set_domain("domain", "statistical")
+def ecdf_slope(signal, p_init=0.5, p_end=0.75):
+    """Computes the slope of the ECDF between two percentiles.
+    Possibility to return infinity values.
+
+    Feature computational cost: 1
+
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    p_init : float
+        Initial percentile
+    p_end : float
+        End percentile
+
+    Returns
+    -------
+    float
+        The slope of the ECDF between two percentiles
+    """
+    signal = np.array(signal)
+    # check if signal is constant
+    if np.sum(np.diff(signal)) == 0:
+        return np.inf
+    else:
+        x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
+        return (p_end - p_init) / (x_end - x_init)
+
+
+@set_domain("domain", "statistical")
 def ecdf_percentile(signal, percentile=[0.2, 0.8]):
-    """Computes the percentile values of the ECDF.
+    """Computes the percentile value of the ECDF.
 
     Feature computational cost: 1
 
@@ -846,7 +874,7 @@ def spectral_distance(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral distance is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -878,7 +906,7 @@ def fundamental_frequency(signal, fs):
     ----------
     signal : nd-array
         Input from which fundamental frequency is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -915,7 +943,7 @@ def max_power_spectrum(signal, fs):
     ----------
     signal : nd-array
         Input from which maximum power spectrum is computed
-    fs : scalar
+    fs : float
         Sampling frequency
 
     Returns
@@ -940,7 +968,7 @@ def max_frequency(signal, fs):
     ----------
     signal : nd-array
         Input from which maximum frequency is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1033,7 +1061,7 @@ def spectral_decrease(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral decrease is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1074,7 +1102,7 @@ def spectral_kurtosis(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral kurtosis is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1105,7 +1133,7 @@ def spectral_skewness(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral skewness is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1138,7 +1166,7 @@ def spectral_spread(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral spread is computed.
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1173,7 +1201,7 @@ def spectral_slope(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral slope is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1215,7 +1243,7 @@ def spectral_variation(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral variation is computed.
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1248,7 +1276,7 @@ def spectral_positive_turning(signal, fs):
     ----------
     signal : nd-array
         Input from which the number of positive turning points of the fft magnitude are computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1281,7 +1309,7 @@ def spectral_roll_off(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral roll-off is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1310,7 +1338,7 @@ def spectral_roll_on(signal, fs):
     ----------
     signal : nd-array
         Signal from which spectral roll-on is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1340,7 +1368,7 @@ def human_range_energy(signal, fs):
     ----------
     signal : nd-array
         Signal from which human range energy ratio is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1381,7 +1409,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     ----------
     signal : nd-array
         Input from which MEL coefficients is computed
-    fs : int
+    fs : float
         Sampling frequency
     pre_emphasis : float
         Pre-emphasis coefficient for pre-emphasis filter application
@@ -1402,9 +1430,9 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     """
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
-    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm='ortho')[1:(num_ceps + 1)]  # Keep 2-13
+    mel_coeff = scipy.fft.dct(filter_banks, type=2, axis=0, norm="ortho")[1 : (num_ceps + 1)]  # Keep 2-13
 
-    mel_coeff -= (np.mean(mel_coeff, axis=0) + 1e-8)
+    mel_coeff -= np.mean(mel_coeff, axis=0) + 1e-8
 
     # liftering
     ncoeff = len(mel_coeff)
@@ -1431,7 +1459,7 @@ def power_bandwidth(signal, fs):
     ----------
     signal : nd-array
         Input from which the power bandwidth computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns
@@ -1474,7 +1502,7 @@ def fft_mean_coeff(signal, fs, nfreq=256):
     ----------
     signal : nd-array
         Input from which fft mean coefficients are computed
-    fs : int
+    fs : float
         Sampling frequency
     nfreq : int
         The number of frequencies
@@ -1540,7 +1568,7 @@ def spectral_entropy(signal, fs):
     ----------
     signal : nd-array
         Input from which spectral entropy is computed
-    fs : int
+    fs : float
         Sampling frequency
 
     Returns

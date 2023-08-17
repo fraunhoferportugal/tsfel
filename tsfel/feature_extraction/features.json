@@ -290,6 +290,26 @@
     }
   },
   "statistical": {
+    "Absolute energy": {
+      "complexity": "log",
+      "description": "Computes the absolute energy of the signal.",
+      "function": "tsfel.abs_energy",
+      "parameters": "",
+      "n_features": 1,
+      "use": "yes",
+      "tag": "audio"
+    },
+    "Average power": {
+      "complexity": "constant",
+      "description": "Computes the average power of the signal.",
+      "function": "tsfel.average_power",
+      "parameters": {
+        "fs": 100
+      },
+      "n_features": 1,
+      "use": "yes",
+      "tag": "audio"
+    },
     "ECDF": {
       "complexity": "log",
       "description": "Computes the values of ECDF (empirical cumulative distribution function) along the time axis.",
@@ -319,6 +339,17 @@
       },
       "n_features": "percentile",
       "use": "yes"
+    },
+    "Entropy": {
+      "complexity": "log",
+      "description": "Computes the entropy of the signal using the Shannon Entropy.",
+      "function": "tsfel.entropy",
+      "parameters": {
+        "prob": "standard"
+      },
+      "n_features": 1,
+      "use": "yes",
+      "tag": "eeg"
     },
     "Histogram": {
       "complexity": "log",
@@ -396,6 +427,14 @@
       "n_features": 1,
       "use": "yes"
     },
+    "Peak to peak distance": {
+      "complexity": "constant",
+      "description": "Computes the peak to peak distance.",
+      "function": "tsfel.pk_pk_distance",
+      "parameters": "",
+      "n_features": 1,
+      "use": "yes"
+    },
     "Root mean square": {
       "complexity": "constant",
       "description": "Computes root mean square of the signal.",
@@ -434,15 +473,6 @@
     }
   },
   "temporal": {
-    "Absolute energy": {
-      "complexity": "log",
-      "description": "Computes the absolute energy of the signal.",
-      "function": "tsfel.abs_energy",
-      "parameters": "",
-      "n_features": 1,
-      "use": "yes",
-      "tag": "audio"
-    },
     "Area under the curve": {
       "complexity": "log",
       "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
@@ -471,17 +501,6 @@
       },
       "n_features": 1,
       "use": "yes"
-    },
-    "Entropy": {
-      "complexity": "log",
-      "description": "Computes the entropy of the signal using the Shannon Entropy.",
-      "function": "tsfel.entropy",
-      "parameters": {
-        "prob": "standard"
-      },
-      "n_features": 1,
-      "use": "yes",
-      "tag": "eeg"
     },
     "Mean absolute diff": {
       "complexity": "constant",
@@ -534,14 +553,6 @@
       "n_features": 1,
       "use": "yes"
     },
-    "Peak to peak distance": {
-      "complexity": "constant",
-      "description": "Computes the peak to peak distance.",
-      "function": "tsfel.pk_pk_distance",
-      "parameters": "",
-      "n_features": 1,
-      "use": "yes"
-    },
     "Positive turning points": {
       "complexity": "constant",
       "description": "Computes number of positive turning points of the signal.",
@@ -574,17 +585,6 @@
       "parameters": "",
       "n_features": 1,
       "use": "yes"
-    },
-    "Total energy": {
-      "complexity": "constant",
-      "description": "Computes the total energy of the signal.",
-      "function": "tsfel.total_energy",
-      "parameters": {
-        "fs": 100
-      },
-      "n_features": 1,
-      "use": "yes",
-      "tag": "audio"
     },
     "Zero crossing rate": {
       "complexity": "constant",
