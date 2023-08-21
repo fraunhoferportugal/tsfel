@@ -4,7 +4,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-with open('requirements.txt', 'r') as f:
+with open('requirements/requirements.txt', 'r') as f:
     install_reqs = [
         s for s in [
             line.strip(' \n') for line in f
@@ -13,7 +13,7 @@ with open('requirements.txt', 'r') as f:
 
 setuptools.setup(
     name="tsfel",
-    version="0.1.5",
+    version="0.1.6",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,
