@@ -107,53 +107,56 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
     folders = [f for f in glob.glob(main_directory + "**/", recursive=True)]
 
-    for fl in folders:
-        sensor_data = {}
-        if search_criteria:
-            for c in search_criteria:
-                if os.path.isfile(fl + c):
-                    key = c.split('.')[0]
-                    sensor_data[key] = pd.read_csv(fl + c, header=None)
-        else:
-            all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
-            for c in all_files:
-                key = c.split(os.sep)[-1].split('.')[0]
-                try:
-                    data_file = pd.read_csv(c, header=None)
-                except pd.io.common.CParserError:
-                    continue
+    if folders:
+        for fl in folders:
+            sensor_data = {}
+            if search_criteria:
+                for c in search_criteria:
+                    if os.path.isfile(fl + c):
+                        key = c.split('.')[0]
+                        sensor_data[key] = pd.read_csv(fl + c, header=None)
+            else:
+                all_files = np.concatenate((glob.glob(fl + '/*.txt'), glob.glob(fl + '/*.csv')))
+                for c in all_files:
+                    key = c.split(os.sep)[-1].split('.')[0]
+                    try:
+                        data_file = pd.read_csv(c, header=None)
+                    except pd.io.common.CParserError:
+                        continue
 
-                if np.dtype('O') in np.array(data_file.dtypes):
-                    continue
+                    if np.dtype('O') in np.array(data_file.dtypes):
+                        continue
 
-                sensor_data[key] = pd.read_csv(c, header=None)
+                    sensor_data[key] = pd.read_csv(c, header=None)
 
-        if not sensor_data:
-            continue
+            if not sensor_data:
+                continue
 
-        pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
+            pp_sensor_data = sensor_data if pre_process is None else pre_process(sensor_data)
 
-        data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
+            data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
 
-        windows = signal_window_splitter(data_new, window_size, overlap)
+            windows = signal_window_splitter(data_new, window_size, overlap)
 
-        if features_path:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      features_path=features_path, header_names=names, n_jobs=n_jobs)
-        else:
-            features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
-                                                      header_names=names, n_jobs=n_jobs)
+            if features_path:
+                features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+                                                          features_path=features_path, header_names=names, n_jobs=n_jobs)
+            else:
+                features = time_series_features_extractor(feat_dict, windows, fs=resample_rate, verbose=0,
+                                                          header_names=names, n_jobs=n_jobs)
 
-        fl = '/'.join(fl.split(os.sep))
-        invalid_char = '<>:"\|?* '
-        for char in invalid_char:
-            fl = fl.replace(char, '')
+            fl = '/'.join(fl.split(os.sep))
+            invalid_char = '<>:"\|?* '
+            for char in invalid_char:
+                fl = fl.replace(char, '')
 
-        pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
-        features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
+            pathlib.Path(output_directory + fl).mkdir(parents=True, exist_ok=True)
+            features.to_csv(output_directory + fl + '/Features.csv', sep=',', encoding='utf-8')
 
-    if verbose == 1:
-        print('Features files saved in: ', output_directory)
+        if verbose == 1:
+            print('Features files saved in: ', output_directory)
+    else:
+        raise FileNotFoundError("There is no folder(s) in directory: " + main_directory)
 
 
 def calc_features(wind_sig, dict_features, fs, **kwargs):
