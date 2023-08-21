@@ -255,6 +255,12 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
     if names is not None:
         names = list(names)
+    else:
+        # Name of each column to be concatenated with feature name
+        if isinstance(signal_windows, pd.DataFrame):
+            names = signal_windows.columns.values
+        elif isinstance(signal_windows[0], pd.DataFrame):
+            names = signal_windows[0].columns.values
 
     if window_size is not None:
         signal_windows = signal_window_splitter(signal_windows, window_size, overlap)
@@ -264,58 +270,72 @@ def time_series_features_extractor(dict_features, signal_windows, fs=None, verbo
 
     features_final = pd.DataFrame()
 
-    if isinstance(signal_windows, pd.DataFrame):
-        features_final = calc_window_features(dict_features, signal_windows, fs, verbose=verbose, single_window=True,
-                                              features_path=features_path,
-                                              header_names=names)
-    else:
-        if isinstance(signal_windows[0], numbers.Real):
-            feat_val = calc_window_features(dict_features, signal_windows, fs, verbose=verbose, single_window=True,
-                                            features_path=features_path,
-                                            header_names=names)
-            feat_val.reset_index(drop=True)
-            return feat_val
+    if isinstance(signal_windows, list) and isinstance(signal_windows[0], numbers.Real):
+        signal_windows = np.array(signal_windows)
+
+    # more than one window
+    if isinstance(signal_windows, list):
+        # Starting the display of progress bar for notebooks interfaces
+        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (
+            get_ipython().__class__.__name__ == "Shell"
+        ):
+
+            out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
         else:
-            # Starting the display of progress bar for notebooks interfaces
-            if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
-                    get_ipython().__class__.__name__ == 'Shell'):
+            out = None
 
-                out = display(progress_bar_notebook(0, len(signal_windows)), display_id=True)
+        if isinstance(n_jobs, int):
+            # Multiprocessing use
+            if n_jobs == -1:
+                cpu_count = mp.cpu_count()
             else:
-                out = None
+                cpu_count = n_jobs
 
-            if isinstance(n_jobs, int):
-                # Multiprocessing use
-                if n_jobs == -1:
-                    cpu_count = mp.cpu_count()
-                else:
-                    cpu_count = n_jobs
+            pool = mp.Pool(cpu_count)
+            features = pool.imap(
+                partial(
+                    calc_features,
+                    dict_features=dict_features,
+                    fs=fs,
+                    features_path=features_path,
+                    header_names=names,
+                ),
+                signal_windows,
+            )
 
-                pool = mp.Pool(cpu_count)
-                features = pool.imap(partial(calc_features, dict_features=dict_features, fs=fs,
-                                             features_path=features_path, header_names=names), signal_windows)
-                for i, feat in enumerate(features):
-                    if verbose == 1:
-                        display_progress_bar(i, signal_windows, out)
-                    features_final = pd.concat([features_final, feat], axis=0)
+            for i, feat in enumerate(features):
+                if verbose == 1:
+                    display_progress_bar(i, len(signal_windows), out)
+                features_final = pd.concat([features_final, feat], axis=0)
 
-                pool.close()
-                pool.join()
+            pool.close()
+            pool.join()
 
-            elif n_jobs is None:
-                # Without multiprocessing
-                for i, feat in enumerate(signal_windows):
-                    features_final = pd.concat(
-                        [
-                            features_final,
-                            calc_window_features(
-                                dict_features, feat, fs, features_path=features_path, header_names=names)
-                        ], axis=0)
-                    if verbose == 1:
-                        display_progress_bar(i, signal_windows, out)
-            else:
-                raise SystemExit('n_jobs value is not valid. '
-                                 'Choose an integer value or None for no multiprocessing.')
+        elif n_jobs is None:
+            for i, feat in enumerate(signal_windows):
+                features_final = pd.concat(
+                    [
+                        features_final,
+                        calc_window_features(
+                            dict_features, feat, fs, features_path=features_path, header_names=names)
+                    ], axis=0)
+                if verbose == 1:
+                    display_progress_bar(i, len(signal_windows), out)
+        else:
+            raise SystemExit(
+                "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing."
+            )
+    # single window
+    else:
+        features_final = calc_window_features(
+            dict_features,
+            signal_windows,
+            fs,
+            verbose=verbose,
+            features_path=features_path,
+            header_names=names,
+            single_window=True,
+        )
 
     if verbose == 1:
         print("\n"+"*** Feature extraction finished ***")
@@ -334,7 +354,7 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
         Dictionary with features
     signal_window: pandas DataFrame
         Input from which features are computed, window
-    fs : int
+    fs : float
         Sampling frequency
     verbose : int
         Level of function communication
@@ -357,10 +377,22 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
     """
 
     features_path = kwargs.get('features_path', None)
-    names = kwargs.get('header_names', None)
+    header_names = kwargs.get('header_names', None)
+
+    # To handle object type signals
+    signal_window = np.array(signal_window).astype(float)
+
+    single_axis = True if len(signal_window.shape) == 1 else False
+
+    if header_names is None:
+        header_names = np.array([0]) if single_axis else np.arange(signal_window.shape[-1])
+    else:
+        if (len(header_names) != signal_window.shape[-1] and not single_axis) or \
+                (len(header_names) != 1 and single_axis):
+            raise Exception("header_names dimension does not match input columns.")
 
     # Execute imports
-    exec("import tsfel")
+    exec("from tsfel import *")
     domain = dict_features.keys()
 
     if features_path:
@@ -370,10 +402,6 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
         exec("from " + features_path.split(os.sep)[-1][:-3]+" import *")
 
     # Create global arrays
-    func_total = []
-    func_names = []
-    imports_total = []
-    parameters_total = []
     feature_results = []
     feature_names = []
 
@@ -385,7 +413,6 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
         if (get_ipython().__class__.__name__ == 'ZMQInteractiveShell') or (
                 get_ipython().__class__.__name__ == 'Shell'):
-            print(len(feat_nb))
             out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
         else:
             out = None
@@ -399,84 +426,55 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
 
             if verbose == 1 and single_window:
                 i_feat = i_feat + 1
-                display_progress_bar(i_feat, feat_nb, out)
+                display_progress_bar(i_feat, len(feat_nb), out)
 
             # Only returns used functions
-            if dict_features[_type][feat]['use'] == 'yes':
-
-                # Read Function Name (generic name)
-                func_names = [feat]
+            if dict_features[_type][feat]["use"] == "yes":
 
                 # Read Function (real name of function)
-                func_total = [dict_features[_type][feat]['function']]
+                func_total = dict_features[_type][feat]["function"]
+
+                if func_total.find("tsfel.") == 0:
+                    func_total = func_total.replace("tsfel.", "")
 
                 # Check for parameters
-                if dict_features[_type][feat]['parameters'] != '':
-                    param = dict_features[_type][feat]['parameters']
+                parameters_total = {}
+
+                if dict_features[_type][feat]["parameters"] != "":
+                    parameters_total = dict_features[_type][feat]["parameters"]
 
                     # Check assert fs parameter:
-                    if 'fs' in param:
+                    if "fs" in parameters_total:
 
                         # Select which fs to use
                         if fs is None:
-
                             # Check if features dict has default sampling frequency value
-                            if type(param['fs']) is int or type(param['fs']) is float:
-                                parameters_total = [str(key) + '=' + str(value) for key, value in param.items()]
-                            else:
-                                raise Exception('No sampling frequency assigned.')
+                            if not (type(parameters_total["fs"]) is int or type(parameters_total["fs"]) is float):
+                                raise Exception("No sampling frequency assigned.")
                         else:
-                            parameters_total = [str(key) + '=' + str(value) for key, value in param.items()
-                                                if key not in 'fs']
-                            parameters_total += ['fs =' + str(fs)]
+                            parameters_total["fs"] = fs
 
-                    # feature has no fs parameter
-                    else:
-                        parameters_total = []
-                        for key, value in param.items():
-                            if type(value) is str:
-                                value = '"'+value+'"'
-                            parameters_total.append([str(key) + '=' + str(value)])
-                else:
-                    parameters_total = ''
-
-                # To handle object type signals
-                signal_window = np.array(signal_window).astype(float)
-
-                # Name of each column to be concatenate with feature name
-                if not isinstance(signal_window, pd.DataFrame):
-                    signal_window = pd.DataFrame(data=signal_window)
-
-                if names is not None:
-                    if len(names) != len(list(signal_window.columns.values)):
-                        raise Exception('header_names dimension does not match input columns.')
-                    else:
-                        header_names = names
-                else:
-                    header_names = signal_window.columns.values
+                # Eval feature results
+                if single_axis:
+                    eval_result = locals()[func_total](signal_window, **parameters_total)
+                    eval_result = np.array([eval_result])
 
                 for ax in range(len(header_names)):
-                    window = signal_window.iloc[:, ax]
-                    execf = func_total[0] + '(window'
-
-                    if parameters_total != '':
-                        execf += ', ' + str(parameters_total).translate(str.maketrans({'[': '', ']': '', "'": ''}))
-
-                    execf += ')'
-                    eval_result = eval(execf, locals())
-
+                    sig_ax = signal_window if single_axis else signal_window[:, ax]
+                    eval_result_ax = locals()[func_total](sig_ax, **parameters_total)
                     # Function returns more than one element
-                    if type(eval_result) == tuple:
-                        if np.isnan(eval_result[0]):
-                            eval_result = np.zeros(len(eval_result))
-                        for rr in range(len(eval_result)):
-                            feature_results += [eval_result[rr]]
-                            feature_names += [str(header_names[ax]) + '_' + func_names[0] + '_' + str(rr)]
+                    if type(eval_result_ax) == tuple:
+                        if np.isnan(eval_result_ax[0]):
+                            eval_result_ax = np.zeros(len(eval_result_ax))
+                        for rr in range(len(eval_result_ax)):
+                            feature_results += [eval_result_ax[rr]]
+                            feature_names += [str(header_names[ax]) + "_" + feat + "_" + str(rr)]
                     else:
-                        feature_results += [eval_result]
-                        feature_names += [str(header_names[ax]) + '_' + func_names[0]]
+                        feature_results += [eval_result_ax]
+                        feature_names += [str(header_names[ax]) + "_" + feat]
 
-    features = pd.DataFrame(data=np.array(feature_results).reshape(1, len(feature_results)),
-                            columns=np.array(feature_names))
+    features = pd.DataFrame(
+        data=np.array(feature_results).reshape(1, len(feature_results)), columns=np.array(feature_names)
+    )
 
     return features
