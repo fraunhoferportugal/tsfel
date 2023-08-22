@@ -2,6 +2,29 @@
 Changelog
 =========
 
+Version 0.1.6
+=============
+- Changes
+    - Feature ``total energy`` changed name to ``average power``
+    - Features ``peak to peak``, ``absolute energy`` and ``entropy`` are now classified as statistical
+
+- Bugfixes
+    - Fixed a bug on numpy bool usage (`#133 <https://github.com/fraunhoferportugal/tsfel/issues/133>`_)
+    - Fixed a bug on features' header names
+
+- Improvements
+    - Correlated features are now computed using absolute value
+    - Unit tests improvements
+    - Refactoring of some code sections and overall improved stability
+
+
+Version 0.1.5
+=============
+-  Bugfixes
+   - Fixed a bug on scipy function median_absolute_deviation to median_abs_deviation (`#128 <https://github.com/fraunhoferportugal/tsfel/pull/128>`_)
+   - Fixed on pandas function df.append to pd.concat (`#120 <https://github.com/fraunhoferportugal/tsfel/pull/120>`_)
+
+
 Version 0.1.4
 =============
 - Bugfixes

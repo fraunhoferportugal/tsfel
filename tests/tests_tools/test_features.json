@@ -1,4 +1,25 @@
 {
+    "new_domain": {
+        "new_feature_with_multiple_tag": {
+            "complexity": "constant",
+            "description": "A new feature with multiple tags",
+            "function": "new_feature_with_multiple_tag",
+            "parameters": "",
+            "tag": [
+                "inertial",
+                "emg"
+            ],
+            "use": "yes"
+        },
+        "new_feature_with_tag": {
+            "complexity": "constant",
+            "description": "A new feature with a tag",
+            "function": "new_feature_with_tag",
+            "parameters": "",
+            "tag": "inertial",
+            "use": "yes"
+        }
+    },
     "spectral": {
         "FFT mean coefficient": {
             "complexity": "constant",
@@ -290,6 +311,26 @@
         }
     },
     "statistical": {
+        "Absolute energy": {
+            "complexity": "log",
+            "description": "Computes the absolute energy of the signal.",
+            "function": "tsfel.abs_energy",
+            "n_features": 1,
+            "parameters": "",
+            "tag": "audio",
+            "use": "yes"
+        },
+        "Average power": {
+            "complexity": "constant",
+            "description": "Computes the average power of the signal.",
+            "function": "tsfel.average_power",
+            "n_features": 1,
+            "parameters": {
+                "fs": 100
+            },
+            "tag": "audio",
+            "use": "yes"
+        },
         "ECDF": {
             "complexity": "log",
             "description": "Computes the values of ECDF (empirical cumulative distribution function) along the time axis.",
@@ -318,6 +359,17 @@
             "parameters": {
                 "percentile": "[0.2, 0.8]"
             },
+            "use": "yes"
+        },
+        "Entropy": {
+            "complexity": "log",
+            "description": "Computes the entropy of the signal using the Shannon Entropy.",
+            "function": "tsfel.entropy",
+            "n_features": 1,
+            "parameters": {
+                "prob": "standard"
+            },
+            "tag": "eeg",
             "use": "yes"
         },
         "Histogram": {
@@ -396,6 +448,14 @@
             "parameters": "",
             "use": "yes"
         },
+        "Peak to peak distance": {
+            "complexity": "constant",
+            "description": "Computes the peak to peak distance.",
+            "function": "tsfel.pk_pk_distance",
+            "n_features": 1,
+            "parameters": "",
+            "use": "yes"
+        },
         "Root mean square": {
             "complexity": "constant",
             "description": "Computes root mean square of the signal.",
@@ -450,15 +510,6 @@
         }
     },
     "temporal": {
-        "Absolute energy": {
-            "complexity": "log",
-            "description": "Computes the absolute energy of the signal.",
-            "function": "tsfel.abs_energy",
-            "n_features": 1,
-            "parameters": "",
-            "tag": "audio",
-            "use": "yes"
-        },
         "Area under the curve": {
             "complexity": "log",
             "description": "Computes the area under the curve of the signal computed with trapezoid rule.",
@@ -486,17 +537,6 @@
             "parameters": {
                 "fs": 100
             },
-            "use": "yes"
-        },
-        "Entropy": {
-            "complexity": "log",
-            "description": "Computes the entropy of the signal using the Shannon Entropy.",
-            "function": "tsfel.entropy",
-            "n_features": 1,
-            "parameters": {
-                "prob": "standard"
-            },
-            "tag": "eeg",
             "use": "yes"
         },
         "Mean absolute diff": {
@@ -550,14 +590,6 @@
             },
             "use": "yes"
         },
-        "Peak to peak distance": {
-            "complexity": "constant",
-            "description": "Computes the peak to peak distance.",
-            "function": "tsfel.pk_pk_distance",
-            "n_features": 1,
-            "parameters": "",
-            "use": "yes"
-        },
         "Positive turning points": {
             "complexity": "constant",
             "description": "Computes number of positive turning points of the signal.",
@@ -589,17 +621,6 @@
             "function": "tsfel.sum_abs_diff",
             "n_features": 1,
             "parameters": "",
-            "use": "yes"
-        },
-        "Total energy": {
-            "complexity": "constant",
-            "description": "Computes the total energy of the signal.",
-            "function": "tsfel.total_energy",
-            "n_features": 1,
-            "parameters": {
-                "fs": 100
-            },
-            "tag": "audio",
             "use": "yes"
         },
         "Zero crossing rate": {

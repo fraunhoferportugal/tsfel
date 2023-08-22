@@ -51,9 +51,12 @@ X = tsfel.time_series_features_extractor(cfg, df)
 #### Statistical domain
 | Features                   | Computational Cost |
 |----------------------------|:------------------:|
+| Absolute energy            |          1         |
+| Average power              |          1         |
 | ECDF                       |          1         |
 | ECDF Percentile            |          1         |
 | ECDF Percentile Count      |          1         |
+| Entropy                    |          1         |
 | Histogram                  |          1         |
 | Interquartile range        |          1         |
 | Kurtosis                   |          1         |
@@ -72,11 +75,9 @@ X = tsfel.time_series_features_extractor(cfg, df)
 #### Temporal domain
 | Features                   | Computational Cost |
 |----------------------------|:------------------:|
-| Absolute energy            |          1         |
 | Area under the curve       |          1         |
 | Autocorrelation            |          1         |
 | Centroid                   |          1         |
-| Entropy                    |          1         |
 | Mean absolute diff         |          1         |
 | Mean diff                  |          1         |
 | Median absolute diff       |          1         |
@@ -87,7 +88,6 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Signal distance            |          1         |
 | Slope                      |          1         |
 | Sum absolute diff          |          1         |
-| Total energy               |          1         |
 | Zero crossing rate         |          1         |
 | Neighbourhood peaks        |          1         |
 
