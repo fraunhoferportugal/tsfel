@@ -365,3 +365,112 @@ def calc_ecdf(signal):
       """
     return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
 
+
+def calc_rms(signal, window):
+    """Windowed Root Mean Square (RMS) with linear detrending.
+ 
+    Parameters
+    ----------
+    signal: nd-array
+        Signal
+    window: int
+        Length of the window in which RMS will be calculated
+ 
+    Returns
+    -------
+    rms : nd-array
+        RMS data in each window with length len(signal)//window
+    """
+    num_windows = len(signal) // window
+    rms = np.zeros(num_windows)
+ 
+    for idx in range(num_windows):
+        start_idx = idx * window
+        end_idx = start_idx + window
+        windowed_signal = signal[start_idx:end_idx]
+ 
+        coeff = np.polyfit(np.arange(window), windowed_signal, 1)
+        detrended_window = windowed_signal - np.polyval(coeff, np.arange(window))
+        rms[idx] = np.sqrt(np.mean(detrended_window ** 2))
+ 
+    return rms
+
+
+def calc_lengths_higuchi(signal, k_max):
+    """Computes the lengths for different subdivisions, using the Higuchi's method.
+ 
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    k_max : int, optional
+        Maximum value of k (number of subdivisions), defaults to 128.
+ 
+    Returns
+    -------
+    lk : nd-array
+        Length of curve for different subdivisions
+    """
+    n = len(signal)
+    lk = np.zeros(k_max)
+    k_values = np.arange(1, k_max + 1)
+ 
+    for k in k_values:
+        lmk = 0
+        for m in range(1, k + 1):
+            sum_length = 0
+            for i in range(1, (n - m) // k + 1):
+                sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
+            lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
+        lk[k - 1] = lmk / k
+ 
+    return lk
+
+
+def LZ76(ss):
+    """
+    Calculate Lempel-Ziv's algorithmic complexity using the LZ76 algorithm
+    and the sliding-window implementation.
+
+    Reference:
+    F. Kaspar, H. G. Schuster, "Easily-calculable measure for the
+    complexity of spatiotemporal patterns", Physical Review A, Volume 36,
+    Number 2 (1987).
+
+    Parameters
+    ----------
+    ss : np.ndarray
+        Binarised signal
+
+    Returns
+    -------
+    lz_index : int
+        LZ index
+    """
+
+    ss = ss.flatten().tolist()
+    i, k, l = 0, 1, 1
+    c, k_max = 1, 1
+    n = len(ss)
+    while True:
+        if ss[i + k - 1] == ss[l + k - 1]:
+            k = k + 1
+            if l + k > n:
+                c = c + 1
+                break
+        else:
+            if k > k_max:
+               k_max = k
+            i = i + 1
+            if i == l:
+                c = c + 1
+                l = l + k_max
+                if l + 1 > n:
+                    break
+                else:
+                    i = 0
+                    k = 1
+                    k_max = 1
+            else:
+                k = 1
+    return c
