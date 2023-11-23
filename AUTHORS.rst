@@ -20,6 +20,7 @@ Lead Development Team
 Contributors
 ------------
 - Hui Liu
+- Isabel Curioso
 - Letícia Fernandes
 - Mariana Abreu
 - Patrícia Bota
