@@ -17,21 +17,6 @@ Highlights
 - **Unit tested**: we provide unit tests for each feature
 - **Easily extended**: adding new features is easy and we encourage you to contribute with your custom features
 
-Contents
-========
-
-.. toctree::
-   :maxdepth: 2
-
-   Get Started <descriptions/get_started>
-   Feature List <descriptions/feature_list>
-   Personalised Features <descriptions/personal>
-   Frequently Asked Questions <descriptions/faq>
-   Module Reference <descriptions/modules>
-   Authors <authors>
-   Changelog <changelog>
-   License <license>
-
 Installation
 ============
 
@@ -59,6 +44,29 @@ The code below extracts all the available features on an example dataset.
 
     # Extract features
     X = tsfel.time_series_features_extractor(cfg, df)
+
+How to cite TSFEL?
+==================
+
+.. admonition:: Note
+
+   Used TSFEL in your research? Please cite us in your publication!
+   Click :ref:`here<authors>` for further details.
+
+Contents
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   Get Started <descriptions/get_started>
+   Feature List <descriptions/feature_list>
+   Personalised Features <descriptions/personal>
+   Frequently Asked Questions <descriptions/faq>
+   Module Reference <descriptions/modules>
+   Authors <authors>
+   Changelog <changelog>
+   License <license>
 
 Indices and tables
 ==================
