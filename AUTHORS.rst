@@ -30,7 +30,7 @@ Contributors
 
 Citing TSFEL
 --------------
-TSFEL was published in Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
+TSFEL was published in Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (2020). `https://doi.org/10.1016/j.softx.2020.100456 <https://doi.org/10.1016/j.softx.2020.100456>`_.
 
 If you used TSFEL in your scientific publication, we would very appreciated if you include the adequate citation:
 

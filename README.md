@@ -122,6 +122,8 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Wavelet entropy                   |          2         |
 | Wavelet variance                  |          2         |
 
+#### Fractal domain - Coming soon
+
 
 ## Citing
 When using TSFEL please cite the following publication:

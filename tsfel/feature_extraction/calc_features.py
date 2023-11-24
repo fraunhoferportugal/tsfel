@@ -173,6 +173,7 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
     \**kwargs:
         * *features_path* (``string``) --
             Directory of script with personal features
+
          * *header_names* (``list or array``) --
             Names of each column window
 

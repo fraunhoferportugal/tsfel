@@ -200,7 +200,7 @@ def distance(signal):
     Calculates the total distance traveled by the signal
     using the hypotenuse between 2 datapoints.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
     Parameters
     ----------
