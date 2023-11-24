@@ -1,9 +1,9 @@
-[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/dev/?badge=dev)
+[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
 [![license](https://img.shields.io/badge/License-BSD%203-brightgreen)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 ![PyPI](https://img.shields.io/pypi/v/tsfel)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/dev/notebooks/TSFEL_HAR_Example.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
 
 # Time Series Feature Extraction Library
 ## Intuitive time series feature extraction
