@@ -17,10 +17,11 @@ from numpy.random import default_rng, Generator, RandomState
 from numpy import sum as npsum
 
 
-def powerlaw_psd_gaussian(exponent: float,
-        size: Union[int, Iterable[int]],
-        fmin: float = 0.0,
-        random_state: Optional[Union[int, Generator, RandomState]] = None
+def powerlaw_psd_gaussian(
+    exponent: float,
+    size: Union[int, Iterable[int]],
+    fmin: float = 0.0,
+    random_state: Optional[Union[int, Generator, RandomState]] = None,
 ):
     """Gaussian (1/f)**beta noise.
 
@@ -97,7 +98,7 @@ def powerlaw_psd_gaussian(exponent: float,
 
     # Validate / normalise fmin
     if 0 <= fmin <= 0.5:
-        fmin = max(fmin, 1. / samples)  # Low frequency cutoff
+        fmin = max(fmin, 1.0 / samples)  # Low frequency cutoff
     else:
         raise ValueError("fmin must be chosen between 0 and 0.5.")
 
@@ -106,12 +107,12 @@ def powerlaw_psd_gaussian(exponent: float,
     ix = npsum(s_scale < fmin)  # Index of the cutoff
     if ix and ix < len(s_scale):
         s_scale[:ix] = s_scale[ix]
-    s_scale = s_scale ** (-exponent / 2.)
+    s_scale = s_scale ** (-exponent / 2.0)
 
     # Calculate theoretical output standard deviation from scaling
     w = s_scale[1:].copy()
-    w[-1] *= (1 + (samples % 2)) / 2.  # correct f = +-0.5
-    sigma = 2 * sqrt(npsum(w ** 2)) / samples
+    w[-1] *= (1 + (samples % 2)) / 2.0  # correct f = +-0.5
+    sigma = 2 * sqrt(npsum(w**2)) / samples
 
     # Adjust size to generate one Fourier component per frequency
     size[-1] = len(f)
@@ -139,7 +140,7 @@ def powerlaw_psd_gaussian(exponent: float,
     sr[..., 0] *= sqrt(2)  # Fix magnitude
 
     # Combine power + corrected phase to Fourier components
-    s = sr + 1J * si
+    s = sr + 1j * si
 
     # Transform to real time series & scale to unit variance
     y = irfft(s, n=samples, axis=-1) / sigma
@@ -155,10 +156,7 @@ def _get_normal_distribution(random_state: Optional[Union[int, Generator, Random
     elif isinstance(random_state, (Generator, RandomState)):
         normal_dist = random_state.normal
     else:
-        raise ValueError(
-            "random_state must be one of integer, numpy.random.Generator, "
-            "numpy.random.Randomstate"
-        )
+        raise ValueError("random_state must be one of integer, numpy.random.Generator, " "numpy.random.Randomstate")
     return normal_dist
 
 
@@ -174,7 +172,7 @@ def _get_data_from_url_plux(url: str):
     return np.loadtxt(url)[1]
 
 
-COLORED_NOISE_SAMPLES = 2 ** 12
+COLORED_NOISE_SAMPLES = 2**12
 
 
 def load_complexities_datasets():
@@ -182,14 +180,27 @@ def load_complexities_datasets():
         "white": {"exponent": 0},
         "pink": {"exponent": 1},
         "brownian": {"exponent": 2},
-        "ecg": {"url": "https://raw.githubusercontent.com/hgamboa/novainstrumentation/master/novainstrumentation/data/cleanecg.txt", "func": _get_data_from_url_plux},
-        "airpax": {"url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/AirPassengers.csv", "func": _get_data_from_url_column},
-        "earthquake": {"url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/Earthquakes.csv", "func": _get_data_from_url_ucr},
-        "50words": {"url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/50words_TEST.csv", "func": _get_data_from_url_ucr},
+        "ecg": {
+            "url": "https://raw.githubusercontent.com/hgamboa/novainstrumentation/master/novainstrumentation/data/cleanecg.txt",
+            "func": _get_data_from_url_plux,
+        },
+        "airpax": {
+            "url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/AirPassengers.csv",
+            "func": _get_data_from_url_column,
+        },
+        "earthquake": {
+            "url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/Earthquakes.csv",
+            "func": _get_data_from_url_ucr,
+        },
+        "50words": {
+            "url": "https://raw.githubusercontent.com/AileenNielsen/TimeSeriesAnalysisWithPython/master/data/50words_TEST.csv",
+            "func": _get_data_from_url_ucr,
+        },
     }
 
     dataset = {
-        key: powerlaw_psd_gaussian(metadata[key]["exponent"], COLORED_NOISE_SAMPLES) if "exponent" in metadata[key]
+        key: powerlaw_psd_gaussian(metadata[key]["exponent"], COLORED_NOISE_SAMPLES)
+        if "exponent" in metadata[key]
         else metadata[key]["func"](metadata[key]["url"])
         for key in metadata
     }

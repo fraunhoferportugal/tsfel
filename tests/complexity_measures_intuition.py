@@ -45,7 +45,7 @@ def get_first_acf_time_constant(signal):
     n = len(signal)
     threshold = 0.36787944117144233  # 1 / np.exp(1)
 
-    acf_vec = acf(signal, adjusted=True, fft=n > 1250, nlags=(int(n/4)))[1:]
+    acf_vec = acf(signal, adjusted=True, fft=n > 1250, nlags=(int(n / 4)))[1:]
     idxs = np.where(acf_vec < threshold)[0]
     first_lag = idxs[0] + 1 if idxs.size > 0 else None
 
@@ -59,15 +59,15 @@ for i, (k, v) in enumerate(dataset.items()):
     signal = dataset[k]
 
     # First row (raw data)
-    ax[0, i].plot(signal, 'k')
+    ax[0, i].plot(signal, "k")
     ax[0, i].set_title(k)
-    ax[0, i].spines[['left', 'top', "right"]].set_visible(False)
+    ax[0, i].spines[["left", "top", "right"]].set_visible(False)
     ax[0, i].tick_params(left=False, right=False, labelleft=False)
 
     # Second row (first_acf_time_constant)
     plot_acf(signal, ax[1, i], adjusted=True, fft=len(signal) > 1250, title="")
-    ax[1, i].axhline(y=(1/np.e), color='r', linestyle='--')
-    ax[1, i].spines[['top', "right"]].set_visible(False)
+    ax[1, i].axhline(y=(1 / np.e), color="r", linestyle="--")
+    ax[1, i].spines[["top", "right"]].set_visible(False)
     ax[1, i].set_title("$\\tau = %d$" % get_first_acf_time_constant(signal))
 
     # Third row (dfa)
@@ -82,7 +82,7 @@ for i, (k, v) in enumerate(dataset.items()):
     plot_multiscale_entropy(info, ax[3, i])
     ax[3, i].set_title("mse = %0.2f" % mse)
     ax[3, i].set_ylim([0, 2.5])
-    ax[3, i].spines[['top', "right"]].set_visible(False)
+    ax[3, i].spines[["top", "right"]].set_visible(False)
 
 f.tight_layout()
 plt.show(block=False)
