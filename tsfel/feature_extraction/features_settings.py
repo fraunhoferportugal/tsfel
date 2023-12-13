@@ -27,7 +27,7 @@ def get_features_by_domain(domain=None, json_path=None):
     Parameters
     ----------
     domain : string
-        Available domains: "statistical"; "spectral"; "temporal"
+        Available domains: "statistical"; "spectral"; "temporal"; "fractal"
         If domain equals None, then the features settings from all domains are returned.
     json_path : string
         Directory of json file. Default: package features.json directory
@@ -42,9 +42,9 @@ def get_features_by_domain(domain=None, json_path=None):
     if json_path is None:
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
-        if domain not in ['statistical', 'temporal', 'spectral', None]:
+        if domain not in ['statistical', 'temporal', 'spectral', 'fractal', None]:
             raise SystemExit(
-                'No valid domain. Choose: statistical, temporal, spectral or None (for all feature settings).')
+                'No valid domain. Choose: statistical, temporal, spectral, fractal or None (for all feature settings).')
 
     dict_features = load_json(json_path)
     if domain is None:

@@ -1,5 +1,6 @@
 import scipy
 import numpy as np
+from sklearn.neighbors import KDTree
 
 
 def set_domain(key, value):
@@ -366,6 +367,84 @@ def calc_ecdf(signal):
     return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
 
 
+def coarse_graining(signal, scale):
+    """ Applies a coarse-graining process to a time series: for a given scale factor, it splits
+    the signal into non-overlapping windows and averages the data points.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    scale : int
+        Scale factor, determines the length of the non-overlapping windows.
+
+    Returns
+    -------
+    coarsegrained_signal : np.ndarray
+        Coarse-grained signal.
+    """
+
+    n = len(signal)
+    windows = n // scale
+    usable_n = windows * scale
+
+    windowed_signal = np.reshape(signal[0:usable_n], (windows, scale))
+    coarsegrained_signal = np.nanmean(windowed_signal, axis=1)
+    
+    return coarsegrained_signal
+
+
+def get_templates(signal, m=3):
+    """ Helper function for the sample entropy calculation. Divides a signal into templates vectors of length m.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension that defines the length of the template vectors, defaults to 3.
+
+    Returns
+    -------
+    np.ndarray    
+        Array of template vectors.
+    """
+    return np.array([signal[i:i+m] for i in range(len(signal) - m + 1)])
+
+
+def sample_entropy(signal, m, tolerance):
+    """ Computes the sample entropy of a signal.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension that defines the length of the template vectors, defaults to 3.
+    tolerance : float
+        Tolerance value, defaults to 0.2 times the standard deviation of the input signal.
+
+    Returns
+    -------
+    float    
+        Sample Entropy of a signal.
+    """
+    templates_B = get_templates(signal, m)
+    templates_B = templates_B[:-1]
+    kdtree_B = KDTree(templates_B, metric="chebyshev")
+    count_B = kdtree_B.query_radius(templates_B, tolerance, count_only=True).astype(np.float64)
+    proportion_B = np.mean((count_B - 1) / (templates_B.shape[0] - 1))
+
+    templates_A = get_templates(signal, m+1)
+    kdtree_A = KDTree(templates_A, metric="chebyshev")
+    count_A = kdtree_A.query_radius(templates_A, tolerance, count_only=True).astype(np.float64)
+    proportion_A = np.mean((count_A - 1) / (templates_A.shape[0] - 1))
+
+    if proportion_B > 0 and proportion_A > 0:
+        return -np.log(proportion_A/proportion_B)
+    return np.nan
+
+
 def calc_rms(signal, window):
     """Windowed Root Mean Square (RMS) with linear detrending.
  
@@ -396,24 +475,51 @@ def calc_rms(signal, window):
     return rms
 
 
-def calc_lengths_higuchi(signal, k_max):
+def compute_rs(signal, lag):
+    """Computes the average rescaled range for a window of length lag.
+   
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    lag : int
+        Window length.
+       
+    Returns
+    -------
+    float
+        Average R/S.
+    """
+    n = len(signal)
+
+    windowed_signal = np.reshape(signal[:n - n % lag], (-1, lag))
+    mean_windows = np.mean(windowed_signal, axis=1)
+    accumulated_windowed_signal = np.cumsum(windowed_signal - np.reshape(mean_windows, (-1, 1)), axis=1)
+
+    r = np.max(accumulated_windowed_signal, axis=1) - np.min(accumulated_windowed_signal, axis=1)
+    s = np.std(windowed_signal, axis=1)
+
+    rs = r / s
+
+    return np.mean(rs)
+
+
+def calc_lengths_higuchi(signal):
     """Computes the lengths for different subdivisions, using the Higuchi's method.
  
     Parameters
     ----------
     signal : np.ndarray
         Input signal.
-    k_max : int, optional
-        Maximum value of k (number of subdivisions), defaults to 128.
- 
+
     Returns
     -------
     lk : nd-array
         Length of curve for different subdivisions
     """
     n = len(signal)
-    lk = np.zeros(k_max)
-    k_values = np.arange(1, k_max + 1)
+    k_values = np.arange(1, n//10)
+    lk = []
  
     for k in k_values:
         lmk = 0
@@ -422,9 +528,9 @@ def calc_lengths_higuchi(signal, k_max):
             for i in range(1, (n - m) // k + 1):
                 sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
             lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
-        lk[k - 1] = lmk / k
+        lk.append(lmk / k)
  
-    return lk
+    return k_values, lk
 
 
 def LZ76(ss):
@@ -474,3 +580,32 @@ def LZ76(ss):
             else:
                 k = 1
     return c
+
+
+def find_plateau(y, threshold=0.1, consecutive_points=5):
+    """ Finds a plateau (if it exists).
+
+    Parameters
+    ----------
+    y : np.ndarray
+        Array of y-axis values.
+    threshold : float
+        Slope threshold to consider as a plateau (default is 0.1).
+    consecutive_points: int
+        Number of consecutive points with a small derivative to consider as a plateau (default is 5).
+
+    Returns
+    -------
+        Index of the beggining of the plateau if it is found, length of y otherwise.
+    """
+
+    dy = np.diff(y)
+
+    for i in range(len(dy) - consecutive_points + 1):
+        if np.all(np.abs(dy[i:i+consecutive_points]) < threshold):
+            plateau_value = np.mean(y[i:i+consecutive_points])
+            if plateau_value > np.mean(y):
+                return i
+
+    # No plateau found
+    return len(y)

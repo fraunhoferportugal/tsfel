@@ -10,6 +10,8 @@ settings2 = tsfel.get_features_by_domain('temporal')
 
 settings3 = tsfel.get_features_by_domain('spectral')
 
+settings12 = tsfel.get_features_by_domain('fractal')
+
 settings4 = tsfel.get_features_by_domain(None)
 
 # settings5 = tsfel.extract_sheet('Features')
