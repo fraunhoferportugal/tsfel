@@ -41,13 +41,13 @@ def get_first_acf_time_constant(signal):
     Captures the approximate scale of the autocorrelation function by measuring the first time lag
     at which the autocorrelation function (acf) drops below 1/e = 0.3679.
     """
-    # TODO: Study whether 1250 is an appropriate value for using the fft-based estimation of the acf.
-    n = len(signal)
+    n = signal.size
+    maxlag = int(n / 4)
     threshold = 0.36787944117144233  # 1 / np.exp(1)
 
-    acf_vec = acf(signal, adjusted=True, fft=n > 1250, nlags=(int(n / 4)))[1:]
+    acf_vec = acf(signal, adjusted=True, fft=n > 400, nlags=maxlag)[1:]  # n > 400 empirically selected based on performance tests
     idxs = np.where(acf_vec < threshold)[0]
-    first_lag = idxs[0] + 1 if idxs.size > 0 else None
+    first_lag = idxs[0] + 1 if idxs.size > 0 else maxlag
 
     return first_lag
 
