@@ -14,7 +14,7 @@ def autocorr(signal):
     time series (size > 450), we use the FFT convolution. This feature measures the first time lag at which the
     autocorrelation function drops below 1/e (= 0.3679).
 
-    Feature computational cost: 1
+    Feature computational cost: 2
 
     Parameters
     ----------
