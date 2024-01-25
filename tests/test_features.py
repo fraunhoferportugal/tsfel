@@ -333,15 +333,15 @@ class TestFeatures(unittest.TestCase):
 
 
     def test_autocorr(self):
-        np.testing.assert_almost_equal(autocorr(const0), 0.0)
-        np.testing.assert_almost_equal(autocorr(const1), 20.0)
-        np.testing.assert_almost_equal(autocorr(constNeg), 20.0)
-        np.testing.assert_almost_equal(autocorr(constF), 125.0)
-        np.testing.assert_almost_equal(autocorr(lin), 2470.0)
-        np.testing.assert_almost_equal(autocorr(lin0), 736.8421052631579, decimal=0)
-        np.testing.assert_almost_equal(autocorr(wave), 500.5, decimal=0)
-        np.testing.assert_almost_equal(autocorr(offsetWave), 4500.0, decimal=0)
-        np.testing.assert_almost_equal(autocorr(noiseWave), 508.6149018530489, decimal=0)
+        np.testing.assert_almost_equal(autocorr(const0), 1)
+        np.testing.assert_almost_equal(autocorr(const1), 1)
+        np.testing.assert_almost_equal(autocorr(constNeg), 1)
+        np.testing.assert_almost_equal(autocorr(constF), 1)
+        np.testing.assert_almost_equal(autocorr(lin), 6)
+        np.testing.assert_almost_equal(autocorr(lin0), 6)
+        np.testing.assert_almost_equal(autocorr(wave), 40)
+        np.testing.assert_almost_equal(autocorr(offsetWave), 40)
+        np.testing.assert_almost_equal(autocorr(noiseWave), 39)
 
 
     def test_auc(self):

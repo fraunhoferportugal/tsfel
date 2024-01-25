@@ -1,4 +1,6 @@
 import scipy.signal
+
+from statsmodels.tsa.stattools import acf
 from tsfel.feature_extraction.features_utils import *
 
 
@@ -6,9 +8,11 @@ from tsfel.feature_extraction.features_utils import *
 
 
 @set_domain("domain", "temporal")
-@set_domain("tag", "inertial")
 def autocorr(signal):
-    """Computes autocorrelation of the signal.
+    """ Calculates the first 1/e crossing of the autocorrelation function (ACF).
+    The adjusted ACF is calculated using the `statsmodels.tsa.stattools.acf`. Following the recommendations for long
+    time series (size > 450), we use the FFT convolution. This feature measures the first time lag at which the
+    autocorrelation function drops below 1/e (= 0.3679).
 
     Feature computational cost: 1
 
@@ -19,12 +23,23 @@ def autocorr(signal):
 
     Returns
     -------
-    float
-        Cross correlation of 1-dimensional sequence
+    int
+        The first time lag at which the ACF drops below 1/e (= 0.3679).
 
     """
-    signal = np.array(signal)
-    return float(np.correlate(signal, signal))
+    n = len(signal)
+    threshold = 0.36787944117144233    # 1 / np.exp(1)
+
+    # For constant input signals, the ACF remains constant, and the expected values for all lags other than
+    # lag 0 will be zero. We standardize that (1/e) occurs at lag 1.
+    if np.all(signal == signal[0]):
+        return 1
+
+    a = acf(signal, adjusted=True, fft=n > 450, nlags=(int(n/3)))[1:]
+    indices = np.where(a < threshold)[0]
+    first1e_acf = indices[0] + 1 if indices.size > 0 else None
+
+    return first1e_acf
 
 
 @set_domain("domain", "temporal")
