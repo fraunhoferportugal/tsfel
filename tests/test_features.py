@@ -942,6 +942,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(dfa(pinkNoise), 1.0162533608512214)
         np.testing.assert_almost_equal(dfa(brownNoise), 1.5183298484325374)
 
+
     def test_hurst_exponent(self):
         np.testing.assert_almost_equal(hurst_exponent(const0), np.nan)
         np.testing.assert_almost_equal(hurst_exponent(const1), np.nan)
@@ -954,6 +955,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(hurst_exponent(pinkNoise), 0.615844258099264)
         np.testing.assert_almost_equal(hurst_exponent(brownNoise), 0.7760864648705851)
 
+
     def test_higuchi_fractal_dimension(self):
         np.testing.assert_almost_equal(higuchi_fractal_dimension(wave), 1.1116648974914232)
         np.testing.assert_almost_equal(higuchi_fractal_dimension(offsetWave), 1.1116648974914232)
@@ -962,6 +964,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(higuchi_fractal_dimension(pinkNoise), 1.9303823647578682)
         np.testing.assert_almost_equal(higuchi_fractal_dimension(brownNoise), 1.581020130301515)
 
+
     def test_maximum_fractal_length(self):
         np.testing.assert_almost_equal(maximum_fractal_length(wave), 1.4082260937055102)
         np.testing.assert_almost_equal(maximum_fractal_length(offsetWave), 1.40822609370551)
@@ -969,6 +972,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(maximum_fractal_length(whiteNoise), 3.7493320152840734)
         np.testing.assert_almost_equal(maximum_fractal_length(pinkNoise), 3.542078306170788)
         np.testing.assert_almost_equal(maximum_fractal_length(brownNoise), 2.4274067988328794)
+
 
     def test_petrosian_fractal_dimension(self):
         np.testing.assert_almost_equal(petrosian_fractal_dimension(const0), 1.0)

@@ -539,6 +539,16 @@
             },
             "use": "yes"
         },
+        "Lempel-Ziv complexity": {
+            "complexity": "squared",
+            "description": "Computes the Lempel-Ziv's (LZ) complexity index.",
+            "function": "tsfel.lempel_ziv",
+            "parameters": {
+              "threshold": null
+            },
+            "n_features": 1,
+            "use": "yes"
+        },
         "Mean absolute diff": {
             "complexity": "constant",
             "description": "Computes mean absolute differences of the signal.",
@@ -569,6 +579,18 @@
             "function": "tsfel.median_diff",
             "n_features": 1,
             "parameters": "",
+            "use": "yes"
+        },
+        "Multiscale entropy": {
+            "complexity": "linear",
+            "description": "Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time scales.",
+            "function": "tsfel.mse",
+            "parameters": {
+              "m": 3,
+              "maxscale": null,
+              "tolerance": null
+            },
+            "n_features": 1,
             "use": "yes"
         },
         "Negative turning points": {
@@ -633,6 +655,48 @@
                 "audio",
                 "emg"
             ],
+            "use": "yes"
+        }
+    },
+    "fractal": {
+        "Detrended fluctuation analysis": {
+            "complexity": "nlog",
+            "description": "Computes the Detrended Fluctuation Analysis (DFA) of the signal.",
+            "function": "tsfel.dfa",
+            "parameters": "",
+            "n_features": 1,
+            "use": "yes"
+        },
+        "Higuchi fractal dimension": {
+            "complexity": "squared",
+            "description": "Computes the fractal dimension of a signal using Higuchi's method (HFD).",
+            "function": "tsfel.higuchi_fractal_dimension",
+            "parameters": "",
+            "n_features": 1,
+            "use": "yes"
+        },
+        "Hurst exponent": {
+            "complexity": "squared",
+            "description": "Computes the Hurst exponent of the signal through the Rescaled range (R/S) analysis.",
+            "function": "tsfel.hurst_exponent",
+            "parameters": "",
+            "n_features": 1,
+            "use": "yes"
+        },
+        "Maximum fractal length": {
+            "complexity": "squared",
+            "description": "Computes the Maximum Fractal Length (MFL) of the signal, which is the average length at the smallest scale, measured from the logarithmic plot determining FD. The Higuchi's method is used.",
+            "function": "tsfel.maximum_fractal_length",
+            "parameters": "",
+            "n_features": 1,
+            "use": "yes"
+        },
+        "Petrosian fractal dimension": {
+            "complexity": "log",
+            "description": "Computes the Petrosian Fractal Dimension of a signal.",
+            "function": "tsfel.petrosian_fractal_dimension",
+            "parameters": "",
+            "n_features": 1,
             "use": "yes"
         }
     }

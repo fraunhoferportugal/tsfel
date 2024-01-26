@@ -23,3 +23,6 @@ scipy >= 1.7.3
 # tsfel/__init__.py: 2
 # tsfel/setup.py: 1
 setuptools >= 47.1.1
+
+# tsfel/feature_extraction/features_utils.py: 1
+scikit-learn >= 0.21.3

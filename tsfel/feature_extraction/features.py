@@ -1890,7 +1890,7 @@ def hurst_exponent(signal):
     n_values = np.array(list(lags))[np.isfinite(rs)]
     rs = np.array(rs)[np.isfinite(rs)]
    
-    coeffs = np.polyfit(np.log(n_values), np.log(rs), 1)
+    coeffs = np.polyfit(np.log10(n_values), np.log10(rs), 1)
     h_exp = coeffs[0]
  
     return h_exp
@@ -1955,6 +1955,7 @@ def maximum_fractal_length(signal):
     return mfl_value
 
 
+@set_domain("domain", "fractal")
 def petrosian_fractal_dimension(signal):
     """Computes the Petrosian Fractal Dimension of a signal.
     

@@ -499,7 +499,7 @@ def compute_rs(signal, lag):
     r = np.max(accumulated_windowed_signal, axis=1) - np.min(accumulated_windowed_signal, axis=1)
     s = np.std(windowed_signal, axis=1)
 
-    rs = r / s
+    rs = np.divide(r,s)
 
     return np.mean(rs)
 
