@@ -1,6 +1,7 @@
 import scipy.signal
+import warnings
 from tsfel.feature_extraction.features_utils import *
-from tsfel.constants import FRACTAL_FEATURES_MIN_SIZE
+from tsfel.constants import FEATURES_MIN_SIZE
 
 
 # ############################################# TEMPORAL DOMAIN ##################################################### #
@@ -332,7 +333,7 @@ def neighbourhood_peaks(signal, n=10):
     subsequence = signal[n:-n]
     # initial iteration
     peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
-    for i in range(2, n + 1):
+    for i in np.arange(2, n + 1):
         peaks &= (subsequence > np.roll(signal, i)[n:-n])
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
@@ -390,22 +391,19 @@ def mse(signal, m=3, maxscale=None, tolerance=None):
 
     n = len(signal)
 
-    if n < FRACTAL_FEATURES_MIN_SIZE:
-        raise ValueError("Input signal must have at least %s data points." % FRACTAL_FEATURES_MIN_SIZE)
+    if n < FEATURES_MIN_SIZE:
+        warnings.warn("Multiscale entropy was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        return np.nan
 
     if tolerance is None:
         tolerance = 0.2 * np.std(signal)
 
     if maxscale is None:
         maxscale = n // (10 + 3)
-        
-    mse = np.zeros(maxscale)
-    for i in range(maxscale):
-        coarsegrained_signal = coarse_graining(signal, i + 1)
-        mse[i] = sample_entropy(coarsegrained_signal, m, tolerance)
-    
-    mse_values = mse[np.isfinite(mse)]
-    mse_area = np.trapz(mse_values) / len(mse_values)
+
+    mse_values = np.array([sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)])
+    mse_values_finite = mse_values[np.isfinite(mse_values)]
+    mse_area = np.trapz(mse_values_finite) / len(mse_values_finite)
 
     return mse_area
 
@@ -1841,8 +1839,9 @@ def dfa(signal):
 
     n = len(signal)
 
-    if n < FRACTAL_FEATURES_MIN_SIZE:
-        raise ValueError("Input signal must have at least %s data points." % FRACTAL_FEATURES_MIN_SIZE)
+    if n < FEATURES_MIN_SIZE:
+        warnings.warn("Detrended fluctuation analysis was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        return np.nan
 
     accumulated_signal = np.cumsum(signal - np.mean(signal))
     windows = set(np.linspace(4, n//10, n//2, dtype=int))
@@ -1880,9 +1879,10 @@ def hurst_exponent(signal):
         return np.nan
     
     n = len(signal)
-
-    if n < FRACTAL_FEATURES_MIN_SIZE:
-        raise ValueError("Input signal must have at least %s data points." % FRACTAL_FEATURES_MIN_SIZE)
+    
+    if n < FEATURES_MIN_SIZE:
+        warnings.warn("Hurst exponent was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        return np.nan
 
     lags = set(np.linspace(4, n//10, n//2, dtype=int))
     rs = [compute_rs(signal, lag) for lag in lags]
@@ -1913,8 +1913,9 @@ def higuchi_fractal_dimension(signal):
 
     n = len(signal)
 
-    if n < FRACTAL_FEATURES_MIN_SIZE:
-        raise ValueError("Input signal must have at least %s data points." % FRACTAL_FEATURES_MIN_SIZE)
+    if n < FEATURES_MIN_SIZE:
+        warnings.warn("Higuchi's fractal dimension was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        return np.nan
 
     k_values, lk = calc_lengths_higuchi(signal)
    
@@ -1943,9 +1944,10 @@ def maximum_fractal_length(signal):
 
     n = len(signal)
 
-    if n < FRACTAL_FEATURES_MIN_SIZE:
-        raise ValueError("Input signal must have at least %s data points." % FRACTAL_FEATURES_MIN_SIZE)
-
+    if n < FEATURES_MIN_SIZE:
+        warnings.warn("Maximum fractal dimension was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        return np.nan
+    
     k_values, lk = calc_lengths_higuchi(signal)
 
     coeffs = np.polyfit(np.log10(1/k_values), np.log10(lk), 1)

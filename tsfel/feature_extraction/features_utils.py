@@ -106,15 +106,15 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
-    for m in range(1, nfilt + 1):
+    for m in np.arange(1, nfilt + 1):
 
         f_m_minus = int(filter_bin[m - 1])  # left
         f_m = int(filter_bin[m])  # center
         f_m_plus = int(filter_bin[m + 1])  # right
 
-        for k in range(f_m_minus, f_m):
+        for k in np.arange(f_m_minus, f_m):
             fbank[m - 1, k] = (k - filter_bin[m - 1]) / (filter_bin[m] - filter_bin[m - 1])
-        for k in range(f_m, f_m_plus):
+        for k in np.arange(f_m, f_m_plus):
             fbank[m - 1, k] = (filter_bin[m + 1] - k) / (filter_bin[m + 1] - filter_bin[m])
 
     # Area Normalization
@@ -409,7 +409,7 @@ def get_templates(signal, m=3):
     np.ndarray    
         Array of template vectors.
     """
-    return np.array([signal[i:i+m] for i in range(len(signal) - m + 1)])
+    return np.array([signal[i:i+m] for i in np.arange(len(signal) - m + 1)])
 
 
 def sample_entropy(signal, m, tolerance):
@@ -463,7 +463,7 @@ def calc_rms(signal, window):
     num_windows = len(signal) // window
     rms = np.zeros(num_windows)
  
-    for idx in range(num_windows):
+    for idx in np.arange(num_windows):
         start_idx = idx * window
         end_idx = start_idx + window
         windowed_signal = signal[start_idx:end_idx]
@@ -523,9 +523,9 @@ def calc_lengths_higuchi(signal):
  
     for k in k_values:
         lmk = 0
-        for m in range(1, k + 1):
+        for m in np.arange(1, k + 1):
             sum_length = 0
-            for i in range(1, (n - m) // k + 1):
+            for i in np.arange(1, (n - m) // k + 1):
                 sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
             lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
         lk.append(lmk / k)
@@ -601,7 +601,7 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
 
     dy = np.diff(y)
 
-    for i in range(len(dy) - consecutive_points + 1):
+    for i in np.arange(len(dy) - consecutive_points + 1):
         if np.all(np.abs(dy[i:i+consecutive_points]) < threshold):
             plateau_value = np.mean(y[i:i+consecutive_points])
             if plateau_value > np.mean(y):
