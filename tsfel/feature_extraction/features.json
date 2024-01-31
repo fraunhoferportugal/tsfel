@@ -544,18 +544,6 @@
       "n_features": 1,
       "use": "yes"
     },
-    "Multiscale entropy": {
-      "complexity": "linear",
-      "description": "Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time scales.",
-      "function": "tsfel.mse",
-      "parameters": {
-        "m": 3,
-        "maxscale": null,
-        "tolerance": null
-      },
-      "n_features": 1,
-      "use": "yes"
-    },
     "Negative turning points": {
       "complexity": "constant",
       "description": "Computes number of negative turning points of the signal.",
@@ -628,7 +616,7 @@
       "function": "tsfel.dfa",
       "parameters": "",
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
     },
     "Higuchi fractal dimension": {
       "complexity": "squared",
@@ -636,7 +624,7 @@
       "function": "tsfel.higuchi_fractal_dimension",
       "parameters": "",
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
     },
     "Hurst exponent": {
       "complexity": "squared",
@@ -644,7 +632,7 @@
       "function": "tsfel.hurst_exponent",
       "parameters": "",
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
     },
     "Maximum fractal length": {
       "complexity": "squared",
@@ -652,7 +640,7 @@
       "function": "tsfel.maximum_fractal_length",
       "parameters": "",
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
     },
     "Petrosian fractal dimension": {
       "complexity": "log",
@@ -660,7 +648,19 @@
       "function": "tsfel.petrosian_fractal_dimension",
       "parameters": "",
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
+    },
+        "Multiscale entropy": {
+      "complexity": "linear",
+      "description": "Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time scales.",
+      "function": "tsfel.mse",
+      "parameters": {
+        "m": 3,
+        "maxscale": null,
+        "tolerance": null
+      },
+      "n_features": 1,
+      "use": "no"
     }
   }
 }

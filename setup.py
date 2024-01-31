@@ -21,7 +21,7 @@ docs_require = find_requirements("requirements-docs.txt")
 
 setuptools.setup(
     name="tsfel",
-    version="0.1.6",
+    version="0.1.7",
     author="Fraunhofer Portugal",
     description="Library for time series feature extraction",
     long_description=long_description,

@@ -50,6 +50,8 @@ def get_features_by_domain(domain=None, json_path=None):
     if domain is None:
         return dict_features
     else:
+        for k in dict_features[domain]:
+            dict_features[domain][k]["use"] = "yes"
         return {domain: dict_features[domain]}
 
 

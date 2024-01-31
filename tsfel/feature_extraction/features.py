@@ -4,6 +4,8 @@ from tsfel.feature_extraction.features_utils import *
 from tsfel.constants import FEATURES_MIN_SIZE
 
 
+warning_flag = False
+warning_msg = "The fractal features will not be calculated and will be replaced with 'nan' because the length of the input signal is smaller than the required minimum of " + str(FEATURES_MIN_SIZE) + " data points."
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -364,7 +366,7 @@ def lempel_ziv(signal, threshold=None):
     return lz_index
 
 
-@set_domain("domain", "temporal")
+@set_domain("domain", "fractal")
 def mse(signal, m=3, maxscale=None, tolerance=None):
     """Computes the Multiscale entropy (MSE) of the signal, that performs the entropy
     analysis over multiple time scales.
@@ -385,6 +387,7 @@ def mse(signal, m=3, maxscale=None, tolerance=None):
     mse_area : np.ndarray
         Normalized area under the MSE curve.
     """
+    global warning_flag
 
     if np.var(signal) == 0 and np.all(signal == signal[0]):
         return np.nan
@@ -392,7 +395,9 @@ def mse(signal, m=3, maxscale=None, tolerance=None):
     n = len(signal)
 
     if n < FEATURES_MIN_SIZE:
-        warnings.warn("Multiscale entropy was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
         return np.nan
 
     if tolerance is None:
@@ -1833,6 +1838,7 @@ def dfa(signal):
     alpha_dfa : float
         Scaling exponent in DFA.
     """
+    global warning_flag
 
     if np.var(signal) == 0 and np.all(signal == signal[0]):
         return np.nan
@@ -1840,7 +1846,9 @@ def dfa(signal):
     n = len(signal)
 
     if n < FEATURES_MIN_SIZE:
-        warnings.warn("Detrended fluctuation analysis was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
         return np.nan
 
     accumulated_signal = np.cumsum(signal - np.mean(signal))
@@ -1874,14 +1882,17 @@ def hurst_exponent(signal):
     h_exp : float
         Hurst exponent.
     """
-    
+    global warning_flag
+
     if np.var(signal) == 0 and np.all(signal == signal[0]):
         return np.nan
     
     n = len(signal)
     
     if n < FEATURES_MIN_SIZE:
-        warnings.warn("Hurst exponent was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
         return np.nan
 
     lags = set(np.linspace(4, n//10, n//2, dtype=int))
@@ -1910,11 +1921,14 @@ def higuchi_fractal_dimension(signal):
     hfd : float
        Fractal dimension.
     """
+    global warning_flag
 
     n = len(signal)
 
     if n < FEATURES_MIN_SIZE:
-        warnings.warn("Higuchi's fractal dimension was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
         return np.nan
 
     k_values, lk = calc_lengths_higuchi(signal)
@@ -1941,11 +1955,14 @@ def maximum_fractal_length(signal):
     mfl : float
        Maximum Fractal Length.
     """
+    global warning_flag
 
     n = len(signal)
 
     if n < FEATURES_MIN_SIZE:
-        warnings.warn("Maximum fractal dimension was not computed because the input signal must have at least %s data points. Returning nan." % FEATURES_MIN_SIZE, UserWarning)
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
         return np.nan
     
     k_values, lk = calc_lengths_higuchi(signal)

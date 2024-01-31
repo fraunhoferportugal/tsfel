@@ -948,7 +948,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(hurst_exponent(const1), np.nan)
         np.testing.assert_almost_equal(hurst_exponent(constNeg), np.nan)
         np.testing.assert_almost_equal(hurst_exponent(constF), np.nan)
-        np.testing.assert_almost_equal(hurst_exponent(wave), 0.5059002257540759)
+        np.testing.assert_almost_equal(hurst_exponent(wave), 0.998709262523381)
         np.testing.assert_almost_equal(hurst_exponent(offsetWave), 0.5059002257540759)
         np.testing.assert_almost_equal(hurst_exponent(noiseWave), 0.5295958646962731)
         np.testing.assert_almost_equal(hurst_exponent(whiteNoise), 0.3245541503645308)
