@@ -2,6 +2,13 @@
 Changelog
 =========
 
+
+Version 0.1.7
+=============
+- Changes
+    - Changed the ``autocorrelation`` logic. It now measures the first lag below (1/e) from the ACF (`#142 <https://github.com/fraunhoferportugal/tsfel/issues/142>`_).
+
+
 Version 0.1.6
 =============
 - Changes

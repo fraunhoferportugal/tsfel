@@ -484,8 +484,8 @@
       "use": "yes"
     },
     "Autocorrelation": {
-      "complexity": "constant",
-      "description": "Computes autocorrelation of the signal.",
+      "complexity": "linear",
+      "description": "Calculates the first lag after the (1/e) crossing of the autocorrelation function (ACF).",
       "function": "tsfel.autocorr",
       "parameters": "",
       "n_features": 1,
