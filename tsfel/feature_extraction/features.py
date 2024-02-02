@@ -1529,8 +1529,8 @@ def power_bandwidth(signal, fs):
 
 @set_domain("domain", "spectral")
 def spectrogram_mean_coeff(signal, fs, bins=32):
-    """Calculates the average power spectral density (PSD) for each frequency throughout the entire signal duration
-    provided by the spectrogram.
+    """Calculates the average power spectral density (PSD) for each frequency
+    throughout the entire signal duration provided by the spectrogram.
 
     The values represent the average power spectral density computed on frequency bins. The feature name refers to the
     frequency bin where the PSD was taken. Each bin is ``fs`` / (``bins`` * 2 - 2) Hz wide. The method relies on the
@@ -1541,16 +1541,16 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
     Parameters
     ----------
     signal : array_like
-        Input from which the spectrogram mean coefficients are computed.
+        Input from which the spectrogram average power spectral density coefficients are computed.
     fs : float
-        Sampling frequency of the `signal`.
+        Sampling frequency of the ``signal``.
     bins : int, optional
         The number of frequency bins.
 
     Returns
     -------
     nd-array
-        The power spectral density for each frequency bin average along the entire signal duration.
+        The power spectral density for each frequency bin averaged along the entire signal duration.
 
     Notes
     -----
@@ -1562,28 +1562,16 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
     in the feature configuration file.
 
     .. versionadded:: 0.1.7
-
     """
 
     if bins > len(signal) // 2 + 1:
         bins = len(signal) // 2 + 1
 
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
-    Sxx_mean_f = Sxx.mean(1)
+    Sxx_mean = Sxx.mean(1)
     f_keys = np.round(frequencies, 1).astype(str)
 
-    """
-    # Find the index of the frequency bin corresponding to 10 Hz
-    frequency_resolution = fs / 64 * 2 - 2
-    for f in frequencies:
-        k = int(f / frequency_resolution)
-        # Calculate the lower and upper bounds
-        lower_bound = k * frequency_resolution
-        upper_bound = (k + 1) * frequency_resolution
-        print(lower_bound, upper_bound, f)
-    """
-
-    return {"names": f_keys, "values": Sxx_mean_f}
+    return {"names": f_keys, "values": Sxx_mean}
 
 
 @set_domain("domain", "spectral")

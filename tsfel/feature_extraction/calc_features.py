@@ -519,7 +519,9 @@ def calc_window_features(
 
                     # Function returns more than one element
                     if isinstance(eval_result_ax, tuple):
-                        eval_result_ax = np.zeros(len(eval_result_ax)) if np.isnan(eval_result_ax[0]) else eval_result_ax
+                        eval_result_ax = (
+                            np.zeros(len(eval_result_ax)) if np.isnan(eval_result_ax[0]) else eval_result_ax
+                        )
                         for rr, value in enumerate(eval_result_ax):
                             feature_results.append(value)
                             feature_names.append(f"{header_names[ax]}_{feat}_{rr}")
@@ -528,13 +530,9 @@ def calc_window_features(
                         names = eval_result_ax["names"]
                         values = eval_result_ax["values"]
                         eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
-                        for current_name, next_name, value in zip(names[:-1], names[1:], values):
+                        for name, value in zip(names, values):
                             feature_results.append(value)
-                            feature_names.append(f"{header_names[ax]}_{feat}_{current_name}-{next_name}Hz")
-
-                        # Adding the last element
-                        feature_results.append(values[-1])
-                        feature_names.append(f"{header_names[ax]}_{feat}_{names[-1]}Hz")
+                            feature_names.append(f"{header_names[ax]}_{feat}_{name}Hz")
 
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)),
