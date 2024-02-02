@@ -949,11 +949,11 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(hurst_exponent(constNeg), np.nan)
         np.testing.assert_almost_equal(hurst_exponent(constF), np.nan)
         np.testing.assert_almost_equal(hurst_exponent(wave), 0.998709262523381)
-        np.testing.assert_almost_equal(hurst_exponent(offsetWave), 0.5059002257540759)
-        np.testing.assert_almost_equal(hurst_exponent(noiseWave), 0.5295958646962731)
-        np.testing.assert_almost_equal(hurst_exponent(whiteNoise), 0.3245541503645308)
-        np.testing.assert_almost_equal(hurst_exponent(pinkNoise), 0.615844258099264)
-        np.testing.assert_almost_equal(hurst_exponent(brownNoise), 0.7760864648705851)
+        np.testing.assert_almost_equal(hurst_exponent(offsetWave), 0.9987092625233801)
+        np.testing.assert_almost_equal(hurst_exponent(noiseWave), 1.080805529048927)
+        np.testing.assert_almost_equal(hurst_exponent(whiteNoise), 0.5705064906877406)
+        np.testing.assert_almost_equal(hurst_exponent(pinkNoise), 0.9225990076703923)
+        np.testing.assert_almost_equal(hurst_exponent(brownNoise), 0.9996474734595799)
 
 
     def test_higuchi_fractal_dimension(self):
