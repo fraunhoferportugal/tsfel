@@ -1,51 +1,56 @@
-"""
-This module offers helper functions designed to facilitate testing and enhance understanding of features that
-quantify repetitiveness in dynamic systems.
+"""This module offers helper functions designed to facilitate testing and
+enhance understanding of features that quantify repetitiveness in dynamic
+systems."""
 
-"""
-from tests.tests_tools.test_data.complexity_datasets import load_complexities_datasets
-
-import numpy as np
-import neurokit2 as nk
 import matplotlib.pyplot as plt
-
-from statsmodels.tsa.stattools import acf
+import neurokit2 as nk
+import numpy as np
 from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.tsa.stattools import acf
+
+from tests.tests_tools.test_data.complexity_datasets import load_complexities_datasets
 
 
 def plot_dfa(info, scale, fluctuations, ax):
-    """
-    Plot log-log visualization of the detrended fluctuation analysis (DFA).
-    """
+    """Plot log-log visualization of the detrended fluctuation analysis
+    (DFA)."""
 
     polyfit = np.polyfit(np.log2(scale), np.log2(fluctuations), 1)
     fluctfit = 2 ** np.polyval(polyfit, np.log2(scale))
     ax.loglog(scale, fluctuations, "o", c="#90A4AE")
-    ax.loglog(scale, fluctfit, c="#E91E63", label=r"$\alpha$ = {:.3f}".format(info["Alpha"]))
+    ax.loglog(
+        scale,
+        fluctfit,
+        c="#E91E63",
+        label=r"$\alpha$ = {:.3f}".format(info["Alpha"]),
+    )
 
     return ax
 
 
 def plot_multiscale_entropy(info, ax):
-    """
-    Plots the entropy values for each scale factor.
-    """
+    """Plots the entropy values for each scale factor."""
 
-    ax.plot(info["Scale"][np.isfinite(info["Value"])], info["Value"][np.isfinite(info["Value"])], color="#FF9800")
+    ax.plot(
+        info["Scale"][np.isfinite(info["Value"])],
+        info["Value"][np.isfinite(info["Value"])],
+        color="#FF9800",
+    )
 
     return ax
 
 
 def get_first_acf_time_constant(signal):
-    """
-    Captures the approximate scale of the autocorrelation function by measuring the first time lag
-    at which the autocorrelation function (acf) drops below 1/e = 0.3679.
-    """
+    """Captures the approximate scale of the autocorrelation function by
+    measuring the first time lag at which the autocorrelation function (acf)
+    drops below 1/e = 0.3679."""
     n = signal.size
     maxlag = int(n / 4)
     threshold = 0.36787944117144233  # 1 / np.exp(1)
 
-    acf_vec = acf(signal, adjusted=True, fft=n > 400, nlags=maxlag)[1:]  # n > 400 empirically selected based on performance tests
+    acf_vec = acf(signal, adjusted=True, fft=n > 400, nlags=maxlag)[
+        1:
+    ]  # n > 400 empirically selected based on performance tests
     idxs = np.where(acf_vec < threshold)[0]
     first_lag = idxs[0] + 1 if idxs.size > 0 else maxlag
 
@@ -55,7 +60,7 @@ def get_first_acf_time_constant(signal):
 dataset = load_complexities_datasets()
 
 f, ax = plt.subplots(4, len(dataset), figsize=(15, 5))
-for i, (k, v) in enumerate(dataset.items()):
+for i, (k, _v) in enumerate(dataset.items()):
     signal = dataset[k]
 
     # First row (raw data)

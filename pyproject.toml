@@ -1,0 +1,130 @@
+[tool.black]
+line-length = 120
+color = true
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+(
+      \.egg
+    | \.eggs
+    | \.git
+    | \.hg
+    | \.dvc
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.nox
+    | \.tox
+    | \.venv
+    | \.venv-docs
+    | \.venv-dev
+    | \.venv-note
+    | \.venv-dempy
+    | _build
+    | build
+    | dist
+    | setup.py
+)
+'''
+
+[tool.isort]
+# https://github.com/timothycrosley/isort
+py_version = 38
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 120
+skip_gitignore = true
+color_output = true
+#known_typing = ["typing", "types", "typing_extensions", "mypy", "mypy_extensions"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: nocover",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "raise AssertionError",
+]
+show_missing = true
+ignore_errors = true
+skip_covered = true
+#fail_under = 100
+#precision = 1
+omit = [
+  "test/*",
+  ".venv*",
+]
+
+# `pytest` configurations
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-vv", "--doctest-modules"]
+doctest_optionflags = "NORMALIZE_WHITESPACE"
+testpaths = ["test"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.mypy]
+# https://mypy.readthedocs.io/en/latest/config_file.html
+python_version = 3.8
+pretty = true
+show_traceback = true
+color_output = true
+warn_return_any = true
+warn_no_return = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+
+[tool.vulture]
+paths = ["src"]
+min_confidence = 65
+
+[tool.pydocstyle]
+convention = "google"
+#ignore = "D205,D415"
+
+[tool.interrogate]
+# https://github.com/econchick/interrogate#configuration
+ignore-init-method = true
+fail-under = 95
+color = true
+# possible values: 0 (minimal output), 1 (-v), 2 (-vv)
+verbose = 0
+quiet = false
+exclude = ["setup.py", "docs", "build"]
+
+[tool.nbqa.config]
+black = "pyproject.toml"
+isort = "pyproject.toml"
+
+[tool.nbqa.mutate]
+isort = 1
+black = 1
+pyupgrade = 1
+
+[tool.nbqa.addopts]
+pyupgrade = ["--py36-plus"]
+
+[tool.nbqa.files]
+isort = "^notebooks/"
+black = "^notebooks/"
+flake8 = "^notebooks/"
+mypy = "^notebooks/"
+pydocstyle = "^notebooks/"
+pyupgrade = "^notebooks/"
+
+[tool.bandit]
+targets = ["src"]
+# (optional) list included test IDs here, eg '[B101, B406]':
+tests = ["B201", "B301"]
+# (optional) list skipped test IDs here, eg '[B101, B406]':
+skips = ["B101", "B601"]
+
+[tool.bandit.assert_used]
+exclude = ["*_test.py", "test_*.py"]
+
+[tool.cruft]
+skip = [".git"]

@@ -1,17 +1,27 @@
-import scipy.signal
+import warnings
 
+import numpy as np
+import scipy.signal
 from statsmodels.tsa.stattools import acf
+
+from tsfel.constants import FEATURES_MIN_SIZE
 from tsfel.feature_extraction.features_utils import *
 
-
+warning_flag = False
+warning_msg = (
+    "The fractal features will not be calculated and will be replaced with 'nan' because the length of the input signal is smaller than the required minimum of "
+    + str(FEATURES_MIN_SIZE)
+    + " data points."
+)
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
 @set_domain("domain", "temporal")
 def autocorr(signal):
-    """ Calculates the first 1/e crossing of the autocorrelation function (ACF).
-    The adjusted ACF is calculated using the `statsmodels.tsa.stattools.acf`. Following the recommendations for long
-    time series (size > 450), we use the FFT convolution. This feature measures the first time lag at which the
+    """Calculates the first 1/e crossing of the autocorrelation function (ACF).
+    The adjusted ACF is calculated using the `statsmodels.tsa.stattools.acf`.
+    Following the recommendations for long time series (size > 450), we use the
+    FFT convolution. This feature measures the first time lag at which the
     autocorrelation function drops below 1/e (= 0.3679).
 
     Feature computational cost: 2
@@ -25,17 +35,16 @@ def autocorr(signal):
     -------
     int
         The first time lag at which the ACF drops below 1/e (= 0.3679).
-
     """
     n = len(signal)
-    threshold = 0.36787944117144233    # 1 / np.exp(1)
+    threshold = 0.36787944117144233  # 1 / np.exp(1)
 
     # For constant input signals, the ACF remains constant, and the expected values for all lags other than
     # lag 0 will be zero. We standardize that (1/e) occurs at lag 1.
     if np.all(signal == signal[0]):
         return 1
 
-    a = acf(signal, adjusted=True, fft=n > 450, nlags=(int(n/3)))[1:]
+    a = acf(signal, adjusted=True, fft=n > 450, nlags=(int(n / 3)))[1:]
     indices = np.where(a < threshold)[0]
     first1e_acf = indices[0] + 1 if indices.size > 0 else None
 
@@ -59,7 +68,6 @@ def calc_centroid(signal, fs):
     -------
     float
         Temporal centroid
-
     """
 
     time = compute_time(signal, fs)
@@ -92,11 +100,12 @@ def negative_turning(signal):
     -------
     float
         Number of negative turning points
-
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
+    negative_turning_pts = np.where(
+        (diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0),
+    )[0]
 
     return len(negative_turning_pts)
 
@@ -117,13 +126,14 @@ def positive_turning(signal):
     -------
     float
         Number of positive turning points
-
     """
     diff_sig = np.diff(signal)
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where(
+        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0),
+    )[0]
 
     return len(positive_turning_pts)
 
@@ -132,19 +142,18 @@ def positive_turning(signal):
 def mean_abs_diff(signal):
     """Computes mean absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which mean absolute deviation is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean absolute deviation is computed
 
-   Returns
-   -------
-   float
-       Mean absolute difference result
-
-   """
+    Returns
+    -------
+    float
+        Mean absolute difference result
+    """
     return np.mean(np.abs(np.diff(signal)))
 
 
@@ -152,19 +161,18 @@ def mean_abs_diff(signal):
 def mean_diff(signal):
     """Computes mean of differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which mean of differences is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which mean of differences is computed
 
-   Returns
-   -------
-   float
-       Mean difference result
-
-   """
+    Returns
+    -------
+    float
+        Mean difference result
+    """
     return np.mean(np.diff(signal))
 
 
@@ -172,19 +180,18 @@ def mean_diff(signal):
 def median_abs_diff(signal):
     """Computes median absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which median absolute difference is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median absolute difference is computed
 
-   Returns
-   -------
-   float
-       Median absolute difference result
-
-   """
+    Returns
+    -------
+    float
+        Median absolute difference result
+    """
     return np.median(np.abs(np.diff(signal)))
 
 
@@ -192,19 +199,18 @@ def median_abs_diff(signal):
 def median_diff(signal):
     """Computes median of differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which median of differences is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which median of differences is computed
 
-   Returns
-   -------
-   float
-       Median difference result
-
-   """
+    Returns
+    -------
+    float
+        Median difference result
+    """
     return np.median(np.diff(signal))
 
 
@@ -226,29 +232,27 @@ def distance(signal):
     -------
     float
         Signal distance
-
     """
     diff_sig = np.diff(signal).astype(float)
-    return np.sum([np.sqrt(1 + diff_sig ** 2)])
+    return np.sum([np.sqrt(1 + diff_sig**2)])
 
 
 @set_domain("domain", "temporal")
 def sum_abs_diff(signal):
     """Computes sum of absolute differences of the signal.
 
-   Feature computational cost: 1
+    Feature computational cost: 1
 
-   Parameters
-   ----------
-   signal : nd-array
-       Input from which sum absolute difference is computed
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which sum absolute difference is computed
 
-   Returns
-   -------
-   float
-       Sum absolute difference result
-
-   """
+    Returns
+    -------
+    float
+        Sum absolute difference result
+    """
     return np.sum(np.abs(np.diff(signal)))
 
 
@@ -271,7 +275,6 @@ def zero_cross(signal):
     -------
     int
         Number of times that signal value cross the zero axis
-
     """
     return len(np.where(np.diff(np.sign(signal)))[0])
 
@@ -293,7 +296,6 @@ def slope(signal):
     -------
     float
         Slope
-
     """
     t = np.linspace(0, len(signal) - 1, len(signal))
 
@@ -302,7 +304,8 @@ def slope(signal):
 
 @set_domain("domain", "temporal")
 def auc(signal, fs):
-    """Computes the area under the curve of the signal computed with trapezoid rule.
+    """Computes the area under the curve of the signal computed with trapezoid
+    rule.
 
     Feature computational cost: 1
 
@@ -316,11 +319,12 @@ def auc(signal, fs):
     -------
     float
         The area under the curve value
-
     """
     t = compute_time(signal, fs)
 
-    return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
+    return np.sum(
+        0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])),
+    )
 
 
 @set_domain("domain", "temporal")
@@ -345,11 +349,36 @@ def neighbourhood_peaks(signal, n=10):
     signal = np.array(signal)
     subsequence = signal[n:-n]
     # initial iteration
-    peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
-    for i in range(2, n + 1):
-        peaks &= (subsequence > np.roll(signal, i)[n:-n])
-        peaks &= (subsequence > np.roll(signal, -i)[n:-n])
+    peaks = (subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n])
+    for i in np.arange(2, n + 1):
+        peaks &= subsequence > np.roll(signal, i)[n:-n]
+        peaks &= subsequence > np.roll(signal, -i)[n:-n]
     return np.sum(peaks)
+
+
+@set_domain("domain", "temporal")
+def lempel_ziv(signal, threshold=None):
+    """Computes the Lempel-Ziv's (LZ) complexity index.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    amp_thres : float, optional
+        Amplitude Threshold for the binarisation. If None, the mean of the signal is used.
+
+    Returns
+    -------
+    lz_index : float
+        Lempel-Ziv complexity index
+    """
+    if threshold is None:
+        threshold = np.mean(signal)
+
+    binary_signal = (signal > threshold).astype(int)
+    lz_index = LZ76(binary_signal)
+
+    return lz_index
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -369,7 +398,6 @@ def abs_energy(signal):
     -------
     float
         Absolute energy
-
     """
     return np.sum(np.abs(signal) ** 2)
 
@@ -392,7 +420,6 @@ def average_power(signal, fs):
     -------
     float
         Average power
-
     """
     time = compute_time(signal, fs)
 
@@ -421,7 +448,6 @@ def entropy(signal, prob="standard"):
     -------
     float
         The normalized entropy value
-
     """
 
     if prob == "standard":
@@ -466,9 +492,12 @@ def hist(signal, nbins=10, r=1):
     -------
     nd-array
         The values of the histogram
-
     """
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(
+        signal,
+        bins=nbins,
+        range=[-r, r],
+    )  # TODO:subsampling parameter
 
     return tuple(histsig)
 
@@ -488,7 +517,6 @@ def interq_range(signal):
     -------
     float
         Interquartile range result
-
     """
     return np.percentile(signal, 75) - np.percentile(signal, 25)
 
@@ -508,7 +536,6 @@ def kurtosis(signal):
     -------
     float
         Kurtosis result
-
     """
     return scipy.stats.kurtosis(signal)
 
@@ -528,7 +555,6 @@ def skewness(signal):
     -------
     int
         Skewness result
-
     """
     return scipy.stats.skew(signal)
 
@@ -548,7 +574,6 @@ def calc_max(signal):
     -------
     float
         Maximum result
-
     """
     return np.max(signal)
 
@@ -568,7 +593,6 @@ def calc_min(signal):
     -------
     float
         Minimum result
-
     """
     return np.min(signal)
 
@@ -589,7 +613,6 @@ def calc_mean(signal):
     -------
     float
         Mean result
-
     """
     return np.mean(signal)
 
@@ -609,7 +632,6 @@ def calc_median(signal):
     -------
     float
         Median result
-
     """
     return np.median(signal)
 
@@ -629,7 +651,6 @@ def mean_abs_deviation(signal):
     -------
     float
         Mean absolute deviation result
-
     """
     return np.mean(np.abs(signal - np.mean(signal, axis=0)), axis=0)
 
@@ -649,7 +670,6 @@ def median_abs_deviation(signal):
     -------
     float
         Mean absolute deviation result
-
     """
     return scipy.stats.median_abs_deviation(signal, scale=1)
 
@@ -672,7 +692,6 @@ def rms(signal):
     -------
     float
         Root mean square
-
     """
     return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
 
@@ -692,7 +711,6 @@ def calc_std(signal):
     -------
     float
         Standard deviation result
-
     """
     return np.std(signal)
 
@@ -712,7 +730,6 @@ def calc_var(signal):
     -------
     float
         Variance result
-
     """
     return np.var(signal)
 
@@ -732,14 +749,14 @@ def pk_pk_distance(signal):
     -------
     float
         peak to peak distance
-
     """
     return np.abs(np.max(signal) - np.min(signal))
 
 
 @set_domain("domain", "statistical")
 def ecdf(signal, d=10):
-    """Computes the values of ECDF (empirical cumulative distribution function) along the time axis.
+    """Computes the values of ECDF (empirical cumulative distribution function)
+    along the time axis.
 
     Feature computational cost: 1
 
@@ -764,8 +781,8 @@ def ecdf(signal, d=10):
 
 @set_domain("domain", "statistical")
 def ecdf_slope(signal, p_init=0.5, p_end=0.75):
-    """Computes the slope of the ECDF between two percentiles.
-    Possibility to return infinity values.
+    """Computes the slope of the ECDF between two percentiles. Possibility to
+    return infinity values.
 
     Feature computational cost: 1
 
@@ -793,7 +810,7 @@ def ecdf_slope(signal, p_init=0.5, p_end=0.75):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile(signal, percentile=[0.2, 0.8]):
+def ecdf_percentile(signal, percentile=None):
     """Computes the percentile value of the ECDF.
 
     Feature computational cost: 1
@@ -810,6 +827,9 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
     float
         The input value(s) of the ECDF
     """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+
     signal = np.array(signal)
     if isinstance(percentile, str):
         percentile = eval(percentile)
@@ -834,8 +854,9 @@ def ecdf_percentile(signal, percentile=[0.2, 0.8]):
 
 
 @set_domain("domain", "statistical")
-def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
-    """Computes the cumulative sum of samples that are less than the percentile.
+def ecdf_percentile_count(signal, percentile=None):
+    """Computes the cumulative sum of samples that are less than the
+    percentile.
 
     Feature computational cost: 1
 
@@ -851,6 +872,9 @@ def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
     float
         The cumulative sum of samples
     """
+    if percentile is None:
+        percentile = [0.2, 0.8]
+
     signal = np.array(signal)
     if isinstance(percentile, str):
         percentile = eval(percentile)
@@ -876,6 +900,7 @@ def ecdf_percentile_count(signal, percentile=[0.2, 0.8]):
 
 # ############################################## SPECTRAL DOMAIN ##################################################### #
 
+
 @set_domain("domain", "spectral")
 def spectral_distance(signal, fs):
     """Computes the signal spectral distance.
@@ -896,7 +921,6 @@ def spectral_distance(signal, fs):
     -------
     float
         spectral distance
-
     """
     f, fmag = calc_fft(signal, fs)
 
@@ -928,7 +952,6 @@ def fundamental_frequency(signal, fs):
     -------
     f0: float
        Predominant frequency of the signal
-
     """
     signal = signal - np.mean(signal)
     f, fmag = calc_fft(signal, fs)
@@ -965,12 +988,15 @@ def max_power_spectrum(signal, fs):
     -------
     nd-array
         Max value of the power spectrum density
-
     """
     if np.std(signal) == 0:
         return float(max(scipy.signal.welch(signal, fs, nperseg=len(signal))[1]))
     else:
-        return float(max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1]))
+        return float(
+            max(
+                scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1],
+            ),
+        )
 
 
 @set_domain("domain", "spectral")
@@ -1053,7 +1079,6 @@ def spectral_centroid(signal, fs):
     -------
     float
         Centroid
-
     """
     f, fmag = calc_fft(signal, fs)
     if not np.sum(fmag):
@@ -1083,7 +1108,6 @@ def spectral_decrease(signal, fs):
     -------
     float
         Spectral decrease
-
     """
     f, fmag = calc_fft(signal, fs)
 
@@ -1124,7 +1148,6 @@ def spectral_kurtosis(signal, fs):
     -------
     float
         Spectral Kurtosis
-
     """
     f, fmag = calc_fft(signal, fs)
     if not spectral_spread(signal, fs):
@@ -1155,7 +1178,6 @@ def spectral_skewness(signal, fs):
     -------
     float
         Spectral Skewness
-
     """
     f, fmag = calc_fft(signal, fs)
     spect_centr = spectral_centroid(signal, fs)
@@ -1188,7 +1210,6 @@ def spectral_spread(signal, fs):
     -------
     float
         Spectral Spread
-
     """
     f, fmag = calc_fft(signal, fs)
     spect_centroid = spectral_centroid(signal, fs)
@@ -1223,7 +1244,6 @@ def spectral_slope(signal, fs):
     -------
     float
         Spectral Slope
-
     """
     f, fmag = calc_fft(signal, fs)
     sum_fmag = fmag.sum()
@@ -1234,11 +1254,11 @@ def spectral_slope(signal, fs):
     if not ([f]) or (sum_fmag == 0):
         return 0
     else:
-        if not (len_f * dot_ff - sum_f ** 2):
+        if not (len_f * dot_ff - sum_f**2):
             return 0
         else:
             num_ = (1 / sum_fmag) * (len_f * np.sum(f * fmag) - sum_f * sum_fmag)
-            denom_ = (len_f * dot_ff - sum_f ** 2)
+            denom_ = len_f * dot_ff - sum_f**2
             return num_ / denom_
 
 
@@ -1265,7 +1285,6 @@ def spectral_variation(signal, fs):
     -------
     float
         Spectral Variation
-
     """
     f, fmag = calc_fft(signal, fs)
 
@@ -1276,7 +1295,7 @@ def spectral_variation(signal, fs):
     if not sum2 or not sum3:
         variation = 1
     else:
-        variation = 1 - (sum1 / ((sum2 ** 0.5) * (sum3 ** 0.5)))
+        variation = 1 - (sum1 / ((sum2**0.5) * (sum3**0.5)))
 
     return variation
 
@@ -1298,14 +1317,15 @@ def spectral_positive_turning(signal, fs):
     -------
     float
         Number of positive turning points
-
     """
     f, fmag = calc_fft(signal, fs)
     diff_sig = np.diff(fmag)
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
+    positive_turning_pts = np.where(
+        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0),
+    )[0]
 
     return len(positive_turning_pts)
 
@@ -1331,7 +1351,6 @@ def spectral_roll_off(signal, fs):
     -------
     float
         Spectral roll-off
-
     """
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
@@ -1360,7 +1379,6 @@ def spectral_roll_on(signal, fs):
     -------
     float
         Spectral roll-on
-
     """
     f, fmag = calc_fft(signal, fs)
     cum_ff = np.cumsum(fmag)
@@ -1390,17 +1408,18 @@ def human_range_energy(signal, fs):
     -------
     float
         Human range energy ratio
-
     """
     f, fmag = calc_fft(signal, fs)
 
-    allenergy = np.sum(fmag ** 2)
+    allenergy = np.sum(fmag**2)
 
     if allenergy == 0:
         # For handling the occurrence of Nan values
         return 0.0
 
-    hr_energy = np.sum(fmag[np.argmin(np.abs(0.6 - f)):np.argmin(np.abs(2.5 - f))] ** 2)
+    hr_energy = np.sum(
+        fmag[np.argmin(np.abs(0.6 - f)) : np.argmin(np.abs(2.5 - f))] ** 2,
+    )
 
     ratio = hr_energy / allenergy
 
@@ -1441,7 +1460,6 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     -------
     nd-array
         MEL cepstral coefficients
-
     """
     filter_banks = filterbank(signal, fs, pre_emphasis, nfft, nfilt)
 
@@ -1452,7 +1470,9 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     # liftering
     ncoeff = len(mel_coeff)
     n = np.arange(ncoeff)
-    lift = 1 + (cep_lifter / 2) * np.sin(np.pi * n / cep_lifter)  # cep_lifter = 22 from python_speech_features library
+    lift = 1 + (cep_lifter / 2) * np.sin(
+        np.pi * n / cep_lifter,
+    )  # cep_lifter = 22 from python_speech_features library
 
     mel_coeff *= lift
 
@@ -1481,13 +1501,16 @@ def power_bandwidth(signal, fs):
     -------
     float
         Occupied power in bandwidth
-
     """
     # Computing the power spectrum density
     if np.std(signal) == 0:
         freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
     else:
-        freq, power = scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))
+        freq, power = scipy.signal.welch(
+            signal / np.std(signal),
+            fs,
+            nperseg=len(signal),
+        )
 
     if np.sum(power) == 0:
         return 0.0
@@ -1584,7 +1607,6 @@ def lpcc(signal, n_coeff=12):
     -------
     nd-array
         Linear prediction cepstral coefficients
-
     """
     # 12-20 cepstral coefficients are sufficient for speech recognition
     lpc_coeffs = lpc(signal, n_coeff)
@@ -1617,14 +1639,13 @@ def spectral_entropy(signal, fs):
     -------
     float
         The normalized spectral entropy value
-
     """
     # Removing DC component
     sig = signal - np.mean(signal)
 
     f, fmag = calc_fft(sig, fs)
 
-    power = fmag ** 2
+    power = fmag**2
 
     if power.sum() == 0:
         return 0.0
@@ -1665,7 +1686,6 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
     -------
     float
         wavelet entropy
-
     """
     if np.sum(signal) == 0:
         return 0.0
@@ -1700,7 +1720,6 @@ def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 1
     -------
     tuple
         CWT absolute mean value
-
     """
     return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
 
@@ -1726,9 +1745,8 @@ def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     -------
     tuple
         CWT std
-
     """
-    return tuple((np.std(wavelet(signal, function, widths), axis=1)))
+    return tuple(np.std(wavelet(signal, function, widths), axis=1))
 
 
 @set_domain("domain", "spectral")
@@ -1752,9 +1770,8 @@ def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     -------
     tuple
         CWT variance
-
     """
-    return tuple((np.var(wavelet(signal, function, widths), axis=1)))
+    return tuple(np.var(wavelet(signal, function, widths), axis=1))
 
 
 @set_domain("domain", "spectral")
@@ -1781,9 +1798,232 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
     -------
     tuple
         CWT energy
-
     """
     cwt = wavelet(signal, function, widths)
-    energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
+    energy = np.sqrt(np.sum(cwt**2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
+
+
+# ############################################## FRACTAL DOMAIN ##################################################### #
+@set_domain("domain", "fractal")
+def dfa(signal):
+    """Computes the Detrended Fluctuation Analysis (DFA) of the signal.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    alpha_dfa : float
+        Scaling exponent in DFA.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    accumulated_signal = np.cumsum(signal - np.mean(signal))
+    windows = set(np.linspace(4, n // 10, n // 2, dtype=int))
+    fluct = np.zeros(len(windows))
+
+    for idx, window in enumerate(windows):
+        fluct[idx] = np.sqrt(np.mean(calc_rms(accumulated_signal, window) ** 2))
+
+    i_plateau = find_plateau(np.log(fluct))
+    fluct = fluct[0:i_plateau]
+    windows = list(windows)[0:i_plateau]
+
+    coeffs = np.polyfit(np.log(windows), np.log(fluct), 1)
+    alpha_dfa = coeffs[0]
+
+    return alpha_dfa
+
+
+@set_domain("domain", "fractal")
+def hurst_exponent(signal):
+    """Computes the Hurst exponent of the signal through the Rescaled range
+    (R/S) analysis.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    h_exp : float
+        Hurst exponent.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    lags = set(np.linspace(4, n // 10, n // 2, dtype=int))
+    rs = [compute_rs(signal, lag) for lag in lags]
+
+    n_values = np.array(list(lags))[np.isfinite(rs)]
+    rs = np.array(rs)[np.isfinite(rs)]
+
+    coeffs = np.polyfit(np.log10(n_values), np.log10(rs), 1)
+    h_exp = coeffs[0]
+
+    return h_exp
+
+
+@set_domain("domain", "fractal")
+def higuchi_fractal_dimension(signal):
+    """Computes the fractal dimension of a signal using Higuchi's method (HFD).
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    hfd : float
+       Fractal dimension.
+    """
+    global warning_flag
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    k_values, lk = calc_lengths_higuchi(signal)
+
+    coeffs = np.polyfit(np.log(1 / k_values), np.log(lk), 1)
+    hfd = coeffs[0]
+
+    return hfd
+
+
+@set_domain("domain", "fractal")
+def maximum_fractal_length(signal):
+    """Computes the Maximum Fractal Length (MFL) of the signal, which is the
+    average length at the smallest scale, measured from the logarithmic plot
+    determining FD. The Higuchi's method is used.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    mfl : float
+       Maximum Fractal Length.
+    """
+    global warning_flag
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    k_values, lk = calc_lengths_higuchi(signal)
+
+    coeffs = np.polyfit(np.log10(1 / k_values), np.log10(lk), 1)
+    trendpoly = np.poly1d(coeffs)
+    mfl_value = trendpoly(0)
+
+    return mfl_value
+
+
+@set_domain("domain", "fractal")
+def petrosian_fractal_dimension(signal):
+    """Computes the Petrosian Fractal Dimension of a signal.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    pfd : float
+       Petrosian Fractal Dimension.
+    """
+    n = len(signal)
+    diff_signal = np.diff(np.sign(np.diff(signal)))
+    num_sign_changes = np.sum(diff_signal != 0)
+
+    pfd = np.log10(n) / (np.log10(n) + np.log10(n / (n + 0.4 * num_sign_changes)))
+
+    return pfd
+
+
+@set_domain("domain", "fractal")
+def mse(signal, m=3, maxscale=None, tolerance=None):
+    """Computes the Multiscale entropy (MSE) of the signal, that performs the
+    entropy analysis over multiple time scales.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension for the sample entropy, defaults to 3.
+    maxscale : int
+        Maximum scale factor, defaults to 1/13 of the length of the input signal.
+    tolerance : float
+        Tolerance value, defaults to 0.2 times the standard deviation of the input signal.
+
+    Returns
+    -------
+    mse_area : np.ndarray
+        Normalized area under the MSE curve.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    if tolerance is None:
+        tolerance = 0.2 * np.std(signal)
+
+    if maxscale is None:
+        maxscale = n // (10 + 3)
+
+    mse_values = np.array(
+        [sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)],
+    )
+    mse_values_finite = mse_values[np.isfinite(mse_values)]
+    mse_area = np.trapz(mse_values_finite) / len(mse_values_finite)
+
+    return mse_area

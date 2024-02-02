@@ -1,11 +1,16 @@
 import time
-import tsfel
-import pandas as pd
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import pandas as pd
 from datasets.empirical1000_dataset import Empirical1000Dataset
 
-DOMAINS = ["statistical", "temporal", "spectral"]  # It specifies the domains included in the analysis.
+import tsfel
+
+DOMAINS = [
+    "statistical",
+    "temporal",
+    "spectral",
+]  # It specifies the domains included in the analysis.
 
 emp_dataset = Empirical1000Dataset()
 
@@ -17,15 +22,20 @@ execution_times_global = pd.DataFrame(
         "Domain": pd.Series(dtype="str"),
         "Execution Time (s)": pd.Series(dtype="int"),
         "Normalized Execution Time (s/feature)": pd.Series(dtype="float32"),
-    }
+    },
 )
 
 for domain in DOMAINS:
     n_features_domain = len(tsfel.get_features_by_domain(domain)[domain])
 
     init_time = time.perf_counter()
-    for id, ts in emp_dataset.raw.items():
-        _ = tsfel.time_series_features_extractor(tsfel.get_features_by_domain(domain), ts.sig, fs=100, verbose=False)
+    for _id, ts in emp_dataset.raw.items():
+        _ = tsfel.time_series_features_extractor(
+            tsfel.get_features_by_domain(domain),
+            ts.sig,
+            fs=100,
+            verbose=False,
+        )
     end_time = time.perf_counter()
     total_time = end_time - init_time
 
@@ -36,8 +46,10 @@ for domain in DOMAINS:
                 {
                     "Domain": [domain],
                     "Execution Time (s)": [int(total_time)],
-                    "Normalized Execution Time (s/feature)": [total_time / n_features_domain],
-                }
+                    "Normalized Execution Time (s/feature)": [
+                        total_time / n_features_domain,
+                    ],
+                },
             ),
         ],
         ignore_index=True,
@@ -52,20 +64,32 @@ execution_times_individual = pd.DataFrame(
         "ID": pd.Series(dtype="int"),
         "Execution Time (s)": pd.Series(dtype="float32"),
         "Length": pd.Series(dtype="int"),
-    }
+    },
 )
 
 for domain in ["statistical", "temporal", "spectral"]:
     for id, ts in emp_dataset.raw.items():
         init_time = time.perf_counter()
-        _ = tsfel.time_series_features_extractor(tsfel.get_features_by_domain(domain), ts.sig, fs=100, verbose=False)
+        _ = tsfel.time_series_features_extractor(
+            tsfel.get_features_by_domain(domain),
+            ts.sig,
+            fs=100,
+            verbose=False,
+        )
         end_time = time.perf_counter()
         total_time = end_time - init_time
 
         execution_times_individual = pd.concat(
             [
                 execution_times_individual,
-                pd.DataFrame({"Domain": [domain], "ID": [id], "Execution Time (s)": [total_time], "Length": [ts.len]}),
+                pd.DataFrame(
+                    {
+                        "Domain": [domain],
+                        "ID": [id],
+                        "Execution Time (s)": [total_time],
+                        "Length": [ts.len],
+                    },
+                ),
             ],
             ignore_index=True,
         )
@@ -83,10 +107,20 @@ fig, (ax0, ax1) = plt.subplots(ncols=2)
 for domain, marker in zip(DOMAINS, ["o", "v", "^"]):
     _data_slice = grouped_stats[grouped_stats["Domain"] == domain]
     ax0.errorbar(
-        _data_slice["Length"], _data_slice["mean"], yerr=_data_slice["std"], label=domain, marker=marker, capsize=4
+        _data_slice["Length"],
+        _data_slice["mean"],
+        yerr=_data_slice["std"],
+        label=domain,
+        marker=marker,
+        capsize=4,
     )
     ax1.errorbar(
-        _data_slice["Length"], _data_slice["mean"], yerr=_data_slice["std"], label=domain, marker=marker, capsize=4
+        _data_slice["Length"],
+        _data_slice["mean"],
+        yerr=_data_slice["std"],
+        label=domain,
+        marker=marker,
+        capsize=4,
     )
 
 [ax.set(xlabel="Length (#)", ylabel="Execution Time (s)") for ax in [ax0, ax1]]

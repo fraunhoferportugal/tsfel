@@ -1,14 +1,14 @@
 import os
 import shutil
 import zipfile
-import requests
-import numpy as np
-import pandas as pd
-import scipy.io as sio
-
-from tqdm import tqdm
 from pathlib import Path
 from urllib.parse import urlparse
+
+import numpy as np
+import pandas as pd
+import requests
+import scipy.io as sio
+from tqdm import tqdm
 
 module_path = os.path.dirname(__file__)
 data_path = os.path.join(module_path, "cached_datasets")
@@ -50,26 +50,46 @@ class Empirical1000Dataset:
 
         self.__dataset_url = "https://figshare.com/ndownloader/articles/5436136/versions/10"
         self.cache_folder_path = data_path
-        self.__empirical1000_folder_path = os.path.join(self.cache_folder_path, "Empirical1000")
+        self.__empirical1000_folder_path = os.path.join(
+            self.cache_folder_path,
+            "Empirical1000",
+        )
 
         if not os.path.exists(self.cache_folder_path) or not os.listdir(self.cache_folder_path) or not use_cache:
             print("Cache folder is empty. Downloading the Empirical1000 dataset...")
-            Path(os.path.join(self.cache_folder_path, "Empirical1000")).mkdir(parents=True, exist_ok=True)
+            Path(os.path.join(self.cache_folder_path, "Empirical1000")).mkdir(
+                parents=True,
+                exist_ok=True,
+            )
             self.__download_dataset()
 
-        self.__data_files = sio.loadmat(os.path.join(self.__empirical1000_folder_path, "INP_1000ts.mat"))
-        self.metadata = pd.read_csv(os.path.join(self.__empirical1000_folder_path, "hctsa_timeseries-info.csv"))
+        self.__data_files = sio.loadmat(
+            os.path.join(self.__empirical1000_folder_path, "INP_1000ts.mat"),
+        )
+        self.metadata = pd.read_csv(
+            os.path.join(self.__empirical1000_folder_path, "hctsa_timeseries-info.csv"),
+        )
 
         for i, name in enumerate(self.metadata["Name"]):
-            self.raw[i] = EmpiricalTimeSeries(name, self.__data_files["timeSeriesData"][0][i].flatten())
+            self.raw[i] = EmpiricalTimeSeries(
+                name,
+                self.__data_files["timeSeriesData"][0][i].flatten(),
+            )
             if extract_features:
-                tqdm_iterator = tqdm(total=len(self.metadata["Name"]), desc="Extracting features.")
+                tqdm_iterator = tqdm(
+                    total=len(self.metadata["Name"]),
+                    desc="Extracting features.",
+                )
                 tqdm_iterator.update(1)
 
     def __download_dataset(self):
         try:
             # Send a request to the dataset URL with allow_redirects=False to handle redirection
-            response = requests.get(self.__dataset_url, stream=True, allow_redirects=False)
+            response = requests.get(
+                self.__dataset_url,
+                stream=True,
+                allow_redirects=False,
+            )
 
             # Check if the request was successful (status code 200)
             if response.status_code == 200:
@@ -80,10 +100,13 @@ class Empirical1000Dataset:
                     total=total_size,
                     unit="B",
                     unit_scale=True,
-                    desc=f"Downloading Empirical1000 dataset",
+                    desc="Downloading Empirical1000 dataset",
                     dynamic_ncols=True,
                 ) as pbar:
-                    with open(os.path.join(self.cache_folder_path, filename), "wb") as out_file:
+                    with open(
+                        os.path.join(self.cache_folder_path, filename),
+                        "wb",
+                    ) as out_file:
                         shutil.copyfileobj(response.raw, out_file)
                         pbar.update(os.path.getsize(out_file.name))
 
@@ -104,7 +127,9 @@ class Empirical1000Dataset:
 
                 print(f"Dataset downloaded and saved to: {self.cache_folder_path}")
             else:
-                print(f"Failed to download dataset. Status code: {response.status_code}")
+                print(
+                    f"Failed to download dataset. Status code: {response.status_code}",
+                )
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -139,7 +164,6 @@ class EmpiricalTimeSeries:
     Methods:
         __init__(self, name, sig):
             Initializes a new EmpiricalTimeSeries object.
-
     """
 
     def __init__(self, name, sig):
@@ -148,9 +172,6 @@ class EmpiricalTimeSeries:
         Parameters:
             name (str): The name or identifier of the time series.
             sig (list or array-like): The time series data.
-
-        Returns:
-            EmpiricalTimeSeries: A new instance of the EmpiricalTimeSeries class.
         """
         self.name = name
         self.sig = sig

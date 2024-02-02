@@ -1,34 +1,36 @@
-import time
 import json
+import time
+
 import numpy as np
 from scipy.optimize import curve_fit
-from tsfel.feature_extraction.features_settings import load_json
+
 from tsfel.feature_extraction.calc_features import calc_window_features
+from tsfel.feature_extraction.features_settings import load_json
 
 
 # curves
 def n_squared(x, no):
-    """The model function"""
-    return no * x ** 2
+    """The model function."""
+    return no * x**2
 
 
 def n_nlog(x, no):
-    """The model function"""
+    """The model function."""
     return no * x * np.log(x)
 
 
 def n_linear(x, no):
-    """The model function"""
+    """The model function."""
     return no * x
 
 
 def n_log(x, no):
-    """The model function"""
+    """The model function."""
     return no * np.log(x)
 
 
 def n_constant(x, no):
-    """The model function"""
+    """The model function."""
     return np.zeros(len(x)) + no
 
 
@@ -46,7 +48,6 @@ def find_best_curve(t, signal):
     -------
     str
         Best fit curve name
-
     """
 
     all_chisq = []
@@ -59,7 +60,14 @@ def find_best_curve(t, signal):
     # Fit the curve
     for curve in list_curves:
         start = 1
-        popt, pcov = curve_fit(curve, t, signal, sigma=sig, p0=start, absolute_sigma=True)
+        popt, pcov = curve_fit(
+            curve,
+            t,
+            signal,
+            sigma=sig,
+            p0=start,
+            absolute_sigma=True,
+        )
 
         # Compute chi square
         nexp = curve(t, *popt)
@@ -73,13 +81,13 @@ def find_best_curve(t, signal):
     curve_name = str(list_curves[idx_best])
     idx1 = curve_name.find("n_")
     idx2 = curve_name.find("at")
-    curve_name = curve_name[idx1 + 2:idx2 - 1]
+    curve_name = curve_name[idx1 + 2 : idx2 - 1]
 
     return curve_name
 
 
 def compute_complexity(feature, domain, json_path, **kwargs):
-    """Computes the feature complexity.
+    r"""Computes the feature complexity.
 
     Parameters
     ----------
@@ -100,12 +108,11 @@ def compute_complexity(feature, domain, json_path, **kwargs):
         Feature complexity
 
     Writes complexity in json file
-
     """
 
     dictionary = load_json(json_path)
 
-    features_path = kwargs.get('features_path', None)
+    features_path = kwargs.get("features_path", None)
 
     # The inputs from this function should be replaced by a dictionary
     one_feat_dict = {domain: {feature: dictionary[domain][feature]}}
@@ -121,7 +128,12 @@ def compute_complexity(feature, domain, json_path, **kwargs):
         for _ in range(20):
 
             start = time.time()
-            calc_window_features(one_feat_dict, wave[:int(ti)], fs, features_path=features_path)
+            calc_window_features(
+                one_feat_dict,
+                wave[: int(ti)],
+                fs,
+                features_path=features_path,
+            )
             end = time.time()
 
             s += [end - start]
@@ -129,16 +141,16 @@ def compute_complexity(feature, domain, json_path, **kwargs):
         signal += [np.mean(s)]
 
     curve_name = find_best_curve(t, signal)
-    dictionary[domain][feature]['complexity'] = curve_name
+    dictionary[domain][feature]["complexity"] = curve_name
 
     with open(json_path, "w") as write_file:
         json.dump(dictionary, write_file, indent=4, sort_keys=True)
 
-    if curve_name == 'constant' or curve_name == 'log':
+    if curve_name == "constant" or curve_name == "log":
         return 1
-    elif curve_name == 'linear':
+    elif curve_name == "linear":
         return 2
-    elif curve_name == 'nlog' or curve_name == 'squared':
+    elif curve_name == "nlog" or curve_name == "squared":
         return 3
     else:
         return 0

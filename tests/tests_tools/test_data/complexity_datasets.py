@@ -1,20 +1,20 @@
-"""
-This module provides functions for creating or downloading representative data from several dataset sources.
-These functions are designed to enhance the understanding of complexity measures related to dynamical systems.
+"""This module provides functions for creating or downloading representative
+data from several dataset sources. These functions are designed to enhance the
+understanding of complexity measures related to dynamical systems.
 
-The implementation for generating colored noise is sourced from the 'colorednoise' PyPI package, with credit to Felix Patzelt.
+The implementation for generating colored noise is sourced from the
+'colorednoise' PyPI package, with credit to Felix Patzelt.
 """
 
 import os
+from typing import Iterable, Optional, Union
 
 import numpy as np
 import pandas as pd
-
-from typing import Union, Iterable, Optional
-from numpy import sqrt, newaxis, integer
-from numpy.fft import irfft, rfftfreq
-from numpy.random import default_rng, Generator, RandomState
+from numpy import integer, newaxis, sqrt
 from numpy import sum as npsum
+from numpy.fft import irfft, rfftfreq
+from numpy.random import Generator, RandomState, default_rng
 
 
 def powerlaw_psd_gaussian(
@@ -148,7 +148,9 @@ def powerlaw_psd_gaussian(
     return y
 
 
-def _get_normal_distribution(random_state: Optional[Union[int, Generator, RandomState]]):
+def _get_normal_distribution(
+    random_state: Optional[Union[int, Generator, RandomState]],
+):
     normal_dist = None
     if isinstance(random_state, (integer, int)) or random_state is None:
         random_state = default_rng(random_state)
@@ -156,7 +158,9 @@ def _get_normal_distribution(random_state: Optional[Union[int, Generator, Random
     elif isinstance(random_state, (Generator, RandomState)):
         normal_dist = random_state.normal
     else:
-        raise ValueError("random_state must be one of integer, numpy.random.Generator, " "numpy.random.Randomstate")
+        raise ValueError(
+            "random_state must be one of integer, numpy.random.Generator, " "numpy.random.Randomstate",
+        )
     return normal_dist
 
 
@@ -199,9 +203,11 @@ def load_complexities_datasets():
     }
 
     dataset = {
-        key: powerlaw_psd_gaussian(metadata[key]["exponent"], COLORED_NOISE_SAMPLES)
-        if "exponent" in metadata[key]
-        else metadata[key]["func"](metadata[key]["url"])
+        key: (
+            powerlaw_psd_gaussian(metadata[key]["exponent"], COLORED_NOISE_SAMPLES)
+            if "exponent" in metadata[key]
+            else metadata[key]["func"](metadata[key]["url"])
+        )
         for key in metadata
     }
 
