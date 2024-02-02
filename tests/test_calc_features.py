@@ -43,7 +43,8 @@ sensor_data[key] = pd.read_csv(folders[-1] + key + ".txt", header=None)
 settings2 = get_features_by_domain("statistical")
 settings3 = get_features_by_domain("temporal")
 settings4 = get_features_by_domain("spectral")
-settings5 = get_features_by_domain()
+settings5 = get_features_by_domain("fractal")
+settings6 = get_features_by_domain()
 settings8 = get_features_by_tag("inertial")
 settings10 = get_features_by_tag()
 
@@ -57,17 +58,17 @@ n_jobs = 1
 
 # multi windows and multi axis
 # input: list
-features0 = time_series_features_extractor(settings5, windows, fs=resample_rate, n_jobs=n_jobs)
+features0 = time_series_features_extractor(settings6, windows, fs=resample_rate, n_jobs=n_jobs)
 
 # multiple windows and single axis
 # input: np.array
-features1 = time_series_features_extractor(settings5, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features1 = time_series_features_extractor(settings6, data_new.values[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
 # input: pd.series
-features2 = time_series_features_extractor(settings5, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
+features2 = time_series_features_extractor(settings6, data_new.iloc[:, 0], fs=resample_rate, n_jobs=n_jobs, window_size=window_size, overlap=overlap)
 
 # single window and multi axis
 # input: pd.DataFrame
-features3 = time_series_features_extractor(settings5, data_new, fs=resample_rate, n_jobs=n_jobs)
+features3 = time_series_features_extractor(settings6, data_new, fs=resample_rate, n_jobs=n_jobs)
 # input: np.array
 features4 = time_series_features_extractor(settings4, data_new.values, fs=resample_rate, n_jobs=n_jobs)
 

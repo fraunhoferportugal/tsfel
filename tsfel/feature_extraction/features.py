@@ -1,9 +1,13 @@
 import scipy.signal
+import warnings
 
 from statsmodels.tsa.stattools import acf
 from tsfel.feature_extraction.features_utils import *
+from tsfel.constants import FEATURES_MIN_SIZE
 
 
+warning_flag = False
+warning_msg = "The fractal features will not be calculated and will be replaced with 'nan' because the length of the input signal is smaller than the required minimum of " + str(FEATURES_MIN_SIZE) + " data points."
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -346,10 +350,82 @@ def neighbourhood_peaks(signal, n=10):
     subsequence = signal[n:-n]
     # initial iteration
     peaks = ((subsequence > np.roll(signal, 1)[n:-n]) & (subsequence > np.roll(signal, -1)[n:-n]))
-    for i in range(2, n + 1):
+    for i in np.arange(2, n + 1):
         peaks &= (subsequence > np.roll(signal, i)[n:-n])
         peaks &= (subsequence > np.roll(signal, -i)[n:-n])
     return np.sum(peaks)
+
+
+@set_domain("domain", "temporal")
+def lempel_ziv(signal, threshold=None):
+    """Computes the Lempel-Ziv's (LZ) complexity index.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    amp_thres : float, optional
+        Amplitude Threshold for the binarisation. If None, the mean of the signal is used.
+
+    Returns
+    -------
+    lz_index : float
+        Lempel-Ziv complexity index
+    """
+    if threshold is None:
+        threshold = np.mean(signal)
+    
+    binary_signal = (signal > threshold).astype(int)
+    lz_index = LZ76(binary_signal)
+
+    return lz_index
+
+
+@set_domain("domain", "fractal")
+def mse(signal, m=3, maxscale=None, tolerance=None):
+    """Computes the Multiscale entropy (MSE) of the signal, that performs the entropy
+    analysis over multiple time scales.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension for the sample entropy, defaults to 3.
+    maxscale : int
+        Maximum scale factor, defaults to 1/13 of the length of the input signal.
+    tolerance : float
+        Tolerance value, defaults to 0.2 times the standard deviation of the input signal.
+
+    Returns
+    -------
+    mse_area : np.ndarray
+        Normalized area under the MSE curve.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    if tolerance is None:
+        tolerance = 0.2 * np.std(signal)
+
+    if maxscale is None:
+        maxscale = n // (10 + 3)
+
+    mse_values = np.array([sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)])
+    mse_values_finite = mse_values[np.isfinite(mse_values)]
+    mse_area = np.trapz(mse_values_finite) / len(mse_values_finite)
+
+    return mse_area
 
 
 # ############################################ STATISTICAL DOMAIN #################################################### #
@@ -1760,3 +1836,177 @@ def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)
     energy = np.sqrt(np.sum(cwt ** 2, axis=1) / np.shape(cwt)[1])
 
     return tuple(energy)
+
+
+# ############################################## FRACTAL DOMAIN ##################################################### #
+@set_domain("domain", "fractal")
+def dfa(signal):
+    """Computes the Detrended Fluctuation Analysis (DFA) of the signal.
+   
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+   
+    Returns
+    -------
+    alpha_dfa : float
+        Scaling exponent in DFA.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    accumulated_signal = np.cumsum(signal - np.mean(signal))
+    windows = set(np.linspace(4, n//10, n//2, dtype=int))
+    fluct = np.zeros(len(windows))
+ 
+    for idx, window in enumerate(windows):
+        fluct[idx] = np.sqrt(np.mean(calc_rms(accumulated_signal, window) ** 2))
+   
+    i_plateau = find_plateau(np.log(fluct))
+    fluct = fluct[0:i_plateau]
+    windows = list(windows)[0:i_plateau]
+
+    coeffs = np.polyfit(np.log(windows), np.log(fluct), 1)
+    alpha_dfa = coeffs[0]
+ 
+    return alpha_dfa
+
+ 
+@set_domain("domain", "fractal")
+def hurst_exponent(signal):
+    """Computes the Hurst exponent of the signal through the Rescaled range (R/S) analysis.
+   
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+       
+    Returns
+    -------
+    h_exp : float
+        Hurst exponent.
+    """
+    global warning_flag
+
+    if np.var(signal) == 0 and np.all(signal == signal[0]):
+        return np.nan
+    
+    n = len(signal)
+    
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    lags = set(np.linspace(4, n//10, n//2, dtype=int))
+    rs = [compute_rs(signal, lag) for lag in lags]
+
+    n_values = np.array(list(lags))[np.isfinite(rs)]
+    rs = np.array(rs)[np.isfinite(rs)]
+   
+    coeffs = np.polyfit(np.log10(n_values), np.log10(rs), 1)
+    h_exp = coeffs[0]
+ 
+    return h_exp
+ 
+
+@set_domain("domain", "fractal")
+def higuchi_fractal_dimension(signal):
+    """Computes the fractal dimension of a signal using Higuchi's method (HFD).
+ 
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    hfd : float
+       Fractal dimension.
+    """
+    global warning_flag
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+
+    k_values, lk = calc_lengths_higuchi(signal)
+   
+    coeffs = np.polyfit(np.log(1/k_values), np.log(lk), 1)
+    hfd = coeffs[0]
+   
+    return hfd
+
+
+@set_domain("domain", "fractal")
+def maximum_fractal_length(signal):
+    """Computes the Maximum Fractal Length (MFL) of the signal, which is the average length
+    at the smallest scale, measured from the logarithmic plot determining FD. The Higuchi's
+    method is used.
+
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    mfl : float
+       Maximum Fractal Length.
+    """
+    global warning_flag
+
+    n = len(signal)
+
+    if n < FEATURES_MIN_SIZE:
+        if not warning_flag:
+            warnings.warn(warning_msg, UserWarning)
+            warning_flag = True
+        return np.nan
+    
+    k_values, lk = calc_lengths_higuchi(signal)
+
+    coeffs = np.polyfit(np.log10(1/k_values), np.log10(lk), 1)
+    trendpoly = np.poly1d(coeffs)
+    mfl_value = trendpoly(0)
+
+    return mfl_value
+
+
+@set_domain("domain", "fractal")
+def petrosian_fractal_dimension(signal):
+    """Computes the Petrosian Fractal Dimension of a signal.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    
+    Returns
+    -------
+    pfd : float
+       Petrosian Fractal Dimension.
+    """
+    n = len(signal)
+    diff_signal = np.diff(np.sign(np.diff(signal)))
+    num_sign_changes = np.sum(diff_signal != 0)
+
+    pfd = np.log10(n) / (np.log10(n) + np.log10(n / (n + 0.4 * num_sign_changes)))
+
+    return pfd

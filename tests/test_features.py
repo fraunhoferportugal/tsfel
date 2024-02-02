@@ -1,6 +1,7 @@
 import unittest
 
 import numpy as np
+import colorednoise as cn
 
 from tsfel.feature_extraction.features import *
 
@@ -22,6 +23,13 @@ wave = np.sin(2 * np.pi * f * x / Fs)
 np.random.seed(seed=10)
 noiseWave = wave + np.random.normal(0, 0.1, 1000)
 offsetWave = wave + 2
+
+duration = 5
+samples = duration * Fs
+whiteNoise = cn.powerlaw_psd_gaussian(0, samples, random_state=10)
+pinkNoise = cn.powerlaw_psd_gaussian(1, samples, random_state=10)
+brownNoise = cn.powerlaw_psd_gaussian(2, samples, random_state=10)
+
 
 class TestFeatures(unittest.TestCase):
     # ############################################### STATISTICAL FEATURES ############################################### #
@@ -414,6 +422,28 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(neighbourhood_peaks(wave), 5.0)
         np.testing.assert_almost_equal(neighbourhood_peaks(offsetWave), 5.0)
         np.testing.assert_almost_equal(neighbourhood_peaks(noiseWave), 14.0)
+
+
+    def test_lempel_ziv(self):
+        np.testing.assert_almost_equal(lempel_ziv(const0), 2.0)
+        np.testing.assert_almost_equal(lempel_ziv(const1), 2.0)
+        np.testing.assert_almost_equal(lempel_ziv(constNeg), 2.0)
+        np.testing.assert_almost_equal(lempel_ziv(constF), 2.0)
+        np.testing.assert_almost_equal(lempel_ziv(lin), 3.0)
+        np.testing.assert_almost_equal(lempel_ziv(lin0), 3.0)
+        np.testing.assert_almost_equal(lempel_ziv(wave), 4.0)
+        np.testing.assert_almost_equal(lempel_ziv(offsetWave), 4.0)
+        np.testing.assert_almost_equal(lempel_ziv(noiseWave), 16.0)
+
+
+    def test_mse(self):
+        np.testing.assert_almost_equal(mse(const0), np.nan)
+        np.testing.assert_almost_equal(mse(const1), np.nan)
+        np.testing.assert_almost_equal(mse(constNeg), np.nan)
+        np.testing.assert_almost_equal(mse(constF), np.nan)
+        np.testing.assert_almost_equal(mse(wave), 0.08721585110301311)
+        np.testing.assert_almost_equal(mse(offsetWave), 0.08721585110301311)
+        np.testing.assert_almost_equal(mse(noiseWave), 0.11937683012271358)
 
 
     # ################################################ SPECTRAL FEATURES ################################################# #
@@ -896,6 +926,67 @@ class TestFeatures(unittest.TestCase):
                                        (0.08974932264551803, 0.09625677262091348, 0.10445439794914707,
                                         0.11395898775133596, 0.13232987540429264, 0.16660216672432593,
                                         0.2187598255162308, 0.2877294431226156, 0.37226945502166053))
+
+
+    # ################################################ FRACTAL FEATURES ################################################# #
+
+    def test_dfa(self):
+        np.testing.assert_almost_equal(dfa(const0), np.nan)
+        np.testing.assert_almost_equal(dfa(const1), np.nan)
+        np.testing.assert_almost_equal(dfa(constNeg), np.nan)
+        np.testing.assert_almost_equal(dfa(constF), np.nan)
+        np.testing.assert_almost_equal(dfa(wave), 2.0354620960383225)
+        np.testing.assert_almost_equal(dfa(offsetWave), 2.0354620960383234)
+        np.testing.assert_almost_equal(dfa(noiseWave), 1.5878329458221712)
+        np.testing.assert_almost_equal(dfa(whiteNoise), 0.512887549688051)
+        np.testing.assert_almost_equal(dfa(pinkNoise), 1.0162533608512214)
+        np.testing.assert_almost_equal(dfa(brownNoise), 1.5183298484325374)
+
+
+    def test_hurst_exponent(self):
+        np.testing.assert_almost_equal(hurst_exponent(const0), np.nan)
+        np.testing.assert_almost_equal(hurst_exponent(const1), np.nan)
+        np.testing.assert_almost_equal(hurst_exponent(constNeg), np.nan)
+        np.testing.assert_almost_equal(hurst_exponent(constF), np.nan)
+        np.testing.assert_almost_equal(hurst_exponent(wave), 0.998709262523381)
+        np.testing.assert_almost_equal(hurst_exponent(offsetWave), 0.5059002257540759)
+        np.testing.assert_almost_equal(hurst_exponent(noiseWave), 0.5295958646962731)
+        np.testing.assert_almost_equal(hurst_exponent(whiteNoise), 0.3245541503645308)
+        np.testing.assert_almost_equal(hurst_exponent(pinkNoise), 0.615844258099264)
+        np.testing.assert_almost_equal(hurst_exponent(brownNoise), 0.7760864648705851)
+
+
+    def test_higuchi_fractal_dimension(self):
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(wave), 1.1116648974914232)
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(offsetWave), 1.1116648974914232)
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(noiseWave), 1.2787337809642858)
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(whiteNoise), 1.9999190166166754)
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(pinkNoise), 1.9303823647578682)
+        np.testing.assert_almost_equal(higuchi_fractal_dimension(brownNoise), 1.581020130301515)
+
+
+    def test_maximum_fractal_length(self):
+        np.testing.assert_almost_equal(maximum_fractal_length(wave), 1.4082260937055102)
+        np.testing.assert_almost_equal(maximum_fractal_length(offsetWave), 1.40822609370551)
+        np.testing.assert_almost_equal(maximum_fractal_length(noiseWave), 1.6957110038772847)
+        np.testing.assert_almost_equal(maximum_fractal_length(whiteNoise), 3.7493320152840734)
+        np.testing.assert_almost_equal(maximum_fractal_length(pinkNoise), 3.542078306170788)
+        np.testing.assert_almost_equal(maximum_fractal_length(brownNoise), 2.4274067988328794)
+
+
+    def test_petrosian_fractal_dimension(self):
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(const0), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(const1), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(constNeg), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(constF), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(lin), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(lin0), 1.0)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(wave), 1.000578238436128)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(offsetWave), 1.000578238436128)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(noiseWave), 1.0343688500384227)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(whiteNoise), 1.0285596700513615)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(pinkNoise), 1.0247825195115237)
+        np.testing.assert_almost_equal(petrosian_fractal_dimension(brownNoise), 1.0193455287912367)
 
 
 if __name__ == '__main__':

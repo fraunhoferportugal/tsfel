@@ -1,5 +1,6 @@
 import scipy
 import numpy as np
+from sklearn.neighbors import KDTree
 
 
 def set_domain(key, value):
@@ -105,15 +106,15 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
-    for m in range(1, nfilt + 1):
+    for m in np.arange(1, nfilt + 1):
 
         f_m_minus = int(filter_bin[m - 1])  # left
         f_m = int(filter_bin[m])  # center
         f_m_plus = int(filter_bin[m + 1])  # right
 
-        for k in range(f_m_minus, f_m):
+        for k in np.arange(f_m_minus, f_m):
             fbank[m - 1, k] = (k - filter_bin[m - 1]) / (filter_bin[m] - filter_bin[m - 1])
-        for k in range(f_m, f_m_plus):
+        for k in np.arange(f_m, f_m_plus):
             fbank[m - 1, k] = (filter_bin[m + 1] - k) / (filter_bin[m + 1] - filter_bin[m])
 
     # Area Normalization
@@ -365,3 +366,246 @@ def calc_ecdf(signal):
       """
     return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
 
+
+def coarse_graining(signal, scale):
+    """ Applies a coarse-graining process to a time series: for a given scale factor, it splits
+    the signal into non-overlapping windows and averages the data points.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    scale : int
+        Scale factor, determines the length of the non-overlapping windows.
+
+    Returns
+    -------
+    coarsegrained_signal : np.ndarray
+        Coarse-grained signal.
+    """
+
+    n = len(signal)
+    windows = n // scale
+    usable_n = windows * scale
+
+    windowed_signal = np.reshape(signal[0:usable_n], (windows, scale))
+    coarsegrained_signal = np.nanmean(windowed_signal, axis=1)
+    
+    return coarsegrained_signal
+
+
+def get_templates(signal, m=3):
+    """ Helper function for the sample entropy calculation. Divides a signal into templates vectors of length m.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension that defines the length of the template vectors, defaults to 3.
+
+    Returns
+    -------
+    np.ndarray    
+        Array of template vectors.
+    """
+    return np.array([signal[i:i+m] for i in np.arange(len(signal) - m + 1)])
+
+
+def sample_entropy(signal, m, tolerance):
+    """ Computes the sample entropy of a signal.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    m : int
+        Embedding dimension that defines the length of the template vectors, defaults to 3.
+    tolerance : float
+        Tolerance value, defaults to 0.2 times the standard deviation of the input signal.
+
+    Returns
+    -------
+    float    
+        Sample Entropy of a signal.
+    """
+    templates_B = get_templates(signal, m)
+    templates_B = templates_B[:-1]
+    kdtree_B = KDTree(templates_B, metric="chebyshev")
+    count_B = kdtree_B.query_radius(templates_B, tolerance, count_only=True).astype(np.float64)
+    proportion_B = np.mean((count_B - 1) / (templates_B.shape[0] - 1))
+
+    templates_A = get_templates(signal, m+1)
+    kdtree_A = KDTree(templates_A, metric="chebyshev")
+    count_A = kdtree_A.query_radius(templates_A, tolerance, count_only=True).astype(np.float64)
+    proportion_A = np.mean((count_A - 1) / (templates_A.shape[0] - 1))
+
+    if proportion_B > 0 and proportion_A > 0:
+        return -np.log(proportion_A/proportion_B)
+    return np.nan
+
+
+def calc_rms(signal, window):
+    """Windowed Root Mean Square (RMS) with linear detrending.
+ 
+    Parameters
+    ----------
+    signal: nd-array
+        Signal
+    window: int
+        Length of the window in which RMS will be calculated
+ 
+    Returns
+    -------
+    rms : nd-array
+        RMS data in each window with length len(signal)//window
+    """
+    num_windows = len(signal) // window
+    rms = np.zeros(num_windows)
+ 
+    for idx in np.arange(num_windows):
+        start_idx = idx * window
+        end_idx = start_idx + window
+        windowed_signal = signal[start_idx:end_idx]
+ 
+        coeff = np.polyfit(np.arange(window), windowed_signal, 1)
+        detrended_window = windowed_signal - np.polyval(coeff, np.arange(window))
+        rms[idx] = np.sqrt(np.mean(detrended_window ** 2))
+ 
+    return rms
+
+
+def compute_rs(signal, lag):
+    """Computes the average rescaled range for a window of length lag.
+   
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+    lag : int
+        Window length.
+       
+    Returns
+    -------
+    float
+        Average R/S.
+    """
+    n = len(signal)
+
+    windowed_signal = np.reshape(signal[:n - n % lag], (-1, lag))
+    mean_windows = np.mean(windowed_signal, axis=1)
+    accumulated_windowed_signal = np.cumsum(windowed_signal - np.reshape(mean_windows, (-1, 1)), axis=1)
+
+    r = np.max(accumulated_windowed_signal, axis=1) - np.min(accumulated_windowed_signal, axis=1)
+    s = np.std(windowed_signal, axis=1)
+
+    rs = np.divide(r,s)
+
+    return np.mean(rs)
+
+
+def calc_lengths_higuchi(signal):
+    """Computes the lengths for different subdivisions, using the Higuchi's method.
+ 
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input signal.
+
+    Returns
+    -------
+    lk : nd-array
+        Length of curve for different subdivisions
+    """
+    n = len(signal)
+    k_values = np.arange(1, n//10)
+    lk = []
+ 
+    for k in k_values:
+        lmk = 0
+        for m in np.arange(1, k + 1):
+            sum_length = 0
+            for i in np.arange(1, (n - m) // k + 1):
+                sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
+            lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
+        lk.append(lmk / k)
+ 
+    return k_values, lk
+
+
+def LZ76(ss):
+    """
+    Calculate Lempel-Ziv's algorithmic complexity using the LZ76 algorithm
+    and the sliding-window implementation.
+
+    Reference:
+    F. Kaspar, H. G. Schuster, "Easily-calculable measure for the
+    complexity of spatiotemporal patterns", Physical Review A, Volume 36,
+    Number 2 (1987).
+
+    Parameters
+    ----------
+    ss : np.ndarray
+        Binarised signal
+
+    Returns
+    -------
+    lz_index : int
+        LZ index
+    """
+
+    ss = ss.flatten().tolist()
+    i, k, l = 0, 1, 1
+    c, k_max = 1, 1
+    n = len(ss)
+    while True:
+        if ss[i + k - 1] == ss[l + k - 1]:
+            k = k + 1
+            if l + k > n:
+                c = c + 1
+                break
+        else:
+            if k > k_max:
+               k_max = k
+            i = i + 1
+            if i == l:
+                c = c + 1
+                l = l + k_max
+                if l + 1 > n:
+                    break
+                else:
+                    i = 0
+                    k = 1
+                    k_max = 1
+            else:
+                k = 1
+    return c
+
+
+def find_plateau(y, threshold=0.1, consecutive_points=5):
+    """ Finds a plateau (if it exists).
+
+    Parameters
+    ----------
+    y : np.ndarray
+        Array of y-axis values.
+    threshold : float
+        Slope threshold to consider as a plateau (default is 0.1).
+    consecutive_points: int
+        Number of consecutive points with a small derivative to consider as a plateau (default is 5).
+
+    Returns
+    -------
+        Index of the beggining of the plateau if it is found, length of y otherwise.
+    """
+
+    dy = np.diff(y)
+
+    for i in np.arange(len(dy) - consecutive_points + 1):
+        if np.all(np.abs(dy[i:i+consecutive_points]) < threshold):
+            plateau_value = np.mean(y[i:i+consecutive_points])
+            if plateau_value > np.mean(y):
+                return i
+
+    # No plateau found
+    return len(y)
