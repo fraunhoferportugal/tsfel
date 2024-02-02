@@ -466,16 +466,25 @@ def calc_window_features(dict_features, signal_window, fs, verbose=1, single_win
                 for ax in range(len(header_names)):
                     sig_ax = signal_window if single_axis else signal_window[:, ax]
                     eval_result_ax = locals()[func_total](sig_ax, **parameters_total)
+
                     # Function returns more than one element
-                    if type(eval_result_ax) == tuple:
-                        if np.isnan(eval_result_ax[0]):
-                            eval_result_ax = np.zeros(len(eval_result_ax))
-                        for rr in range(len(eval_result_ax)):
-                            feature_results += [eval_result_ax[rr]]
-                            feature_names += [str(header_names[ax]) + "_" + feat + "_" + str(rr)]
-                    else:
-                        feature_results += [eval_result_ax]
-                        feature_names += [str(header_names[ax]) + "_" + feat]
+                    if isinstance(eval_result_ax, tuple):
+                        eval_result_ax = np.zeros(len(eval_result_ax)) if np.isnan(eval_result_ax[0]) else eval_result_ax
+                        for rr, value in enumerate(eval_result_ax):
+                            feature_results.append(value)
+                            feature_names.append(f"{header_names[ax]}_{feat}_{rr}")
+
+                    elif isinstance(eval_result_ax, dict):
+                        names = eval_result_ax["names"]
+                        values = eval_result_ax["values"]
+                        eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
+                        for current_name, next_name, value in zip(names[:-1], names[1:], values):
+                            feature_results.append(value)
+                            feature_names.append(f"{header_names[ax]}_{feat}_{current_name}-{next_name}Hz")
+
+                        # Adding the last element
+                        feature_results.append(values[-1])
+                        feature_names.append(f"{header_names[ax]}_{feat}_{names[-1]}Hz")
 
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)), columns=np.array(feature_names)

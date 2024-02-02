@@ -1505,35 +1505,62 @@ def power_bandwidth(signal, fs):
 
 
 @set_domain("domain", "spectral")
-def fft_mean_coeff(signal, fs, nfreq=256):
-    """Computes the mean value of each spectrogram frequency.
+def spectrogram_mean_coeff(signal, fs, bins=32):
+    """Calculates the average power spectral density (PSD) for each frequency throughout the entire signal duration
+    provided by the spectrogram.
 
-    nfreq can not be higher than half signal length plus one.
-    When it does, it is automatically set to half signal length plus one.
+    The values represent the average power spectral density computed on frequency bins. The feature name refers to the
+    frequency bin where the PSD was taken. Each bin is ``fs`` / (``bins`` * 2 - 2) Hz wide. The method relies on the
+    `scipy.signal.spectrogram` and except for ``nperseg`` and ``fs``, all the other parameters are set to its defaults.
 
     Feature computational cost: 1
 
     Parameters
     ----------
-    signal : nd-array
-        Input from which fft mean coefficients are computed
+    signal : array_like
+        Input from which the spectrogram mean coefficients are computed.
     fs : float
-        Sampling frequency
-    nfreq : int
-        The number of frequencies
+        Sampling frequency of the `signal`.
+    bins : int, optional
+        The number of frequency bins.
 
     Returns
     -------
     nd-array
-        The mean value of each spectrogram frequency
+        The power spectral density for each frequency bin average along the entire signal duration.
+
+    Notes
+    -----
+    The optimal number of frequency bins depend on the task at hand. Using a
+    higher number of bins with low sampling frequencies may result in excessive
+    frequency resolution and the loss of valuable coarse-grained information.
+    The default value should be suitable for most cases when working with the
+    default sampling frequency. The number of frequency bins must be modified
+    in the feature configuration file.
+
+    .. versionadded:: 0.1.7
 
     """
-    if nfreq > len(signal) // 2 + 1:
-        nfreq = len(signal) // 2 + 1
 
-    fmag_mean = scipy.signal.spectrogram(signal, fs, nperseg=nfreq * 2 - 2)[2].mean(1)
+    if bins > len(signal) // 2 + 1:
+        bins = len(signal) // 2 + 1
 
-    return tuple(fmag_mean)
+    frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
+    Sxx_mean_f = Sxx.mean(1)
+    f_keys = np.round(frequencies, 1).astype(str)
+
+    """
+    # Find the index of the frequency bin corresponding to 10 Hz
+    frequency_resolution = fs / 64 * 2 - 2
+    for f in frequencies:
+        k = int(f / frequency_resolution)
+        # Calculate the lower and upper bounds
+        lower_bound = k * frequency_resolution
+        upper_bound = (k + 1) * frequency_resolution
+        print(lower_bound, upper_bound, f)
+    """
+
+    return {"names": f_keys, "values": Sxx_mean_f}
 
 
 @set_domain("domain", "spectral")
