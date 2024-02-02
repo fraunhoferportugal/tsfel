@@ -1,5 +1,5 @@
-import scipy
 import numpy as np
+import scipy
 from sklearn.neighbors import KDTree
 
 
@@ -25,14 +25,13 @@ def compute_time(signal, fs):
     -------
     time : float list
         Signal time
-
     """
 
-    return np.arange(0, len(signal))/fs
+    return np.arange(0, len(signal)) / fs
 
 
 def calc_fft(signal, fs):
-    """ This functions computes the fft of a signal.
+    """This functions computes the fft of a signal.
 
     Parameters
     ----------
@@ -47,11 +46,10 @@ def calc_fft(signal, fs):
         Frequency values (xx axis)
     fmag: nd-array
         Amplitude of the frequency values (yy axis)
-
     """
 
     fmag = np.abs(np.fft.rfft(signal))
-    f = np.fft.rfftfreq(len(signal), d=1/fs)
+    f = np.fft.rfftfreq(len(signal), d=1 / fs)
 
     return f.copy(), fmag.copy()
 
@@ -82,7 +80,6 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
     -------
     nd-array
         MEL-spaced filterbank
-
     """
 
     # Signal is already a window from the original signal, so no frame is needed.
@@ -92,17 +89,26 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # pre-emphasis filter to amplify the high frequencies
 
-    emphasized_signal = np.append(np.array(signal)[0], np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]))
+    emphasized_signal = np.append(
+        np.array(signal)[0],
+        np.array(signal[1:]) - pre_emphasis * np.array(signal[:-1]),
+    )
 
     # Fourier transform and Power spectrum
-    mag_frames = np.absolute(np.fft.rfft(emphasized_signal, nfft))  # Magnitude of the FFT
+    mag_frames = np.absolute(
+        np.fft.rfft(emphasized_signal, nfft),
+    )  # Magnitude of the FFT
 
-    pow_frames = ((1.0 / nfft) * (mag_frames ** 2))  # Power Spectrum
+    pow_frames = (1.0 / nfft) * (mag_frames**2)  # Power Spectrum
 
     low_freq_mel = 0
-    high_freq_mel = (2595 * np.log10(1 + (fs / 2) / 700))  # Convert Hz to Mel
-    mel_points = np.linspace(low_freq_mel, high_freq_mel, nfilt + 2)  # Equally spaced in Mel scale
-    hz_points = (700 * (10 ** (mel_points / 2595) - 1))  # Convert Mel to Hz
+    high_freq_mel = 2595 * np.log10(1 + (fs / 2) / 700)  # Convert Hz to Mel
+    mel_points = np.linspace(
+        low_freq_mel,
+        high_freq_mel,
+        nfilt + 2,
+    )  # Equally spaced in Mel scale
+    hz_points = 700 * (10 ** (mel_points / 2595) - 1)  # Convert Mel to Hz
     filter_bin = np.floor((nfft + 1) * hz_points / fs)
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
@@ -119,11 +125,15 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     # Area Normalization
     # If we don't normalize the noise will increase with frequency because of the filter width.
-    enorm = 2.0 / (hz_points[2:nfilt + 2] - hz_points[:nfilt])
+    enorm = 2.0 / (hz_points[2 : nfilt + 2] - hz_points[:nfilt])
     fbank *= enorm[:, np.newaxis]
 
     filter_banks = np.dot(pow_frames, fbank.T)
-    filter_banks = np.where(filter_banks == 0, np.finfo(float).eps, filter_banks)  # Numerical Stability
+    filter_banks = np.where(
+        filter_banks == 0,
+        np.finfo(float).eps,
+        filter_banks,
+    )  # Numerical Stability
     filter_banks = 20 * np.log10(filter_banks)  # dB
 
     return filter_banks
@@ -144,12 +154,11 @@ def autocorr_norm(signal):
     -------
     nd-array
         Autocorrelation result
-
     """
 
     variance = np.var(signal)
     signal = np.copy(signal - signal.mean())
-    r = scipy.signal.correlate(signal, signal)[-len(signal):]
+    r = scipy.signal.correlate(signal, signal)[-len(signal) :]
 
     if (signal == 0).all():
         return np.zeros(len(signal))
@@ -176,7 +185,6 @@ def create_symmetric_matrix(acf, order=11):
     -------
     nd-array
         Symmetric Matrix
-
     """
 
     smatrix = np.empty((order, order))
@@ -205,7 +213,6 @@ def lpc(signal, n_coeff=12):
     -------
     nd-array
         Linear prediction coefficients
-
     """
 
     if signal.ndim > 1:
@@ -217,25 +224,26 @@ def lpc(signal, n_coeff=12):
     order = n_coeff - 1
 
     # Calculate LPC with Yule-Walker
-    acf = np.correlate(signal, signal, 'full')
+    acf = np.correlate(signal, signal, "full")
 
-    r = np.zeros(order+1, 'float32')
+    r = np.zeros(order + 1, "float32")
     # Assuring that works for all type of input lengths
-    nx = np.min([order+1, len(signal)])
-    r[:nx] = acf[len(signal)-1:len(signal)+order]
+    nx = np.min([order + 1, len(signal)])
+    r[:nx] = acf[len(signal) - 1 : len(signal) + order]
 
     smatrix = create_symmetric_matrix(r[:-1], order)
 
     if np.sum(smatrix) == 0:
-        return tuple(np.zeros(order+1))
+        return tuple(np.zeros(order + 1))
 
     lpc_coeffs = np.dot(np.linalg.inv(smatrix), -r[1:])
 
-    return tuple(np.concatenate(([1.], lpc_coeffs)))
+    return tuple(np.concatenate(([1.0], lpc_coeffs)))
 
 
 def create_xx(features):
-    """Computes the range of features amplitude for the probability density function calculus.
+    """Computes the range of features amplitude for the probability density
+    function calculus.
 
     Parameters
     ----------
@@ -246,13 +254,12 @@ def create_xx(features):
     -------
     nd-array
         range of features amplitude
-
     """
 
     features_ = np.copy(features)
 
     if max(features_) < 0:
-        max_f = - max(features_)
+        max_f = -max(features_)
         min_f = min(features_)
     else:
         min_f = min(features_)
@@ -267,7 +274,8 @@ def create_xx(features):
 
 
 def kde(features):
-    """Computes the probability density function of the input signal using a Gaussian KDE (Kernel Density Estimate)
+    """Computes the probability density function of the input signal using a
+    Gaussian KDE (Kernel Density Estimate)
 
     Parameters
     ----------
@@ -278,7 +286,6 @@ def kde(features):
     -------
     nd-array
         probability density values
-
     """
     features_ = np.copy(features)
     xx = create_xx(features_)
@@ -287,13 +294,14 @@ def kde(features):
         noise = np.random.randn(len(features_)) * 0.0001
         features_ = np.copy(features_ + noise)
 
-    kernel = scipy.stats.gaussian_kde(features_, bw_method='silverman')
+    kernel = scipy.stats.gaussian_kde(features_, bw_method="silverman")
 
     return np.array(kernel(xx) / np.sum(kernel(xx)))
 
 
 def gaussian(features):
-    """Computes the probability density function of the input signal using a Gaussian function
+    """Computes the probability density function of the input signal using a
+    Gaussian function.
 
     Parameters
     ----------
@@ -303,7 +311,6 @@ def gaussian(features):
     -------
     nd-array
         probability density values
-
     """
 
     features_ = np.copy(features)
@@ -337,7 +344,6 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
     nd-array
         The result of the CWT along the time axis
         matrix with size (len(widths),len(signal))
-
     """
 
     if isinstance(function, str):
@@ -354,23 +360,22 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
 def calc_ecdf(signal):
     """Computes the ECDF of the signal.
 
-      Parameters
-      ----------
-      signal : nd-array
-          Input from which ECDF is computed
-      Returns
-      -------
-      nd-array
-        Sorted signal and computed ECDF.
-
-      """
-    return np.sort(signal), np.arange(1, len(signal)+1)/len(signal)
+    Parameters
+    ----------
+    signal : nd-array
+        Input from which ECDF is computed
+    Returns
+    -------
+    nd-array
+      Sorted signal and computed ECDF.
+    """
+    return np.sort(signal), np.arange(1, len(signal) + 1) / len(signal)
 
 
 def coarse_graining(signal, scale):
-    """ Applies a coarse-graining process to a time series: for a given scale factor, it splits
+    """Applies a coarse-graining process to a time series: for a given scale factor, it splits
     the signal into non-overlapping windows and averages the data points.
-    
+
     Parameters
     ----------
     signal : np.ndarray
@@ -390,13 +395,14 @@ def coarse_graining(signal, scale):
 
     windowed_signal = np.reshape(signal[0:usable_n], (windows, scale))
     coarsegrained_signal = np.nanmean(windowed_signal, axis=1)
-    
+
     return coarsegrained_signal
 
 
 def get_templates(signal, m=3):
-    """ Helper function for the sample entropy calculation. Divides a signal into templates vectors of length m.
-    
+    """Helper function for the sample entropy calculation. Divides a signal
+    into templates vectors of length m.
+
     Parameters
     ----------
     signal : np.ndarray
@@ -406,15 +412,15 @@ def get_templates(signal, m=3):
 
     Returns
     -------
-    np.ndarray    
+    np.ndarray
         Array of template vectors.
     """
-    return np.array([signal[i:i+m] for i in np.arange(len(signal) - m + 1)])
+    return np.array([signal[i : i + m] for i in np.arange(len(signal) - m + 1)])
 
 
 def sample_entropy(signal, m, tolerance):
-    """ Computes the sample entropy of a signal.
-    
+    """Computes the sample entropy of a signal.
+
     Parameters
     ----------
     signal : np.ndarray
@@ -426,35 +432,39 @@ def sample_entropy(signal, m, tolerance):
 
     Returns
     -------
-    float    
+    float
         Sample Entropy of a signal.
     """
     templates_B = get_templates(signal, m)
     templates_B = templates_B[:-1]
     kdtree_B = KDTree(templates_B, metric="chebyshev")
-    count_B = kdtree_B.query_radius(templates_B, tolerance, count_only=True).astype(np.float64)
+    count_B = kdtree_B.query_radius(templates_B, tolerance, count_only=True).astype(
+        np.float64,
+    )
     proportion_B = np.mean((count_B - 1) / (templates_B.shape[0] - 1))
 
-    templates_A = get_templates(signal, m+1)
+    templates_A = get_templates(signal, m + 1)
     kdtree_A = KDTree(templates_A, metric="chebyshev")
-    count_A = kdtree_A.query_radius(templates_A, tolerance, count_only=True).astype(np.float64)
+    count_A = kdtree_A.query_radius(templates_A, tolerance, count_only=True).astype(
+        np.float64,
+    )
     proportion_A = np.mean((count_A - 1) / (templates_A.shape[0] - 1))
 
     if proportion_B > 0 and proportion_A > 0:
-        return -np.log(proportion_A/proportion_B)
+        return -np.log(proportion_A / proportion_B)
     return np.nan
 
 
 def calc_rms(signal, window):
     """Windowed Root Mean Square (RMS) with linear detrending.
- 
+
     Parameters
     ----------
     signal: nd-array
         Signal
     window: int
         Length of the window in which RMS will be calculated
- 
+
     Returns
     -------
     rms : nd-array
@@ -462,29 +472,29 @@ def calc_rms(signal, window):
     """
     num_windows = len(signal) // window
     rms = np.zeros(num_windows)
- 
+
     for idx in np.arange(num_windows):
         start_idx = idx * window
         end_idx = start_idx + window
         windowed_signal = signal[start_idx:end_idx]
- 
+
         coeff = np.polyfit(np.arange(window), windowed_signal, 1)
         detrended_window = windowed_signal - np.polyval(coeff, np.arange(window))
-        rms[idx] = np.sqrt(np.mean(detrended_window ** 2))
- 
+        rms[idx] = np.sqrt(np.mean(detrended_window**2))
+
     return rms
 
 
 def compute_rs(signal, lag):
     """Computes the average rescaled range for a window of length lag.
-   
+
     Parameters
     ----------
     signal : np.ndarray
         Input signal.
     lag : int
         Window length.
-       
+
     Returns
     -------
     float
@@ -492,21 +502,28 @@ def compute_rs(signal, lag):
     """
     n = len(signal)
 
-    windowed_signal = np.reshape(signal[:n - n % lag], (-1, lag))
+    windowed_signal = np.reshape(signal[: n - n % lag], (-1, lag))
     mean_windows = np.mean(windowed_signal, axis=1)
-    accumulated_windowed_signal = np.cumsum(windowed_signal - np.reshape(mean_windows, (-1, 1)), axis=1)
+    accumulated_windowed_signal = np.cumsum(
+        windowed_signal - np.reshape(mean_windows, (-1, 1)),
+        axis=1,
+    )
 
-    r = np.max(accumulated_windowed_signal, axis=1) - np.min(accumulated_windowed_signal, axis=1)
+    r = np.max(accumulated_windowed_signal, axis=1) - np.min(
+        accumulated_windowed_signal,
+        axis=1,
+    )
     s = np.std(windowed_signal, axis=1)
 
-    rs = np.divide(r,s)
+    rs = np.divide(r, s)
 
     return np.mean(rs)
 
 
 def calc_lengths_higuchi(signal):
-    """Computes the lengths for different subdivisions, using the Higuchi's method.
- 
+    """Computes the lengths for different subdivisions, using the Higuchi's
+    method.
+
     Parameters
     ----------
     signal : np.ndarray
@@ -518,9 +535,9 @@ def calc_lengths_higuchi(signal):
         Length of curve for different subdivisions
     """
     n = len(signal)
-    k_values = np.arange(1, n//10)
+    k_values = np.arange(1, n // 10)
     lk = []
- 
+
     for k in k_values:
         lmk = 0
         for m in np.arange(1, k + 1):
@@ -529,13 +546,12 @@ def calc_lengths_higuchi(signal):
                 sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
             lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
         lk.append(lmk / k)
- 
+
     return k_values, lk
 
 
 def LZ76(ss):
-    """
-    Calculate Lempel-Ziv's algorithmic complexity using the LZ76 algorithm
+    """Calculate Lempel-Ziv's algorithmic complexity using the LZ76 algorithm
     and the sliding-window implementation.
 
     Reference:
@@ -566,7 +582,7 @@ def LZ76(ss):
                 break
         else:
             if k > k_max:
-               k_max = k
+                k_max = k
             i = i + 1
             if i == l:
                 c = c + 1
@@ -583,7 +599,7 @@ def LZ76(ss):
 
 
 def find_plateau(y, threshold=0.1, consecutive_points=5):
-    """ Finds a plateau (if it exists).
+    """Finds a plateau (if it exists).
 
     Parameters
     ----------
@@ -602,8 +618,8 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
     dy = np.diff(y)
 
     for i in np.arange(len(dy) - consecutive_points + 1):
-        if np.all(np.abs(dy[i:i+consecutive_points]) < threshold):
-            plateau_value = np.mean(y[i:i+consecutive_points])
+        if np.all(np.abs(dy[i : i + consecutive_points]) < threshold):
+            plateau_value = np.mean(y[i : i + consecutive_points])
             if plateau_value > np.mean(y):
                 return i
 

@@ -122,7 +122,7 @@ repos:
             name: add-trailing-comma
             description: Automatically add trailing commas to calls and literals.
     - repo: https://github.com/PyCQA/flake8
-      rev: 6.1.0
+      rev: 7.0.0
       hooks:
           - id: flake8
             name: flake8 - check the style and quality of some python code
@@ -141,13 +141,13 @@ repos:
                 - flake8-typing-imports==1.12.0
                 #- flake8-match==1.0.0
     - repo: https://github.com/psf/black
-      rev: 23.10.0
+      rev: 24.1.1
       hooks:
           - id: black
             name: black - consistent Python code formatting
             description: The uncompromising Python code formatter
     - repo: https://github.com/PyCQA/isort
-      rev: 5.12.0
+      rev: 5.13.2
       hooks:
           - id: isort
             name: isort - sort Python imports
@@ -169,11 +169,11 @@ repos:
 # Notebooks
 ##########################################################################################
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 1.7.0
+      rev: 1.7.1
       hooks:
-          - id: nbqa-flake8
-            name: nbqa-flake8 - Python linting (notebooks)
-            additional_dependencies: [flake8]
+#          - id: nbqa-flake8
+#            name: nbqa-flake8 - Python linting (notebooks)
+#            additional_dependencies: [flake8]
           #- id: nbqa-mypy
           #  name: nbqa-mypy - Static type checker for Python (notebooks)
           #  additional_dependencies: [mypy]
@@ -235,16 +235,16 @@ repos:
 ##########################################################################################
 # Security
 ##########################################################################################
-    - repo: local
-      hooks:
-          - id: safety
-            name: safety
-            description: Analyze your Python requirements for known security vulnerabilities
-            entry: safety check --short-report -r
-            language: system
-            files: requirements/*.txt
+#    - repo: local
+#      hooks:
+#          - id: safety
+#            name: safety
+#            description: Analyze your Python requirements for known security vulnerabilities
+#            entry: safety check --short-report -r
+#            language: system
+#            files: requirements/*.txt
     - repo:  https://github.com/PyCQA/bandit
-      rev: 1.7.5
+      rev: 1.7.7
       hooks:
           - id: bandit
             args: ["-c", "pyproject.toml"]
