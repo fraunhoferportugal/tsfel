@@ -594,8 +594,8 @@
             "use": "yes"
         },
         "Lempel-Ziv complexity": {
-            "complexity": "squared",
-            "description": "Computes the Lempel-Ziv's (LZ) complexity index.",
+            "complexity": "linear",
+            "description": "Computes the Lempel-Ziv's (LZ) complexity index, normalized by the signal's length.",
             "function": "tsfel.lempel_ziv",
             "n_features": 1,
             "parameters": {

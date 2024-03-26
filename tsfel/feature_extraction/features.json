@@ -503,11 +503,11 @@
       "use": "yes"
     },
     "Lempel-Ziv complexity": {
-      "complexity": "squared",
-      "description": "Computes the Lempel-Ziv's (LZ) complexity index.",
+      "complexity": "linear",
+      "description": "Computes the Lempel-Ziv's (LZ) complexity index, normalized by the signal's length.",
       "function": "tsfel.lempel_ziv",
       "parameters": {
-        "threshold": null
+          "threshold": null
       },
       "n_features": 1,
       "use": "yes"
@@ -650,7 +650,7 @@
       "n_features": 1,
       "use": "no"
     },
-        "Multiscale entropy": {
+    "Multiscale entropy": {
       "complexity": "linear",
       "description": "Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time scales.",
       "function": "tsfel.mse",
