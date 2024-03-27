@@ -583,7 +583,7 @@ def calc_lempel_ziv_complexity(sequence):
             sub_strings.add(sub_str)
             ind += inc
             inc = 1
-    
+
     return len(sub_strings) / len(sequence)
 
 
