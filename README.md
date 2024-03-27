@@ -30,8 +30,8 @@ tsfel
 
 ## Includes a comprehensive number of features
 
-TSFEL is optimized for time series and **automatically extracts over 60 different features on the statistical, temporal
-and spectral domains.**
+TSFEL is optimized for time series and **automatically extracts over 65 different features on the statistical, temporal,
+spectral and fractal domains.**
 
 ## Functionalities
 
@@ -92,7 +92,7 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Area under the curve    |         1          |
 | Autocorrelation         |         2          |
 | Centroid                |         1          |
-| Lempel-Ziv-Complexity\*  |         2          |
+| Lempel-Ziv-Complexity\* |         2          |
 | Mean absolute diff      |         1          |
 | Mean diff               |         1          |
 | Median absolute diff    |         1          |
@@ -105,6 +105,8 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Sum absolute diff       |         1          |
 | Zero crossing rate      |         1          |
 | Neighbourhood peaks     |         1          |
+
+\* Disabled by default due to its longer execution time compared to other features.
 
 #### Spectral domain
 
@@ -137,8 +139,6 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Wavelet entropy                  |         2          |
 | Wavelet variance                 |         2          |
 
-\*Disabled by default due to its longer execution time compared to other features.
-
 #### Fractal domain
 
 | Features                             | Computational Cost |
@@ -150,8 +150,10 @@ X = tsfel.time_series_features_extractor(cfg, df)
 | Multiscale entropy (MSE)             |         1          |
 | Petrosian fractal dimension          |         1          |
 
-_Fractal features are typically applied to relatively longer signals to capture meaningful patterns, and it's usually
-unnecessary to previously divide the signal into shorter windows. Fractal features are disabled in the default feature
+_Fractal domain features are typically applied to relatively longer signals to capture meaningful patterns, and it's
+usually
+unnecessary to previously divide the signal into shorter windows. Therefore, this domain is disabled in the default
+feature
 configuration files._
 
 ## Citing
