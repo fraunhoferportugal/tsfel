@@ -32,14 +32,6 @@
             "parameters": "",
             "use": "no"
         },
-        "Petrosian fractal dimension": {
-            "complexity": "log",
-            "description": "Computes the Petrosian Fractal Dimension of a signal.",
-            "function": "tsfel.petrosian_fractal_dimension",
-            "n_features": 1,
-            "parameters": "",
-            "use": "no"
-        },
         "Multiscale entropy": {
             "complexity": "linear",
             "description": "Computes the Multiscale entropy (MSE) of the signal, that performs the entropy analysis over multiple time scales.",
@@ -51,12 +43,20 @@
                 "tolerance": null
             },
             "use": "no"
+        },
+        "Petrosian fractal dimension": {
+            "complexity": "log",
+            "description": "Computes the Petrosian Fractal Dimension of a signal.",
+            "function": "tsfel.petrosian_fractal_dimension",
+            "n_features": 1,
+            "parameters": "",
+            "use": "no"
         }
     },
     "new_domain": {
         "new_feature_with_multiple_tag": {
-            "complexity": "log",
-            "description": "A new feature with multiple tags",
+            "complexity": "constant",
+            "description": "A new feature with multiple tags.",
             "function": "new_feature_with_multiple_tag",
             "parameters": "",
             "tag": [
@@ -66,8 +66,8 @@
             "use": "yes"
         },
         "new_feature_with_tag": {
-            "complexity": "log",
-            "description": "A new feature with a tag",
+            "complexity": "constant",
+            "description": "A new feature with a tag.",
             "function": "new_feature_with_tag",
             "parameters": "",
             "tag": "inertial",
@@ -548,14 +548,14 @@
         },
         "new_feature": {
             "complexity": "constant",
-            "description": "Computes a new feature",
+            "description": "Computes a new feature.",
             "function": "new_feature",
             "parameters": "",
             "use": "yes"
         },
         "new_feature_with_parameter": {
-            "complexity": "constant",
-            "description": "A new feature",
+            "complexity": "log",
+            "description": "A new feature.",
             "function": "new_feature_with_parameter",
             "parameters": {
                 "weight": 0.5
@@ -594,14 +594,14 @@
             "use": "yes"
         },
         "Lempel-Ziv complexity": {
-            "complexity": "squared",
-            "description": "Computes the Lempel-Ziv's (LZ) complexity index.",
+            "complexity": "linear",
+            "description": "Computes the Lempel-Ziv's (LZ) complexity index, normalized by the signal's length.",
             "function": "tsfel.lempel_ziv",
             "n_features": 1,
             "parameters": {
                 "threshold": null
             },
-            "use": "yes"
+            "use": "no"
         },
         "Mean absolute diff": {
             "complexity": "constant",

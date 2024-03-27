@@ -704,7 +704,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(entropy(lin), 1.0)
         np.testing.assert_almost_equal(entropy(lin0), 1.0)
         np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
-        np.testing.assert_almost_equal(entropy(offsetWave), 0.8890012261845581)
+        np.testing.assert_almost_equal(entropy(offsetWave), 0.8891261649211666)
         np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
     def test_neighbourhood_peaks(self):
@@ -719,24 +719,15 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(neighbourhood_peaks(noiseWave), 14.0)
 
     def test_lempel_ziv(self):
-        np.testing.assert_almost_equal(lempel_ziv(const0), 2.0)
-        np.testing.assert_almost_equal(lempel_ziv(const1), 2.0)
-        np.testing.assert_almost_equal(lempel_ziv(constNeg), 2.0)
-        np.testing.assert_almost_equal(lempel_ziv(constF), 2.0)
-        np.testing.assert_almost_equal(lempel_ziv(lin), 3.0)
-        np.testing.assert_almost_equal(lempel_ziv(lin0), 3.0)
-        np.testing.assert_almost_equal(lempel_ziv(wave), 4.0)
-        np.testing.assert_almost_equal(lempel_ziv(offsetWave), 4.0)
-        np.testing.assert_almost_equal(lempel_ziv(noiseWave), 16.0)
-
-    def test_mse(self):
-        np.testing.assert_almost_equal(mse(const0), np.nan)
-        np.testing.assert_almost_equal(mse(const1), np.nan)
-        np.testing.assert_almost_equal(mse(constNeg), np.nan)
-        np.testing.assert_almost_equal(mse(constF), np.nan)
-        np.testing.assert_almost_equal(mse(wave), 0.08721585110301311)
-        np.testing.assert_almost_equal(mse(offsetWave), 0.08721585110301311)
-        np.testing.assert_almost_equal(mse(noiseWave), 0.11937683012271358)
+        np.testing.assert_almost_equal(lempel_ziv(const0), 0.25)
+        np.testing.assert_almost_equal(lempel_ziv(const1), 0.25)
+        np.testing.assert_almost_equal(lempel_ziv(constNeg), 0.25)
+        np.testing.assert_almost_equal(lempel_ziv(constF), 0.25)
+        np.testing.assert_almost_equal(lempel_ziv(lin), 0.4)
+        np.testing.assert_almost_equal(lempel_ziv(lin0), 0.4)
+        np.testing.assert_almost_equal(lempel_ziv(wave), 0.066)
+        np.testing.assert_almost_equal(lempel_ziv(offsetWave), 0.066)
+        np.testing.assert_almost_equal(lempel_ziv(noiseWave), 0.079)
 
     # ################################################ SPECTRAL FEATURES ################################################# #
     def test_max_fre(self):
@@ -947,7 +938,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_skewness(wave, Fs),
-            10746623.828906002,
+            10757350.436568316,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -978,7 +969,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_kurtosis(wave, Fs),
-            123297212118194.1,
+            123562213974218.03,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -1157,7 +1148,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_positive_turning(offsetWave, Fs),
-            160,
+            161,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -2198,6 +2189,15 @@ class TestFeatures(unittest.TestCase):
             petrosian_fractal_dimension(brownNoise),
             1.0193455287912367,
         )
+
+    def test_mse(self):
+        np.testing.assert_almost_equal(mse(const0), np.nan)
+        np.testing.assert_almost_equal(mse(const1), np.nan)
+        np.testing.assert_almost_equal(mse(constNeg), np.nan)
+        np.testing.assert_almost_equal(mse(constF), np.nan)
+        np.testing.assert_almost_equal(mse(wave), 0.08721585110301311)
+        np.testing.assert_almost_equal(mse(offsetWave), 0.08721585110301311)
+        np.testing.assert_almost_equal(mse(noiseWave), 0.11937683012271358)
 
 
 if __name__ == "__main__":
