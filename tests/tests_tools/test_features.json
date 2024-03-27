@@ -601,7 +601,7 @@
             "parameters": {
                 "threshold": null
             },
-            "use": "yes"
+            "use": "no"
         },
         "Mean absolute diff": {
             "complexity": "constant",
