@@ -1,6 +1,8 @@
 import json
-import tsfel
+
 import numpy as np
+
+import tsfel
 
 
 def load_json(json_path):
@@ -15,7 +17,6 @@ def load_json(json_path):
     -------
     Dict
         Dictionary
-
     """
 
     return json.load(open(json_path))
@@ -27,7 +28,7 @@ def get_features_by_domain(domain=None, json_path=None):
     Parameters
     ----------
     domain : string
-        Available domains: "statistical"; "spectral"; "temporal"
+        Available domains: "statistical"; "spectral"; "temporal"; "fractal"
         If domain equals None, then the features settings from all domains are returned.
     json_path : string
         Directory of json file. Default: package features.json directory
@@ -36,20 +37,23 @@ def get_features_by_domain(domain=None, json_path=None):
     -------
     Dict
         Dictionary with the features settings
-
     """
 
     if json_path is None:
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
-        if domain not in ['statistical', 'temporal', 'spectral', None]:
+        if domain not in ["statistical", "temporal", "spectral", "fractal", None]:
             raise SystemExit(
-                'No valid domain. Choose: statistical, temporal, spectral or None (for all feature settings).')
+                "No valid domain. Choose: statistical, temporal, spectral, fractal or None (for all feature settings).",
+            )
 
     dict_features = load_json(json_path)
     if domain is None:
         return dict_features
     else:
+        if domain == "fractal":
+            for k in dict_features[domain]:
+                dict_features[domain][k]["use"] = "yes"
         return {domain: dict_features[domain]}
 
 
@@ -68,14 +72,14 @@ def get_features_by_tag(tag=None, json_path=None):
     -------
     Dict
         Dictionary with the features settings
-
     """
     if json_path is None:
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
         if tag not in ["audio", "inertial", "ecg", "eeg", "emg", None]:
             raise SystemExit(
-                "No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.")
+                "No valid tag. Choose: audio, inertial, ecg, eeg, emg or None.",
+            )
     features_tag = {}
     dict_features = load_json(json_path)
     if tag is None:
@@ -90,18 +94,21 @@ def get_features_by_tag(tag=None, json_path=None):
                 try:
                     js_tag = dict_features[domain][feat]["tag"]
                     if isinstance(js_tag, list):
-                        if any([tag in js_t for js_t in js_tag]):
-                            features_tag[domain].update({feat: dict_features[domain][feat]})
+                        if any(tag in js_t for js_t in js_tag):
+                            features_tag[domain].update(
+                                {feat: dict_features[domain][feat]},
+                            )
                     elif js_tag == tag:
                         features_tag[domain].update({feat: dict_features[domain][feat]})
                 except KeyError:
                     continue
         # To remove empty dicts
-        return dict([[d, features_tag[d]] for d in list(features_tag.keys()) if bool(features_tag[d])])
+        return {d: features_tag[d] for d in list(features_tag.keys()) if bool(features_tag[d])}
 
 
 def get_number_features(dict_features):
-    """Count the total number of features based on input parameters of each feature
+    """Count the total number of features based on input parameters of each
+    feature.
 
     Parameters
     ----------

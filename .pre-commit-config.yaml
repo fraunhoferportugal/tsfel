@@ -1,0 +1,338 @@
+---
+##########################################################################################
+#                                                                                        #
+#                       Pre-commit configuration file                                    #
+#                                                                                        #
+#                                                                                        #
+# See https://pre-commit.com for more information                                        #
+# See https://pre-commit.com/hooks.html for more hooks                                   #
+#                                                                                        #
+# To install the git pre-commit hook run:                                                #
+#   pre-commit install                                                                   #
+#   pre-commit autoupdate                                                                #
+# To update the pre-commit hooks run:                                                    #
+#   pre-commit install --install-hooks -t pre-commit -t commit-msg                       #
+# To run all hooks against current changes in your repository                            #
+#   pre-commit run --all-files                                                           #
+# If you wish to execute an individual hook use pre-commit run <hook_id>. Example:       #
+#   pre-commit run black                                                                 #
+#                                                                                        #
+##########################################################################################
+default_language_version:
+    python: python3
+default_stages: [commit, push]
+fail_fast: false
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.5.0
+      hooks:
+          - id: fix-byte-order-marker
+            name: fix-byte-order-marker
+            description: removes UTF-8 byte order marker
+          - id: trailing-whitespace
+            name: trailing-whitespace
+            description: Trims trailing whitespace
+            args: [--markdown-linebreak-ext=md]
+          - id: end-of-file-fixer
+            name: end-of-file-fixer
+            description: Makes sure files end in a newline and only a newline
+          - id: check-json
+            name: check-json
+            description: Attempts to load all json files to verify syntax
+          - id: check-toml
+            name: check-toml
+            description: Attempts to load all TOML files to verify syntax
+          - id: check-symlinks
+            name: check-symlinks
+            description: Checks for symlinks which do not point to anything
+          - id: check-added-large-files
+            name: check-added-large-files
+            description: Prevent files larger than 1 MB from being committed
+            args: [ "--maxkb=1024", '--enforce-all' ]
+          - id: check-case-conflict
+            name: check-case-conflict
+            description: Check for files with names that would conflict on a case-insensitive filesystem like MacOS HFS+ or Windows FAT
+          - id: end-of-file-fixer
+            name: end-of-file-fixer
+            description: Makes sure files end in a newline and only a newline
+          - id: mixed-line-ending
+            name: mixed-line-ending
+            description: Replaces or checks mixed line ending
+          - id: check-ast
+            name: check-ast
+            description: Simply check whether files parse as valid python
+          - id: debug-statements
+            name: debug-statements
+            description: Check for debugger imports and py37+ breakpoint() calls in python source
+          - id: detect-aws-credentials
+            name: detect-aws-credentials
+            description: Checks for the existence of AWS/Minio secrets that you have set up
+            args: [--allow-missing-credentials]
+          - id: detect-private-key
+            name: detect-private-key
+            description: Checks for the existence of private keys.
+          - id: requirements-txt-fixer
+            name: requirements-txt-fixer
+            description: Sorts entries in requirements.txt and removes incorrect entries
+          #- id: no-commit-to-branch
+          #  name: no-commit-to-master-branch
+          #  description: Prevent commits to master/main branch
+          #  language: python
+          #  args: ["-b", master, "-b", main]
+          #  pass_filenames: false
+          - id: check-merge-conflict
+            name: check-merge-conflict
+            description: Check for files that contain merge conflict strings
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: v1.10.0
+      hooks:
+          - id: python-check-mock-methods
+            name: check-mock-methods
+            description: Prevent common mistakes of assert mck.not_called(), assert mck.called_once_with(...) and mck.assert_called.
+          - id: python-use-type-annotations
+            name: python-use-type-annotations
+            description: Enforce that python3.6+ type annotations are used instead of type comments
+          - id: python-check-blanket-noqa
+            name: python-check-blanket-noqa
+            description: Enforce that noqa annotations always occur with specific codes.
+          # - id: python-no-eval
+          #   name: python-no-eval
+          #   description: A quick check for the eval() built-in function
+    # - repo: https://github.com/pre-commit/mirrors-mypy
+    #   rev: v1.5.1
+    #   hooks:
+    #       - id: mypy
+    #         name: mypy - static type checker for Python
+    #         description: Static type checker for Python
+    #         files: ^src/
+    #         exclude: ^tests/
+    #         args: [--ignore-missing-imports]
+    #         additional_dependencies: [types-all]
+    # not working really well
+    # - repo: https://github.com/asottile/yesqa
+    #   rev: v1.4.0
+    #   hooks:
+    #       - id: yesqa
+    #         name: yesqa - remove unnecessary `# noqa` comments
+    #         description: Automatically remove unnecessary `# noqa` comments
+    - repo: https://github.com/asottile/add-trailing-comma
+      rev: v3.1.0
+      hooks:
+          - id: add-trailing-comma
+            name: add-trailing-comma
+            description: Automatically add trailing commas to calls and literals.
+    - repo: https://github.com/PyCQA/flake8
+      rev: 7.0.0
+      hooks:
+          - id: flake8
+            name: flake8 - check the style and quality of some python code
+            description: Python tool that glues together pycodestyle, pyflakes, mccabe, and third-party plugins to check the style and quality of some python code
+            additional_dependencies:
+                - flake8-bugbear
+                # - flake8-variables-names
+                # - pep8-naming
+                # - flake8-print
+                - flake8-quotes
+                - flake8-broken-line
+                - flake8-comprehensions
+                - flake8-spellcheck # ignored by now
+                - flake8-eradicate
+                #- flake8-walrus==1.1.0
+                - flake8-typing-imports==1.12.0
+                #- flake8-match==1.0.0
+    - repo: https://github.com/psf/black
+      rev: 24.1.1
+      hooks:
+          - id: black
+            name: black - consistent Python code formatting
+            description: The uncompromising Python code formatter
+    - repo: https://github.com/PyCQA/isort
+      rev: 5.13.2
+      hooks:
+          - id: isort
+            name: isort - sort Python imports
+            description: Library to sort imports
+    - repo: https://github.com/asottile/pyupgrade
+      rev: v3.15.0
+      hooks:
+          - id: pyupgrade
+            name: pyupgrade - upgrade syntax for newer versions of the language
+            description: Automatically upgrade syntax for newer versions of the language
+            args: [--py36-plus]
+    # - repo: https://github.com/jendrikseipp/vulture
+    #   rev: v2.9.1
+    #   hooks:
+    #       - id: vulture
+    #         name: vulture - finds unused code in Python programs
+    #         description: Finds unused code in Python programs
+##########################################################################################
+# Notebooks
+##########################################################################################
+    - repo: https://github.com/nbQA-dev/nbQA
+      rev: 1.7.1
+      hooks:
+#          - id: nbqa-flake8
+#            name: nbqa-flake8 - Python linting (notebooks)
+#            additional_dependencies: [flake8]
+          #- id: nbqa-mypy
+          #  name: nbqa-mypy - Static type checker for Python (notebooks)
+          #  additional_dependencies: [mypy]
+          #  args: [--ignore-missing-imports]
+          - id: nbqa-isort
+            name: nbqa-isort - Sort Python imports (notebooks)
+            additional_dependencies: [isort]
+          - id: nbqa-pyupgrade
+            name: nbqa-pyupgrade - Upgrade syntax for newer versions of Python (notebooks)
+            additional_dependencies: [pyupgrade]
+            args: [--py36-plus]
+          - id: nbqa-black
+            name: nbqa-black - consistent Python code formatting (notebooks)
+            additional_dependencies: [black]
+#          - id: nbqa-pydocstyle
+#            additional_dependencies: [pydocstyle, toml==0.10.2]
+    - repo: https://github.com/kynan/nbstripout
+      rev: 0.6.1
+      hooks:
+          - id: nbstripout
+            name: nbstripout - strip outputs from notebooks
+            description: Strip output from Jupyter and IPython notebooks
+            args:
+              - --extra-keys
+              - "metadata.colab metadata.kernelspec cell.metadata.colab cell.metadata.executionInfo cell.metadata.id cell.metadata.outputId"
+            files: .ipynb
+##########################################################################################
+# Shell Scripting
+##########################################################################################
+    - repo: local
+      hooks:
+          - id: shellcheck
+            name: shellcheck - static analysis tool for shell scripts
+            description: A static analysis tool for shell scripts
+            language: script
+            entry: scripts/shellcheck.sh
+            types: [shell]
+            args: [-e, SC1091]
+    - repo: https://github.com/lovesegfault/beautysh
+      rev: v6.2.1
+      hooks:
+          - id: beautysh
+            name: beautysh - Autoformat shell scripts
+            description: Autoformat shell scripts
+##########################################################################################
+# Tests
+##########################################################################################
+    - repo: local
+      hooks:
+          - id: pytest
+            name: pytest
+            description: Run pytest
+            entry: pytest -sv test
+            language: system
+            always_run: true
+            types: [python]
+            stages: [push]
+            pass_filenames: false
+##########################################################################################
+# Security
+##########################################################################################
+#    - repo: local
+#      hooks:
+#          - id: safety
+#            name: safety
+#            description: Analyze your Python requirements for known security vulnerabilities
+#            entry: safety check --short-report -r
+#            language: system
+#            files: requirements/*.txt
+    - repo:  https://github.com/PyCQA/bandit
+      rev: 1.7.7
+      hooks:
+          - id: bandit
+            args: ["-c", "pyproject.toml"]
+            additional_dependencies: [".[toml]"]
+    # - repo: https://github.com/PyCQA/bandit
+    #   rev: 1.7.5
+    #   hooks:
+    #       - id: bandit
+    #         name: bandit - find common security issues in Python code.
+    #         description: Tool designed to find common security issues in Python code
+    #         args: ["-c", "pyproject.toml"]
+    #         additional_dependencies: [toml==0.10.2]
+##########################################################################################
+# Git
+##########################################################################################
+    # - repo: https://github.com/commitizen-tools/commitizen
+    #   rev: 3.6.0
+    #   hooks:
+    #       - id: commitizen
+    #         stages: [commit-msg]
+    #         additional_dependencies: [git+https://bitbucket.fraunhofer.pt/scm/is2020/mlops-commit-drafter.git]
+##########################################################################################
+# Documentation
+##########################################################################################
+    - repo: https://github.com/executablebooks/mdformat
+      rev: 0.7.17
+      hooks:
+          - id: mdformat
+            name: mdformat - Markdown formatter that can be used to enforce a consistent style in Markdown files
+            description: Markdown formatter that can be used to enforce a consistent style in Markdown files
+            additional_dependencies:
+              - mdformat-black
+              - mdformat-beautysh
+            exclude: CHANGELOG.md
+    - repo: https://github.com/myint/docformatter
+      rev: v1.7.5
+      hooks:
+          - id: docformatter
+            name: docformatter - formats docstrings to follow PEP 257
+            description: Formats docstrings to follow PEP 257
+            args: [--in-place]
+    - repo: https://github.com/terrencepreilly/darglint
+      rev: v1.8.1
+      hooks:
+          - id: darglint
+            name: darglint - Python documentation linter
+            description: A python documentation linter which checks that the docstring description matches the definition.
+            args: ["-z", long]
+#    - repo: https://github.com/econchick/interrogate
+#      rev: 1.5.0
+#      hooks:
+#          - id: interrogate
+#            name: interrogate - interrogate a codebase for docstring coverage
+#            description: Interrogate a codebase for docstring coverage
+# WIP
+#    - repo: https://github.com/PyCQA/prospector
+#      rev: 1.5.3.1
+#      hooks:
+#          - id: prospector
+##########################################################################################
+# DVC
+##########################################################################################
+# https://dvc.org/doc/command-reference/install#--use-pre-commit-tool
+#    - repo: https://github.com/iterative/dvc
+#      hooks:
+#         - id: dvc-pre-commit
+#           language_version: python3
+#           stages:
+#           - commit
+#         - id: dvc-pre-push
+#           # use s3/gs/etc instead of all to only install specific cloud support
+#           additional_dependencies: ['.[all]']
+#           language_version: python3
+#           stages:
+#           - push
+#           - always_run: true
+#         - id: dvc-post-checkout
+#           language_version: python3
+#           stages:
+#           - post-checkout
+##########################################################################################
+# Docker
+##########################################################################################
+    - repo: local
+      hooks:
+          - id: hadolint
+            name: hadolint - Lint Dockerfile for errors and enforce best practices
+            description: Lint Dockerfile for errors and enforce best practices
+            language: script
+            entry: scripts/hadolint.sh
+            files: Dockerfile
