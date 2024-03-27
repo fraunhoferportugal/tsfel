@@ -310,6 +310,9 @@ def time_series_features_extractor(
     if isinstance(signal_windows, list) and isinstance(signal_windows[0], numbers.Real):
         signal_windows = np.array(signal_windows)
 
+    if len(np.shape(signal_windows)) > 2:
+        signal_windows = list(signal_windows)
+
     # more than one window
     if isinstance(signal_windows, list):
         # Starting the display of progress bar for notebooks interfaces

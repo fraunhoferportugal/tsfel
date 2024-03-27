@@ -118,7 +118,7 @@ features5 = time_series_features_extractor(
 )
 # input: np.array
 features6 = time_series_features_extractor(
-    settings4,
+    settings5,
     data_new.values[:, 0],
     fs=resample_rate,
     n_jobs=n_jobs,

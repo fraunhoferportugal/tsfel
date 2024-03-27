@@ -554,7 +554,7 @@
             "use": "yes"
         },
         "new_feature_with_parameter": {
-            "complexity": "log",
+            "complexity": "constant",
             "description": "A new feature.",
             "function": "new_feature_with_parameter",
             "parameters": {
