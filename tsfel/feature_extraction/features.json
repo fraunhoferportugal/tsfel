@@ -510,7 +510,7 @@
           "threshold": null
       },
       "n_features": 1,
-      "use": "yes"
+      "use": "no"
     },
     "Mean absolute diff": {
       "complexity": "constant",
