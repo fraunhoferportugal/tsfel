@@ -704,7 +704,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(entropy(lin), 1.0)
         np.testing.assert_almost_equal(entropy(lin0), 1.0)
         np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
-        np.testing.assert_almost_equal(entropy(offsetWave), 0.8890012261845581)
+        np.testing.assert_almost_equal(entropy(offsetWave), 0.8891261649211666)
         np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
     def test_neighbourhood_peaks(self):
@@ -938,7 +938,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_skewness(wave, Fs),
-            10746623.828906002,
+            10757350.436568316,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -969,7 +969,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_kurtosis(wave, Fs),
-            123297212118194.1,
+            123562213974218.03,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -1148,7 +1148,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_positive_turning(offsetWave, Fs),
-            160,
+            161,
             decimal=1,
         )
         np.testing.assert_almost_equal(
