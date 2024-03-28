@@ -1545,7 +1545,7 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
 
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
     Sxx_mean = Sxx.mean(1)
-    f_keys = np.round(frequencies, 1).astype(str)
+    f_keys = np.round(frequencies, 2).astype(str)
 
     return {"names": f_keys, "values": Sxx_mean}
 
