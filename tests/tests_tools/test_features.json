@@ -66,7 +66,7 @@
             "use": "yes"
         },
         "new_feature_with_tag": {
-            "complexity": "constant",
+            "complexity": "log",
             "description": "A new feature with a tag.",
             "function": "new_feature_with_tag",
             "parameters": "",
@@ -75,17 +75,6 @@
         }
     },
     "spectral": {
-        "FFT mean coefficient": {
-            "complexity": "constant",
-            "description": "Computes the mean value of each spectrogram frequency.",
-            "function": "tsfel.fft_mean_coeff",
-            "n_features": "nfreq",
-            "parameters": {
-                "fs": 100,
-                "nfreq": 256
-            },
-            "use": "yes"
-        },
         "Fundamental frequency": {
             "complexity": "log",
             "description": "Computes the fundamental frequency.",
@@ -296,6 +285,17 @@
             "function": "tsfel.spectral_variation",
             "n_features": 1,
             "parameters": {
+                "fs": 100
+            },
+            "use": "yes"
+        },
+        "Spectrogram mean coefficient": {
+            "complexity": "constant",
+            "description": "Calculates the average value for each frequency in the spectrogram over the entire duration of the signal.",
+            "function": "tsfel.spectrogram_mean_coeff",
+            "n_features": "bins",
+            "parameters": {
+                "bins": 32,
                 "fs": 100
             },
             "use": "yes"
@@ -554,7 +554,7 @@
             "use": "yes"
         },
         "new_feature_with_parameter": {
-            "complexity": "constant",
+            "complexity": "log",
             "description": "A new feature.",
             "function": "new_feature_with_parameter",
             "parameters": {

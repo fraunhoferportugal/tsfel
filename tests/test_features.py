@@ -1345,23 +1345,23 @@ class TestFeatures(unittest.TestCase):
 
     def test_fft_mean_coeff(self):
         np.testing.assert_almost_equal(
-            fft_mean_coeff(const0, Fs, nfreq=10),
+            spectrogram_mean_coeff(const0, Fs, bins=10)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(const1, Fs, nfreq=10),
+            spectrogram_mean_coeff(const1, Fs, bins=10)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(constNeg, Fs, nfreq=10),
+            spectrogram_mean_coeff(constNeg, Fs, bins=10)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(constF, Fs, nfreq=10),
+            spectrogram_mean_coeff(constF, Fs, bins=10)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(lin, Fs, nfreq=10),
+            spectrogram_mean_coeff(lin, Fs, bins=10)["values"],
             (
                 0.00408221375370652,
                 0.29732082717207287,
@@ -1376,7 +1376,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(lin0, Fs, nfreq=10),
+            spectrogram_mean_coeff(lin0, Fs, bins=10)["values"],
             (
                 0.004523228535962903,
                 0.3294413597474491,
@@ -1391,7 +1391,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(wave, Fs, nfreq=10),
+            spectrogram_mean_coeff(wave, Fs, bins=10)["values"],
             (
                 2.0234880089914443e-06,
                 0.0001448004568848076,
@@ -1406,7 +1406,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(offsetWave, Fs, nfreq=10),
+            spectrogram_mean_coeff(offsetWave, Fs, bins=10)["values"],
             (
                 2.0234880089914642e-06,
                 0.00014480045688480763,
@@ -1421,7 +1421,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            fft_mean_coeff(noiseWave, Fs, nfreq=10),
+            spectrogram_mean_coeff(noiseWave, Fs, bins=10)["values"],
             (
                 3.2947755935395495e-06,
                 0.00014466702099241778,

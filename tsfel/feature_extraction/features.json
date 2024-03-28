@@ -1,14 +1,14 @@
 {
   "spectral": {
-    "FFT mean coefficient": {
+    "Spectrogram mean coefficient": {
       "complexity": "constant",
-      "description": "Computes the mean value of each spectrogram frequency.",
-      "function": "tsfel.fft_mean_coeff",
+      "description": "Calculates the average value for each frequency in the spectrogram over the entire duration of the signal.",
+      "function": "tsfel.spectrogram_mean_coeff",
       "parameters": {
         "fs": 100,
-        "nfreq": 256
+        "bins": 32
       },
-      "n_features": "nfreq",
+      "n_features": "bins",
       "use": "yes"
     },
     "Fundamental frequency": {
