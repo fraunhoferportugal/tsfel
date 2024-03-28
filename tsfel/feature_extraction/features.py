@@ -1,6 +1,5 @@
 import warnings
 
-import numpy as np
 import scipy.signal
 from statsmodels.tsa.stattools import acf
 
@@ -103,9 +102,7 @@ def negative_turning(signal):
     """
     diff_sig = np.diff(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
-    negative_turning_pts = np.where(
-        (diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0),
-    )[0]
+    negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
 
     return len(negative_turning_pts)
 
@@ -131,9 +128,7 @@ def positive_turning(signal):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where(
-        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0),
-    )[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
@@ -322,9 +317,7 @@ def auc(signal, fs):
     """
     t = compute_time(signal, fs)
 
-    return np.sum(
-        0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])),
-    )
+    return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
 
 
 @set_domain("domain", "temporal")
@@ -358,7 +351,8 @@ def neighbourhood_peaks(signal, n=10):
 
 @set_domain("domain", "temporal")
 def lempel_ziv(signal, threshold=None):
-    """Computes the Lempel-Ziv's (LZ) complexity index.
+    """Computes the Lempel-Ziv's (LZ) complexity index, normalized by the
+    signal's length.
 
     Parameters
     ----------
@@ -376,7 +370,8 @@ def lempel_ziv(signal, threshold=None):
         threshold = np.mean(signal)
 
     binary_signal = (signal > threshold).astype(int)
-    lz_index = LZ76(binary_signal)
+    string_binary_signal = "".join(map(str, binary_signal))
+    lz_index = calc_lempel_ziv_complexity(string_binary_signal)
 
     return lz_index
 
@@ -493,11 +488,7 @@ def hist(signal, nbins=10, r=1):
     nd-array
         The values of the histogram
     """
-    histsig, bin_edges = np.histogram(
-        signal,
-        bins=nbins,
-        range=[-r, r],
-    )  # TODO:subsampling parameter
+    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
 
     return tuple(histsig)
 
@@ -829,7 +820,6 @@ def ecdf_percentile(signal, percentile=None):
     """
     if percentile is None:
         percentile = [0.2, 0.8]
-
     signal = np.array(signal)
     if isinstance(percentile, str):
         percentile = eval(percentile)
@@ -992,11 +982,7 @@ def max_power_spectrum(signal, fs):
     if np.std(signal) == 0:
         return float(max(scipy.signal.welch(signal, fs, nperseg=len(signal))[1]))
     else:
-        return float(
-            max(
-                scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1],
-            ),
-        )
+        return float(max(scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))[1]))
 
 
 @set_domain("domain", "spectral")
@@ -1323,9 +1309,7 @@ def spectral_positive_turning(signal, fs):
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
-    positive_turning_pts = np.where(
-        (diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0),
-    )[0]
+    positive_turning_pts = np.where((diff_sig[array_signal + 1] < 0) & (diff_sig[array_signal] > 0))[0]
 
     return len(positive_turning_pts)
 
@@ -1417,9 +1401,7 @@ def human_range_energy(signal, fs):
         # For handling the occurrence of Nan values
         return 0.0
 
-    hr_energy = np.sum(
-        fmag[np.argmin(np.abs(0.6 - f)) : np.argmin(np.abs(2.5 - f))] ** 2,
-    )
+    hr_energy = np.sum(fmag[np.argmin(np.abs(0.6 - f)) : np.argmin(np.abs(2.5 - f))] ** 2)
 
     ratio = hr_energy / allenergy
 
@@ -1470,9 +1452,7 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
     # liftering
     ncoeff = len(mel_coeff)
     n = np.arange(ncoeff)
-    lift = 1 + (cep_lifter / 2) * np.sin(
-        np.pi * n / cep_lifter,
-    )  # cep_lifter = 22 from python_speech_features library
+    lift = 1 + (cep_lifter / 2) * np.sin(np.pi * n / cep_lifter)  # cep_lifter = 22 from python_speech_features library
 
     mel_coeff *= lift
 
@@ -1506,11 +1486,7 @@ def power_bandwidth(signal, fs):
     if np.std(signal) == 0:
         freq, power = scipy.signal.welch(signal, fs, nperseg=len(signal))
     else:
-        freq, power = scipy.signal.welch(
-            signal / np.std(signal),
-            fs,
-            nperseg=len(signal),
-        )
+        freq, power = scipy.signal.welch(signal / np.std(signal), fs, nperseg=len(signal))
 
     if np.sum(power) == 0:
         return 0.0
@@ -2008,9 +1984,7 @@ def mse(signal, m=3, maxscale=None, tolerance=None):
     if maxscale is None:
         maxscale = n // (10 + 3)
 
-    mse_values = np.array(
-        [sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)],
-    )
+    mse_values = np.array([sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)])
     mse_values_finite = mse_values[np.isfinite(mse_values)]
     mse_area = np.trapz(mse_values_finite) / len(mse_values_finite)
 

@@ -5,9 +5,18 @@ Changelog
 
 Version 0.1.7
 =============
+- New features
+    - Implemented the Lempel-Ziv-Complexity in the temporal domain (`#146 <https://github.com/fraunhoferportugal/tsfel/pull/146>`_)
+    - Added the fractal domain with the following features (`#144 <https://github.com/fraunhoferportugal/tsfel/pull/144>`_):
+        - Detrended fluctuation analysis (DFA)
+        - Higuchi fractal dimension
+        - Hurst exponent
+        - Maximum fractal length
+        - Multiscale entropy (MSE)
+        - Petrosian fractal dimension
+
 - Changes
     - Changed the ``autocorrelation`` logic. It now measures the first lag below (1/e) from the ACF (`#142 <https://github.com/fraunhoferportugal/tsfel/issues/142>`_).
-
 
 Version 0.1.6
 =============
@@ -22,7 +31,7 @@ Version 0.1.6
 - Improvements
     - Correlated features are now computed using absolute value
     - Unit tests improvements
-    - Refactoring of some code sections and overall improved stability
+    - Refactoring of some code sections and overall improved stability\
 
 
 Version 0.1.5

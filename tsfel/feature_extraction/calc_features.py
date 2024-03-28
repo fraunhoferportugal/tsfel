@@ -310,6 +310,9 @@ def time_series_features_extractor(
     if isinstance(signal_windows, list) and isinstance(signal_windows[0], numbers.Real):
         signal_windows = np.array(signal_windows)
 
+    if len(np.shape(signal_windows)) > 2:
+        signal_windows = list(signal_windows)
+
     # more than one window
     if isinstance(signal_windows, list):
         # Starting the display of progress bar for notebooks interfaces
@@ -533,6 +536,10 @@ def calc_window_features(
                         for name, value in zip(names, values):
                             feature_results.append(value)
                             feature_names.append(f"{header_names[ax]}_{feat}_{name}Hz")
+                    else:
+                        feature_results += [eval_result_ax]
+                        feature_names += [str(header_names[ax]) + "_" + feat]
+
 
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)),

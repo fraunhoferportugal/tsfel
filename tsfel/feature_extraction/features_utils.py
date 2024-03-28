@@ -550,52 +550,41 @@ def calc_lengths_higuchi(signal):
     return k_values, lk
 
 
-def LZ76(ss):
-    """Calculate Lempel-Ziv's algorithmic complexity using the LZ76 algorithm
-    and the sliding-window implementation.
+def calc_lempel_ziv_complexity(sequence):
+    """Manual implementation of the Lempel-Ziv complexity.
+
+    It is defined as the number of different substrings encountered as
+    the stream is viewed from begining to the end.
 
     Reference:
-    F. Kaspar, H. G. Schuster, "Easily-calculable measure for the
-    complexity of spatiotemporal patterns", Physical Review A, Volume 36,
-    Number 2 (1987).
+    https://github.com/Naereen/Lempel-Ziv_Complexity/blob/master/src/lempel_ziv_complexity.py
 
     Parameters
     ----------
-    ss : np.ndarray
-        Binarised signal
+    sequence : string
+        Binarised signal, as a string of characters
 
     Returns
     -------
-    lz_index : int
         LZ index
     """
 
-    ss = ss.flatten().tolist()
-    i, k, l = 0, 1, 1
-    c, k_max = 1, 1
-    n = len(ss)
+    sub_strings = set()
+
+    ind = 0
+    inc = 1
     while True:
-        if ss[i + k - 1] == ss[l + k - 1]:
-            k = k + 1
-            if l + k > n:
-                c = c + 1
-                break
+        if ind + inc > len(sequence):
+            break
+        sub_str = sequence[ind : ind + inc]
+        if sub_str in sub_strings:
+            inc += 1
         else:
-            if k > k_max:
-                k_max = k
-            i = i + 1
-            if i == l:
-                c = c + 1
-                l = l + k_max
-                if l + 1 > n:
-                    break
-                else:
-                    i = 0
-                    k = 1
-                    k_max = 1
-            else:
-                k = 1
-    return c
+            sub_strings.add(sub_str)
+            ind += inc
+            inc = 1
+
+    return len(sub_strings) / len(sequence)
 
 
 def find_plateau(y, threshold=0.1, consecutive_points=5):

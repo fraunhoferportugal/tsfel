@@ -2,6 +2,7 @@ import time
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 from datasets.empirical1000_dataset import Empirical1000Dataset
 
 import tsfel
@@ -129,4 +130,31 @@ for domain, marker in zip(DOMAINS, ["o", "v", "^"]):
 ax1.set_xscale("log")
 ax1.set_yscale("log")
 
-plt.show()
+#########################################################################################################
+#                    Experiment 4 - Measure the overall execution time per feature                      #
+#########################################################################################################
+execution_times_feature = pd.DataFrame(columns=["Domain", "Feature_Name", "Execution_Time"])
+cfg = tsfel.get_features_by_domain()
+for domain in DOMAINS:
+    for feature in cfg[domain]:
+        print(domain, feature)
+        init_time = time.perf_counter()
+        for _, ts in emp_dataset.raw.items():
+            _ = tsfel.time_series_features_extractor(
+                {domain: {feature: cfg[domain][feature]}},
+                ts.sig,
+                fs=100,
+                verbose=False,
+            )
+        execution_time = time.perf_counter() - init_time
+
+        execution_times_feature.loc[len(execution_times_feature)] = {
+            "Domain": domain,
+            "Feature_Name": feature,
+            "Execution_Time": execution_time,
+        }
+
+fig, ax = plt.subplots(1, 1)
+sns.barplot(execution_times_feature, x="Feature_Name", y="Execution_Time", hue="Domain", ax=ax)
+ax.tick_params(axis="x", rotation=90)
+plt.show(block=False)
