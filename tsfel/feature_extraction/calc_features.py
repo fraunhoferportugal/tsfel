@@ -535,7 +535,7 @@ def calc_window_features(
                         eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
                         for name, value in zip(names, values):
                             feature_results.append(value)
-                            feature_names.append(f"{header_names[ax]}_{feat}_{name}Hz")
+                            feature_names.append(f"{header_names[ax]}_{feat}_{name}")
                     else:
                         feature_results += [eval_result_ax]
                         feature_names += [str(header_names[ax]) + "_" + feat]

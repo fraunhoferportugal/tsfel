@@ -1546,8 +1546,8 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
     Sxx_mean = Sxx.mean(1)
     f_keys = np.round(frequencies, 2).astype(str)
-
-    return {"names": f_keys, "values": Sxx_mean}
+    
+    return {"names": [str(name) + "Hz" for name in f_keys], "values": Sxx_mean}
 
 
 @set_domain("domain", "spectral")
@@ -1627,12 +1627,17 @@ def spectral_entropy(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
-    """Computes CWT entropy of the signal.
+def calc_wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10), stats=("entropy", "energy", "abs_mean", "std", "var")):
+    """Continuous Wavelet Transform (CWT)
+    
+    - Computes CWT entropy of the signal.
+        Implementation details in:
+        https://dsp.stackexchange.com/questions/13055/how-to-calculate-cwt-shannon-entropy
+        B.F. Yan, A. Miyamoto, E. Bruhwiler, Wavelet transform-based modal parameter identification considering uncertainty
 
-    Implementation details in:
-    https://dsp.stackexchange.com/questions/13055/how-to-calculate-cwt-shannon-entropy
-    B.F. Yan, A. Miyamoto, E. Bruhwiler, Wavelet transform-based modal parameter identification considering uncertainty
+    - Computes CWT energy, absolute mean value, std value, variance of each wavelet scale.
+        Implementation details (cwt energy):
+        https://stackoverflow.com/questions/37659422/energy-for-1-d-wavelet-in-python
 
     Feature computational cost: 2
 
@@ -1648,125 +1653,47 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
 
     Returns
     -------
-    float
-        wavelet entropy
+    dict
+        wavelet entropy, absolute mean value, std and variance
     """
+
+    res, names = [], []
+    n_feat = np.arange(len(widths))
+    cwt = wavelet(signal, function, widths)
+    
+    # entropy
     if np.sum(signal) == 0:
-        return 0.0
+        w_entropy = [0.0]
+    else:
+        energy_scale = np.sum(np.abs(cwt), axis=1)
+        t_energy = np.sum(energy_scale)
+        prob = energy_scale / t_energy
+        w_entropy = [-np.sum(prob * np.log(prob))]
+    res.extend(w_entropy)
+    names.extend([stats[0]])
 
-    cwt = wavelet(signal, function, widths)
-    energy_scale = np.sum(np.abs(cwt), axis=1)
-    t_energy = np.sum(energy_scale)
-    prob = energy_scale / t_energy
-    w_entropy = -np.sum(prob * np.log(prob))
-
-    return w_entropy
-
-
-@set_domain("domain", "spectral")
-@set_domain("tag", ["eeg", "ecg"])
-def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
-    """Computes CWT absolute mean value of each wavelet scale.
-
-    Feature computational cost: 2
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
-
-    Returns
-    -------
-    tuple
-        CWT absolute mean value
-    """
-    return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
-
-
-@set_domain("domain", "spectral")
-@set_domain("domain", "eeg")
-def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
-    """Computes CWT std value of each wavelet scale.
-
-    Feature computational cost: 2
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
-
-    Returns
-    -------
-    tuple
-        CWT std
-    """
-    return tuple(np.std(wavelet(signal, function, widths), axis=1))
-
-
-@set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
-def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
-    """Computes CWT variance value of each wavelet scale.
-
-    Feature computational cost: 2
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
-
-    Returns
-    -------
-    tuple
-        CWT variance
-    """
-    return tuple(np.var(wavelet(signal, function, widths), axis=1))
-
-
-@set_domain("domain", "spectral")
-@set_domain("tag", "eeg")
-def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
-    """Computes CWT energy of each wavelet scale.
-
-    Implementation details:
-    https://stackoverflow.com/questions/37659422/energy-for-1-d-wavelet-in-python
-
-    Feature computational cost: 2
-
-    Parameters
-    ----------
-    signal : nd-array
-        Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
-
-    Returns
-    -------
-    tuple
-        CWT energy
-    """
-    cwt = wavelet(signal, function, widths)
+    # energy
     energy = np.sqrt(np.sum(cwt**2, axis=1) / np.shape(cwt)[1])
+    res.extend(energy)
+    names.extend([stats[1] + "_s" + str(i) for i in n_feat])
 
-    return tuple(energy)
+    # absolute mean value
+    cwt_abs_mean = tuple(np.abs(np.mean(cwt, axis=1)))
+    res.extend(cwt_abs_mean)
+    names.extend([stats[2] + "_s" + str(i) for i in n_feat])
+
+    # std
+    cwt_std = tuple(np.std(cwt, axis=1))
+    res.extend(cwt_std)
+    names.extend([stats[3] + "_s" + str(i) for i in n_feat])
+
+    # std
+    cwt_var = tuple(np.var(cwt, axis=1))
+    res.extend(cwt_var)
+    names.extend([stats[4] + "_s" + str(i) for i in n_feat])
+
+
+    return {"names": names, "values": res}
 
 
 # ############################################## FRACTAL DOMAIN ##################################################### #

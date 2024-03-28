@@ -61,6 +61,20 @@ windows = signal_window_splitter(data_new, window_size, overlap)
 
 n_jobs = 1
 
+def test_dataset_extractor():
+
+    # Dataset features extractor
+    dataset_features_extractor(
+        main_directory,
+        settings4,
+        search_criteria=search_criteria,
+        time_unit=time_unit,
+        resample_rate=resample_rate,
+        window_size=window_size,
+        overlap=overlap,
+        pre_process=pre_process,
+        output_directory=output_directory,
+    )
 
 class TestCalcFeatures(unittest.TestCase):
     def test_input_list_window_multi_axis_multi(self):
@@ -185,21 +199,8 @@ class TestCalcFeatures(unittest.TestCase):
             (1, 169),
         )
 
-    def test_dataset_extractor(self):
-
-        # Dataset features extractor
-        data = dataset_features_extractor(
-            main_directory,
-            settings4,
-            search_criteria=search_criteria,
-            time_unit=time_unit,
-            resample_rate=resample_rate,
-            window_size=window_size,
-            overlap=overlap,
-            pre_process=pre_process,
-            output_directory=output_directory,
-        )
-
 
 if __name__ == "__main__":
     unittest.main()
+    test_dataset_extractor()
+    
