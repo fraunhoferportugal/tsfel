@@ -327,7 +327,7 @@ def gaussian(features):
     return np.array(pdf_gauss / np.sum(pdf_gauss))
 
 
-def continuous_wavelet_transform(signal, wavelet="mexh", widths=np.arange(1, 10)):
+def continuous_wavelet_transform(signal, fs, wavelet="mexh", widths=np.arange(1, 10)):
     """Computes CWT (continuous wavelet transform) of the signal.
 
     Parameters
@@ -350,7 +350,7 @@ def continuous_wavelet_transform(signal, wavelet="mexh", widths=np.arange(1, 10)
     if isinstance(widths, str):
         widths = eval(widths)
 
-    coefficients, frequencies = pywt.cwt(signal, widths, wavelet)
+    coefficients, frequencies = pywt.cwt(signal, widths, wavelet, sampling_period=1 / fs)
 
     return coefficients, frequencies
 

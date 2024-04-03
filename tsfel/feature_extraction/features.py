@@ -1627,7 +1627,7 @@ def spectral_entropy(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_entropy(signal, wavelet="mexh", max_width=10):
+def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT entropy of the signal.
 
     Implementation details in:
@@ -1638,6 +1638,8 @@ def wavelet_entropy(signal, wavelet="mexh", max_width=10):
     ----------
     signal : nd-array
         Input from which CWT is computed
+    fs: int
+        Signal sampling frequency
     wavelet : string
         Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     max_width : int
@@ -1653,7 +1655,7 @@ def wavelet_entropy(signal, wavelet="mexh", max_width=10):
 
     widths = np.arange(1, max_width)
 
-    coeffs, _ = continuous_wavelet_transform(signal, wavelet, widths)
+    coeffs, _ = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
     energy_scale = np.sum(np.abs(coeffs), axis=1)
     t_energy = np.sum(energy_scale)
     prob = energy_scale / t_energy
@@ -1664,13 +1666,15 @@ def wavelet_entropy(signal, wavelet="mexh", max_width=10):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", ["eeg", "ecg"])
-def wavelet_abs_mean(signal, wavelet="mexh", max_width=10):
+def wavelet_abs_mean(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT absolute mean value of each wavelet scale.
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
+    fs: int
+        Signal sampling frequency
     wavelet : string
         Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     max_width : int
@@ -1678,24 +1682,28 @@ def wavelet_abs_mean(signal, wavelet="mexh", max_width=10):
 
     Returns
     -------
-    tuple
+    nd-array
         CWT absolute mean value
     """
     widths = np.arange(1, max_width)
 
-    coeffs, _ = continuous_wavelet_transform(signal, wavelet, widths)
-    return tuple(np.abs(np.mean(coeffs, axis=1)))
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.abs(np.mean(coeffs, axis=1))}
 
 
 @set_domain("domain", "spectral")
 @set_domain("domain", "eeg")
-def wavelet_std(signal, wavelet="mexh", max_width=10):
+def wavelet_std(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT std value of each wavelet scale.
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
+    fs: int
+        Signal sampling frequency
     wavelet : string
         Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     max_width : int
@@ -1703,24 +1711,28 @@ def wavelet_std(signal, wavelet="mexh", max_width=10):
 
     Returns
     -------
-    tuple
+    nd-array
         CWT std
     """
     widths = np.arange(1, max_width)
 
-    coeffs, _ = continuous_wavelet_transform(signal, wavelet, widths)
-    return tuple(np.std(coeffs, axis=1))
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.std(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_var(signal, wavelet="mexh", max_width=10):
+def wavelet_var(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT variance value of each wavelet scale.
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
+    fs: int
+        Signal sampling frequency
     wavelet : string
         Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     max_width : int
@@ -1728,18 +1740,20 @@ def wavelet_var(signal, wavelet="mexh", max_width=10):
 
     Returns
     -------
-    tuple
+    nd-array
         CWT variance
     """
     widths = np.arange(1, max_width)
 
-    coeffs, _ = continuous_wavelet_transform(signal, wavelet, widths)
-    return tuple(np.var(coeffs, axis=1))
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.var(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_energy(signal, wavelet="mexh", max_width=10):
+def wavelet_energy(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT energy of each wavelet scale.
 
     Implementation details:
@@ -1749,6 +1763,8 @@ def wavelet_energy(signal, wavelet="mexh", max_width=10):
     ----------
     signal : nd-array
         Input from which CWT is computed
+    fs: int
+        Signal sampling frequency
     wavelet : string
         Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     max_width : int
@@ -1756,15 +1772,15 @@ def wavelet_energy(signal, wavelet="mexh", max_width=10):
 
     Returns
     -------
-    tuple
+    nd-array
         CWT energy
     """
     widths = np.arange(1, max_width)
 
-    coeffs, _ = continuous_wavelet_transform(signal, wavelet, widths)
-    energy = np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
 
-    return tuple(energy)
+    return {"names": f_keys, "values": np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])}
 
 
 # ############################################## FRACTAL DOMAIN ##################################################### #

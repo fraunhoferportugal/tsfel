@@ -1601,23 +1601,23 @@ class TestFeatures(unittest.TestCase):
         )
 
     def test_wavelet_entropy(self):
-        np.testing.assert_almost_equal(wavelet_entropy(const0), 0.0)
-        np.testing.assert_almost_equal(wavelet_entropy(const1), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(constNeg), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(constF), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(lin), 1.9788857784433986)
-        np.testing.assert_almost_equal(wavelet_entropy(lin0), 2.034956946804592)
-        np.testing.assert_almost_equal(wavelet_entropy(wave), 1.7273424867024354)
-        np.testing.assert_almost_equal(wavelet_entropy(offsetWave), 1.7956330280777661)
-        np.testing.assert_almost_equal(wavelet_entropy(noiseWave), 2.040089456959981)
+        np.testing.assert_almost_equal(wavelet_entropy(const0, Fs), 0.0)
+        np.testing.assert_almost_equal(wavelet_entropy(const1, Fs), 1.944364115732569)
+        np.testing.assert_almost_equal(wavelet_entropy(constNeg, Fs), 1.944364115732569)
+        np.testing.assert_almost_equal(wavelet_entropy(constF, Fs), 1.944364115732569)
+        np.testing.assert_almost_equal(wavelet_entropy(lin, Fs), 1.9788857784433986)
+        np.testing.assert_almost_equal(wavelet_entropy(lin0, Fs), 2.034956946804592)
+        np.testing.assert_almost_equal(wavelet_entropy(wave, Fs), 1.7273424867024354)
+        np.testing.assert_almost_equal(wavelet_entropy(offsetWave, Fs), 1.7956330280777661)
+        np.testing.assert_almost_equal(wavelet_entropy(noiseWave, Fs), 2.040089456959981)
 
     def test_wavelet_abs_mean(self):
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(const0),
+            wavelet_abs_mean(const0, Fs)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(const1),
+            wavelet_abs_mean(const1, Fs)["values"],
             (
                 0.07899792805784951,
                 0.2398975173116698,
@@ -1631,7 +1631,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(constNeg),
+            wavelet_abs_mean(constNeg, Fs)["values"],
             (
                 0.07899792805784951,
                 0.2398975173116698,
@@ -1645,7 +1645,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(constF),
+            wavelet_abs_mean(constF, Fs)["values"],
             (
                 0.1974948201446238,
                 0.5997437932791744,
@@ -1659,7 +1659,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(lin),
+            wavelet_abs_mean(lin, Fs)["values"],
             (
                 0.7109813525202424,
                 2.159077655804685,
@@ -1673,7 +1673,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(lin0),
+            wavelet_abs_mean(lin0, Fs)["values"],
             (
                 0.041577856872977034,
                 0.12626185121702949,
@@ -1687,7 +1687,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(wave),
+            wavelet_abs_mean(wave, Fs)["values"],
             (
                 4.957379822130953e-05,
                 0.00015010126842380971,
@@ -1701,7 +1701,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(offsetWave),
+            wavelet_abs_mean(offsetWave, Fs)["values"],
             (
                 0.0031103433240926713,
                 0.00944579942404298,
@@ -1715,7 +1715,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_abs_mean(noiseWave),
+            wavelet_abs_mean(noiseWave, Fs)["values"],
             (
                 4.49133263252551e-05,
                 8.13724192662979e-05,
@@ -1731,11 +1731,11 @@ class TestFeatures(unittest.TestCase):
 
     def test_wavelet_std(self):
         np.testing.assert_almost_equal(
-            wavelet_std(const0),
+            wavelet_std(const0, Fs)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(const1),
+            wavelet_std(const1, Fs)["values"],
             (
                 0.1643028877893254,
                 0.2750570476702813,
@@ -1749,7 +1749,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(constNeg),
+            wavelet_std(constNeg, Fs)["values"],
             (
                 0.1643028877893254,
                 0.2750570476702813,
@@ -1763,7 +1763,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(constF),
+            wavelet_std(constF, Fs)["values"],
             (
                 0.4107572194733135,
                 0.6876426191757031,
@@ -1777,7 +1777,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(lin),
+            wavelet_std(lin, Fs)["values"],
             (
                 2.5500773964136476,
                 5.241917897854233,
@@ -1791,7 +1791,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(lin0),
+            wavelet_std(lin0, Fs)["values"],
             (
                 2.107175440366379,
                 4.719615720034338,
@@ -1805,7 +1805,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(wave),
+            wavelet_std(wave, Fs)["values"],
             (
                 0.0019110445651182074,
                 0.009682149832596305,
@@ -1819,7 +1819,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(offsetWave),
+            wavelet_std(offsetWave, Fs)["values"],
             (
                 0.05109714551769268,
                 0.10242370885712056,
@@ -1833,7 +1833,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_std(noiseWave),
+            wavelet_std(noiseWave, Fs)["values"],
             (
                 0.08113389135272678,
                 0.09399082458459491,
@@ -1849,11 +1849,11 @@ class TestFeatures(unittest.TestCase):
 
     def test_wavelet_var(self):
         np.testing.assert_almost_equal(
-            wavelet_var(const0),
+            wavelet_var(const0, Fs)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(const1),
+            wavelet_var(const1, Fs)["values"],
             (
                 0.026995438935911654,
                 0.07565637947309138,
@@ -1867,7 +1867,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(constNeg),
+            wavelet_var(constNeg, Fs)["values"],
             (
                 0.026995438935911654,
                 0.07565637947309138,
@@ -1881,7 +1881,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(constF),
+            wavelet_var(constF, Fs)["values"],
             (
                 0.16872149334944786,
                 0.47285237170682104,
@@ -1895,7 +1895,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(lin),
+            wavelet_var(lin, Fs)["values"],
             (
                 6.502894727699807,
                 27.477703247844538,
@@ -1909,7 +1909,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(lin0),
+            wavelet_var(lin0, Fs)["values"],
             (
                 4.440188336483244,
                 22.274772544795244,
@@ -1923,7 +1923,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(wave),
+            wavelet_var(wave, Fs)["values"],
             (
                 3.652091329867838e-06,
                 9.374402538084466e-05,
@@ -1937,7 +1937,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(offsetWave),
+            wavelet_var(offsetWave, Fs)["values"],
             (
                 0.0026109182800562606,
                 0.010490616136048195,
@@ -1951,7 +1951,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_var(noiseWave),
+            wavelet_var(noiseWave, Fs)["values"],
             (
                 0.006582708326036073,
                 0.008834275106092093,
@@ -1967,11 +1967,11 @@ class TestFeatures(unittest.TestCase):
 
     def test_wavelet_energy(self):
         np.testing.assert_almost_equal(
-            wavelet_energy(const0),
+            wavelet_energy(const0, Fs)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(const1),
+            wavelet_energy(const1, Fs)["values"],
             (
                 0.182307738654575,
                 0.36497561327490674,
@@ -1985,7 +1985,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(constNeg),
+            wavelet_energy(constNeg, Fs)["values"],
             (
                 0.182307738654575,
                 0.36497561327490674,
@@ -1999,7 +1999,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(constF),
+            wavelet_energy(constF, Fs)["values"],
             (
                 0.4557693466364376,
                 0.9124390331872667,
@@ -2013,7 +2013,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(lin),
+            wavelet_energy(lin, Fs)["values"],
             (
                 2.6473362482562206,
                 5.669155102097631,
@@ -2027,7 +2027,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(lin0),
+            wavelet_energy(lin0, Fs)["values"],
             (
                 2.1075855984195266,
                 4.721304332477201,
@@ -2041,7 +2041,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(wave),
+            wavelet_energy(wave, Fs)["values"],
             (
                 0.0019116874460376426,
                 0.00968331326414813,
@@ -2055,7 +2055,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(offsetWave),
+            wavelet_energy(offsetWave, Fs)["values"],
             (
                 0.05119172311663272,
                 0.10285834561574206,
@@ -2069,7 +2069,7 @@ class TestFeatures(unittest.TestCase):
             ),
         )
         np.testing.assert_almost_equal(
-            wavelet_energy(noiseWave),
+            wavelet_energy(noiseWave, Fs)["values"],
             (
                 0.0811339037840714,
                 0.09399085980861496,

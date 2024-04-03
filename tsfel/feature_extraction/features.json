@@ -230,6 +230,7 @@
       "description": "Computes CWT absolute mean value of each wavelet scale.",
       "function": "tsfel.wavelet_abs_mean",
       "parameters": {
+          "fs": 100,
           "max_width": 10,
           "wavelet": "mexh"
       },
@@ -244,6 +245,7 @@
         "description": "Computes CWT energy of each wavelet scale.",
         "function": "tsfel.wavelet_energy",
         "parameters": {
+            "fs": 100,
             "max_width": 10,
             "wavelet": "mexh"
         },
@@ -255,6 +257,7 @@
         "description": "Computes CWT entropy of the signal.",
         "function": "tsfel.wavelet_entropy",
         "parameters": {
+            "fs": 100,
             "max_width": 10,
             "wavelet": "mexh"
         },
@@ -266,6 +269,7 @@
         "description": "Computes CWT std value of each wavelet scale.",
         "function": "tsfel.wavelet_std",
         "parameters": {
+            "fs": 100,
             "max_width": 10,
             "wavelet": "mexh"
         },
@@ -276,6 +280,7 @@
         "description": "Computes CWT variance value of each wavelet scale.",
         "function": "tsfel.wavelet_var",
         "parameters": {
+            "fs": 100,
             "max_width": 10,
             "wavelet": "mexh"
         },
