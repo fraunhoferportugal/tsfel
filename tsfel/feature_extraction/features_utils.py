@@ -1,4 +1,5 @@
 import numpy as np
+import pywt
 import scipy
 from sklearn.neighbors import KDTree
 
@@ -326,15 +327,15 @@ def gaussian(features):
     return np.array(pdf_gauss / np.sum(pdf_gauss))
 
 
-def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def continuous_wavelet_transform(signal, wavelet="mexh", widths=np.arange(1, 10)):
     """Computes CWT (continuous wavelet transform) of the signal.
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
     widths :  nd-array
         Widths to use for transformation
         Default: np.arange(1,10)
@@ -346,15 +347,12 @@ def wavelet(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
         matrix with size (len(widths),len(signal))
     """
 
-    if isinstance(function, str):
-        function = eval(function)
-
     if isinstance(widths, str):
         widths = eval(widths)
 
-    cwt = scipy.signal.cwt(signal, function, widths)
+    coefficients, frequencies = pywt.cwt(signal, widths, wavelet)
 
-    return cwt
+    return coefficients, frequencies
 
 
 def calc_ecdf(signal):

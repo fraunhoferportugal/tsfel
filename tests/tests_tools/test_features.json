@@ -304,10 +304,9 @@
             "complexity": "linear",
             "description": "Computes CWT absolute mean value of each wavelet scale.",
             "function": "tsfel.wavelet_abs_mean",
-            "n_features": "widths",
             "parameters": {
-                "function": "scipy.signal.ricker",
-                "widths": "np.arange(1,10)"
+                "max_width": 10,
+                "wavelet": "mexh"
             },
             "tag": [
                 "eeg",
@@ -319,10 +318,9 @@
             "complexity": "linear",
             "description": "Computes CWT energy of each wavelet scale.",
             "function": "tsfel.wavelet_energy",
-            "n_features": "widths",
             "parameters": {
-                "function": "scipy.signal.ricker",
-                "widths": "np.arange(1,10)"
+                "max_width": 10,
+                "wavelet": "mexh"
             },
             "tag": "eeg",
             "use": "yes"
@@ -331,10 +329,9 @@
             "complexity": "linear",
             "description": "Computes CWT entropy of the signal.",
             "function": "tsfel.wavelet_entropy",
-            "n_features": 1,
             "parameters": {
-                "function": "scipy.signal.ricker",
-                "widths": "np.arange(1,10)"
+                "max_width": 10,
+                "wavelet": "mexh"
             },
             "tag": "eeg",
             "use": "yes"
@@ -343,22 +340,19 @@
             "complexity": "linear",
             "description": "Computes CWT std value of each wavelet scale.",
             "function": "tsfel.wavelet_std",
-            "n_features": "widths",
             "parameters": {
-                "function": "scipy.signal.ricker",
-                "widths": "np.arange(1,10)"
+                "max_width": 10,
+                "wavelet": "mexh"
             },
-            "tag": "eeg",
             "use": "yes"
         },
         "Wavelet variance": {
             "complexity": "linear",
             "description": "Computes CWT variance value of each wavelet scale.",
             "function": "tsfel.wavelet_var",
-            "n_features": "widths",
             "parameters": {
-                "function": "scipy.signal.ricker",
-                "widths": "np.arange(1,10)"
+                "max_width": 10,
+                "wavelet": "mexh"
             },
             "tag": "eeg",
             "use": "yes"
@@ -547,14 +541,14 @@
             "use": "yes"
         },
         "new_feature": {
-            "complexity": "constant",
+            "complexity": "log",
             "description": "Computes a new feature.",
             "function": "new_feature",
             "parameters": "",
             "use": "yes"
         },
         "new_feature_with_parameter": {
-            "complexity": "constant",
+            "complexity": "log",
             "description": "A new feature.",
             "function": "new_feature_with_parameter",
             "parameters": {

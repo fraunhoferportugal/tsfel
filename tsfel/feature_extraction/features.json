@@ -230,63 +230,57 @@
       "description": "Computes CWT absolute mean value of each wavelet scale.",
       "function": "tsfel.wavelet_abs_mean",
       "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
+          "max_width": 10,
+          "wavelet": "mexh"
       },
-      "n_features": "widths",
-      "use": "yes",
       "tag": [
-        "eeg",
-        "ecg"
-      ]
+          "eeg",
+          "ecg"
+      ],
+      "use": "yes"
     },
     "Wavelet energy": {
-      "complexity": "linear",
-      "description": "Computes CWT energy of each wavelet scale.",
-      "function": "tsfel.wavelet_energy",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "n_features": "widths",
-      "use": "yes",
-      "tag": "eeg"
+        "complexity": "linear",
+        "description": "Computes CWT energy of each wavelet scale.",
+        "function": "tsfel.wavelet_energy",
+        "parameters": {
+            "max_width": 10,
+            "wavelet": "mexh"
+        },
+        "tag": "eeg",
+        "use": "yes"
     },
     "Wavelet entropy": {
-      "complexity": "linear",
-      "description": "Computes CWT entropy of the signal.",
-      "function": "tsfel.wavelet_entropy",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "n_features": 1,
-      "use": "yes",
-      "tag": "eeg"
+        "complexity": "linear",
+        "description": "Computes CWT entropy of the signal.",
+        "function": "tsfel.wavelet_entropy",
+        "parameters": {
+            "max_width": 10,
+            "wavelet": "mexh"
+        },
+        "tag": "eeg",
+        "use": "yes"
     },
     "Wavelet standard deviation": {
-      "complexity": "linear",
-      "description": "Computes CWT std value of each wavelet scale.",
-      "function": "tsfel.wavelet_std",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "n_features": "widths",
-      "use": "yes",
-      "tag": "eeg"
+        "complexity": "linear",
+        "description": "Computes CWT std value of each wavelet scale.",
+        "function": "tsfel.wavelet_std",
+        "parameters": {
+            "max_width": 10,
+            "wavelet": "mexh"
+        },
+        "use": "yes"
     },
     "Wavelet variance": {
-      "complexity": "linear",
-      "description": "Computes CWT variance value of each wavelet scale.",
-      "function": "tsfel.wavelet_var",
-      "parameters": {
-        "function": "scipy.signal.ricker",
-        "widths": "np.arange(1,10)"
-      },
-      "n_features": "widths",
-      "use": "yes",
-      "tag": "eeg"
+        "complexity": "linear",
+        "description": "Computes CWT variance value of each wavelet scale.",
+        "function": "tsfel.wavelet_var",
+        "parameters": {
+            "max_width": 10,
+            "wavelet": "mexh"
+        },
+        "tag": "eeg",
+        "use": "yes"
     }
   },
   "statistical": {
