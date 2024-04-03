@@ -74,7 +74,7 @@ class TestCalcFeatures(unittest.TestCase):
         )
         np.testing.assert_array_equal(
             features0.shape,
-            (16, 552),
+            (16, 495),
         )
 
     def test_input_array_window_tosplit_axis_single(self):
@@ -91,7 +91,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features1.shape,
-            (16, 184),
+            (16, 165),
         )
 
     def test_input_series_window_tosplit_axis_single(self):
@@ -107,7 +107,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features2.shape,
-            (16, 184),
+            (16, 165),
         )
 
     def test_input_dataframe_window_single_axis_multi(self):
@@ -136,7 +136,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features4.shape,
-            (1, 1005),
+            (1, 333),
         )
     
     def test_input_series_window_single_axis_single(self):
@@ -182,7 +182,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features7.shape,
-            (1, 393),
+            (1, 169),
         )
 
     def test_dataset_extractor(self):
