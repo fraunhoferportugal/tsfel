@@ -238,6 +238,7 @@
           "eeg",
           "ecg"
       ],
+      "n_features": "max_width",
       "use": "yes"
     },
     "Wavelet energy": {
@@ -250,6 +251,7 @@
             "wavelet": "mexh"
         },
         "tag": "eeg",
+        "n_features": "max_width",
         "use": "yes"
     },
     "Wavelet entropy": {
@@ -262,6 +264,7 @@
             "wavelet": "mexh"
         },
         "tag": "eeg",
+        "n_features": "max_width",
         "use": "yes"
     },
     "Wavelet standard deviation": {
@@ -273,6 +276,7 @@
             "max_width": 10,
             "wavelet": "mexh"
         },
+        "n_features": "max_width",
         "use": "yes"
     },
     "Wavelet variance": {
@@ -285,6 +289,7 @@
             "wavelet": "mexh"
         },
         "tag": "eeg",
+        "n_features": "max_width",
         "use": "yes"
     }
   },
