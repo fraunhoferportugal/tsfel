@@ -29,3 +29,6 @@ setuptools >= 47.1.1
 
 # tsfel/feature_extraction/features.py: 39
 statsmodels >= 0.12.0
+
+# tsfel/feature_extraction/features_utils.py: 1
+PyWavelets >= 1.6.0
