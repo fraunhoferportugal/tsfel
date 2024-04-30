@@ -822,7 +822,7 @@ def ecdf_percentile(signal, percentile=None):
         percentile = [0.2, 0.8]
     signal = np.array(signal)
     if isinstance(percentile, str):
-        percentile = eval(percentile)
+        percentile = string_to_list(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -867,7 +867,7 @@ def ecdf_percentile_count(signal, percentile=None):
 
     signal = np.array(signal)
     if isinstance(percentile, str):
-        percentile = eval(percentile)
+        percentile = string_to_list(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 

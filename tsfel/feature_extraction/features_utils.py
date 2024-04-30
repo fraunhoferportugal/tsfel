@@ -30,6 +30,27 @@ def compute_time(signal, fs):
     return np.arange(0, len(signal)) / fs
 
 
+def string_to_list(list_string):
+    """
+    Converts a string representation of a list into an actual Python list.
+
+
+    Parameters
+    ----------
+    list_string : str
+        A string representation of a list.
+
+    Returns
+    ----------
+    list
+        A Python list containing integers or floats, based on the numeric values in the input string.
+    """
+    stripped_string = list_string.strip("[] \n")
+    list_elements = stripped_string.split(",")
+    parsed_list = [float(x) if '.' in x else int(x) for x in list_elements if x.strip()]
+    return parsed_list
+
+
 def calc_fft(signal, fs):
     """This functions computes the fft of a signal.
 
