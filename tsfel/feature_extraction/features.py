@@ -1652,6 +1652,8 @@ def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     """
     if np.sum(signal) == 0:
         return 0.0
+    
+    max_width = int(max_width)
 
     widths = np.arange(1, max_width)
 
@@ -1685,6 +1687,7 @@ def wavelet_abs_mean(signal, fs, wavelet="mexh", max_width=10):
     nd-array
         CWT absolute mean value
     """
+    max_width = int(max_width)
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
@@ -1714,6 +1717,7 @@ def wavelet_std(signal, fs, wavelet="mexh", max_width=10):
     nd-array
         CWT std
     """
+    max_width = int(max_width)
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
@@ -1743,6 +1747,7 @@ def wavelet_var(signal, fs, wavelet="mexh", max_width=10):
     nd-array
         CWT variance
     """
+    max_width = int(max_width)
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
@@ -1775,6 +1780,7 @@ def wavelet_energy(signal, fs, wavelet="mexh", max_width=10):
     nd-array
         CWT energy
     """
+    max_width = int(max_width)
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)

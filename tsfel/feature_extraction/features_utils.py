@@ -347,9 +347,6 @@ def continuous_wavelet_transform(signal, fs, wavelet="mexh", widths=np.arange(1,
         matrix with size (len(widths),len(signal))
     """
 
-    if isinstance(widths, str):
-        widths = eval(widths)
-
     coefficients, frequencies = pywt.cwt(signal, widths, wavelet, sampling_period=1 / fs)
 
     return coefficients, frequencies
