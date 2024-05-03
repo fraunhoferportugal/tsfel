@@ -1627,24 +1627,23 @@ def spectral_entropy(signal, fs):
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT entropy of the signal.
 
     Implementation details in:
     https://dsp.stackexchange.com/questions/13055/how-to-calculate-cwt-shannon-entropy
     B.F. Yan, A. Miyamoto, E. Bruhwiler, Wavelet transform-based modal parameter identification considering uncertainty
 
-    Feature computational cost: 2
-
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
+    fs: int
+        Signal sampling frequency
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
+    max_width : int
+        Maximum width to use for transformation, defaults to 10
 
     Returns
     -------
@@ -1653,9 +1652,13 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
     """
     if np.sum(signal) == 0:
         return 0.0
+    
+    max_width = int(max_width)
 
-    cwt = wavelet(signal, function, widths)
-    energy_scale = np.sum(np.abs(cwt), axis=1)
+    widths = np.arange(1, max_width)
+
+    coeffs, _ = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    energy_scale = np.sum(np.abs(coeffs), axis=1)
     t_energy = np.sum(energy_scale)
     prob = energy_scale / t_energy
     w_entropy = -np.sum(prob * np.log(prob))
@@ -1665,108 +1668,125 @@ def wavelet_entropy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10
 
 @set_domain("domain", "spectral")
 @set_domain("tag", ["eeg", "ecg"])
-def wavelet_abs_mean(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet_abs_mean(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT absolute mean value of each wavelet scale.
-
-    Feature computational cost: 2
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
+    fs: int
+        Signal sampling frequency
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
+    max_width : int
+        Maximum width to use for transformation, defaults to 10
 
     Returns
     -------
-    tuple
+    nd-array
         CWT absolute mean value
     """
-    return tuple(np.abs(np.mean(wavelet(signal, function, widths), axis=1)))
+    max_width = int(max_width)
+    widths = np.arange(1, max_width)
+
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.abs(np.mean(coeffs, axis=1))}
 
 
 @set_domain("domain", "spectral")
 @set_domain("domain", "eeg")
-def wavelet_std(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet_std(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT std value of each wavelet scale.
 
-    Feature computational cost: 2
-
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
+    fs: int
+        Signal sampling frequency
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
+    max_width : int
+        Maximum width to use for transformation, defaults to 10
 
     Returns
     -------
-    tuple
+    nd-array
         CWT std
     """
-    return tuple(np.std(wavelet(signal, function, widths), axis=1))
+    max_width = int(max_width)
+    widths = np.arange(1, max_width)
+
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.std(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_var(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet_var(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT variance value of each wavelet scale.
-
-    Feature computational cost: 2
 
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
+    fs: int
+        Signal sampling frequency
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
+    max_width : int
+        Maximum width to use for transformation, defaults to 10
 
     Returns
     -------
-    tuple
+    nd-array
         CWT variance
     """
-    return tuple(np.var(wavelet(signal, function, widths), axis=1))
+    max_width = int(max_width)
+    widths = np.arange(1, max_width)
+
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.var(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
 @set_domain("tag", "eeg")
-def wavelet_energy(signal, function=scipy.signal.ricker, widths=np.arange(1, 10)):
+def wavelet_energy(signal, fs, wavelet="mexh", max_width=10):
     """Computes CWT energy of each wavelet scale.
 
     Implementation details:
     https://stackoverflow.com/questions/37659422/energy-for-1-d-wavelet-in-python
 
-    Feature computational cost: 2
-
     Parameters
     ----------
     signal : nd-array
         Input from which CWT is computed
-    function :  wavelet function
-        Default: scipy.signal.ricker
-    widths :  nd-array
-        Widths to use for transformation
-        Default: np.arange(1,10)
+    fs: int
+        Signal sampling frequency
+    wavelet : string
+        Wavelet to use, defaults to "mexh" which represents the mexican hat wavelet (Ricker wavelet)
+    max_width : int
+        Maximum width to use for transformation, defaults to 10
 
     Returns
     -------
-    tuple
+    nd-array
         CWT energy
     """
-    cwt = wavelet(signal, function, widths)
-    energy = np.sqrt(np.sum(cwt**2, axis=1) / np.shape(cwt)[1])
+    max_width = int(max_width)
+    widths = np.arange(1, max_width)
 
-    return tuple(energy)
+    coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
+    f_keys = np.round(frequencies, 2).astype(str)
+
+    return {"names": f_keys, "values": np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])}
 
 
 # ############################################## FRACTAL DOMAIN ##################################################### #
