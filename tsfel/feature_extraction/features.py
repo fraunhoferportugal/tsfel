@@ -822,7 +822,7 @@ def ecdf_percentile(signal, percentile=None):
         percentile = [0.2, 0.8]
     signal = np.array(signal)
     if isinstance(percentile, str):
-        percentile = string_to_list(percentile)
+        percentile = safe_eval_string(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -867,7 +867,7 @@ def ecdf_percentile_count(signal, percentile=None):
 
     signal = np.array(signal)
     if isinstance(percentile, str):
-        percentile = string_to_list(percentile)
+        percentile = safe_eval_string(percentile)
     if isinstance(percentile, (float, int)):
         percentile = [percentile]
 
@@ -1652,7 +1652,7 @@ def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     """
     if np.sum(signal) == 0:
         return 0.0
-    
+
     max_width = int(max_width)
 
     widths = np.arange(1, max_width)

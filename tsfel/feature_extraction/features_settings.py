@@ -3,7 +3,7 @@ import json
 import numpy as np
 
 import tsfel
-from tsfel.feature_extraction.features_utils import string_to_list
+from tsfel.feature_extraction.features_utils import safe_eval_string
 
 
 def load_json(json_path):
@@ -135,7 +135,7 @@ def get_number_features(dict_features):
                 if isinstance(n_feat_param, int):
                     number_features += n_feat_param
                 else:
-                    n_feat_param_list = string_to_list(list(n_feat_param))
+                    n_feat_param_list = safe_eval_string(n_feat_param)
                     number_features += len(n_feat_param_list)
 
     return number_features

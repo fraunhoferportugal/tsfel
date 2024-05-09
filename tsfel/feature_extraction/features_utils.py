@@ -31,24 +31,24 @@ def compute_time(signal, fs):
     return np.arange(0, len(signal)) / fs
 
 
-def string_to_list(list_string):
-    """
-    Converts a string representation of a list into an actual Python list.
-
+def safe_eval_string(list_string):
+    """Safely evaluate a string containing a Python literal list of floats or
+    integers. This method is safer and faster on runtime than
+    `ast.eval_literal`.
 
     Parameters
     ----------
     list_string : str
-        A string representation of a list.
+        A string representation of a list literal.
 
     Returns
     ----------
-    list
-        A Python list containing integers or floats, based on the numeric values in the input string.
+    parsed_list
+        A list containing integers or floats.
     """
-    stripped_string = list_string.strip("[] \n")
-    list_elements = stripped_string.split(",")
-    parsed_list = [float(x) if '.' in x else int(x) for x in list_elements if x.strip()]
+    list_elements = list_string.strip("[] \n").split(",")
+    parsed_list = [float(x) if "." in x else int(x) for x in list_elements if x.strip()]
+
     return parsed_list
 
 
