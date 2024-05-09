@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from tsfel.feature_extraction.calc_features import dataset_features_extractor, time_series_features_extractor
-from tsfel.feature_extraction.features_settings import get_features_by_domain, get_features_by_tag, get_number_features
+from tsfel.feature_extraction.features_settings import get_features_by_domain, get_number_features, load_json
 from tsfel.utils.add_personal_features import add_feature_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
@@ -171,7 +171,7 @@ class TestCalcFeatures(unittest.TestCase):
 
     def test_personal_features(self):
         # personal features
-        settings1 = json.load(open(personal_path_json))
+        settings1 = load_json(personal_path_json)
         add_feature_json(personal_features_path, personal_path_json)
         features7 = time_series_features_extractor(
             settings1,

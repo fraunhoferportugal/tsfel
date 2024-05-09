@@ -7,20 +7,23 @@ from tsfel.feature_extraction.features_utils import safe_eval_string
 
 
 def load_json(json_path):
-    """Loads the json file given by filename.
+    """A convenient method that wraps the built-in `json.load`. This method
+    might be handy to load customized feature configuration files.
 
     Parameters
     ----------
-    json_path : string
-        Json path
+    json_path : file-like object, string, or pathlib.Path.
+        The json file to read.
 
     Returns
     -------
-    Dict
-        Dictionary
+    dict
+        Data stored in the file.
     """
+    with open(json_path) as f:
+        out = json.load(f)
 
-    return json.load(open(json_path))
+    return out
 
 
 def get_features_by_domain(domain=None, json_path=None):
