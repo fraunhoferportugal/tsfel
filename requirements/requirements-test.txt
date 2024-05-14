@@ -5,4 +5,4 @@ pyarrow==15.0.0
 pytest==7.1.1
 requests==2.31.0
 seaborn==0.13.2
-tqdm==4.66.1
+tqdm==4.66.3
