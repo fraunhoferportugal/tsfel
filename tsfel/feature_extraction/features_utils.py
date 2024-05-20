@@ -246,7 +246,7 @@ def lpc(signal, n_coeff=12):
     order = n_coeff - 1
 
     # Calculate LPC with Yule-Walker
-    acf = np.correlate(signal, signal, "full")
+    acf = scipy.signal.correlate(signal, signal, "full")
 
     r = np.zeros(order + 1, "float32")
     # Assuring that works for all type of input lengths
