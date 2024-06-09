@@ -58,7 +58,7 @@ Now that we have the input data we are ready for the feature extraction step. TS
 
 .. code:: python
 
-    cfg_file = tsfel.get_features_by_domain()                                                        # If no argument is passed retrieves all available features
+    cfg_file = tsfel.get_features_by_domain()                                                        # If no argument is passed retrieves all the features available by default.
     X_train = tsfel.time_series_features_extractor(cfg_file, X_train_sig, fs=50, window_size=250)    # Receives a time series sampled at 50 Hz, divides into windows of size 250 (i.e. 5 seconds) and extracts all features
 
 We finally have now ``X_train`` as the final feature vector composed of 205 features calculated for each of the 3764 extracted windows.
@@ -72,7 +72,6 @@ TSFEL provides a method to increase flexibility when extracting features over mu
 * **Time series are stored on different file locations**
 
   * TSFEL crawls over a given dataset root directory and extracts features from all text files which match filenames provided by the user
-
 
 
 * **Files store time series in delimited format**
@@ -116,6 +115,7 @@ Bellow, we list four examples to set up the configuration dictionary.
   cgf_file = tsfel.get_features_by_domain("statistical")  # All statistical domain features will be extracted
   cgf_file = tsfel.get_features_by_domain("temporal")     # All temporal domain features will be extracted
   cgf_file = tsfel.get_features_by_domain("spectral")     # All spectral domain features will be extracted
+  cgf_file = tsfel.get_features_by_domain("fractal")      # All fractal domain features will be extracted
 
 In case you want a customised set of features or a combination of features from several domains, you can need to edit the configuration dictionary (JSON). You must edit the value of the key ``use`` to ``yes`` or ``no`` as appropriate. You can load any of the previous configuration dictionaries and set to ``"use": "no"`` the features you are not interested in or edit a dictionary manually or programmatically and set the ``use`` as ``yes`` or ``no`` as appropriate. An example file is available  `here <https://github.com/fraunhoferportugal/tsfel/blob/development/tsfel/feature_extraction/features.json/>`_.
 
