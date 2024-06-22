@@ -1,4 +1,8 @@
-[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
+<p align="center">
+    <a href="https://readthedocs.org/projects/tsfel/badge/?version=latest"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/feature/datasets/docs/imgs/tsfel_feature_sets.png" width="100%" alt="tsfel logo" /></a>
+</p>
+
+[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
 [![license](https://img.shields.io/badge/License-BSD%203-brightgreen)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 ![PyPI](https://img.shields.io/pypi/v/tsfel)
@@ -23,7 +27,9 @@ It does not requires installation as it relies on Google Colabs and a user inter
 Advanced users can take full potential of TSFEL by installing as a python package
 
 ```python
-pip install tsfel
+pip
+install
+tsfel
 ```
 
 ## Includes a comprehensive number of features
