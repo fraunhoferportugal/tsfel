@@ -5,63 +5,61 @@ Get Started
 Overview
 --------
 
-Time series are passed as inputs for the main TSFEL extraction method, either as arrays previously loaded in memory or stored in files on a dataset. Since TSFEL can handle multidimensional time series, a set of preprocessing methods is afterwards applied to ensure that the signal quality is adequate and time series synchronisation so that the window calculation process is properly achieved. After the feature extraction, the result is saved using a standard schema ready to be digested by most of the classification and data mining platforms. Each line corresponds to a window with the results of the feature extraction methods stored along with the corresponding columns.
+Time series are passed as inputs for the main ``TSFEL`` extraction method, either as variables previously loaded in memory or stored in files within a dataset. Since ``TSFEL`` can handle multidimensional time series, a set of preprocessing methods is applied to ensure adequate signal quality and time series synchronization, enabling accurate window calculation.
+
+After feature extraction, the results are saved using a standard schema, making them compatible with most classification and data mining platforms. Each line corresponds to a window, with the results of the feature extraction methods stored in the corresponding columns.
 
 .. image:: ../imgs/tsfel_pipeline.png
     :align: center
     :scale: 25 %
     :alt: TSFEL!
 
-Extract from time series as array objects
------------------------------------------
+Extract from time series stored in DataFrames, Series or ndarrays
+-----------------------------------------------------------------
 
-Let us start by downloading some data. A complete dataset description can be found in [1]_. On this example we will use a time series sampled by an accelerometer sensor at 50 Hz.
+Let's start by downloading some data. The following method returns a single-lead electrocardiogram (ECG) recorded at 100 Hz for a duration of 10 seconds.
 
 .. code:: python
 
     import tsfel
-    import zipfile
-    import numpy as np
     import pandas as pd
 
-    # Load the dataset from online repository
-    !wget https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.zip
+    data = tsfel.datasets.load_biopluxecg()    # A single-lead ECG collected during 10 s at 100 Hz.
 
-    # Unzip the dataset
-    zip_ref = zipfile.ZipFile("UCI HAR Dataset.zip", 'r')
-    zip_ref.extractall()
-    zip_ref.close()
-
-    # Store the dataset as a Pandas dataframe.
-    x_train_sig = np.loadtxt('UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt', dtype='float32')
-    X_train_sig = pd.DataFrame(np.hstack(x_train_sig), columns=["total_acc_x"])
-
-Let us look to the data structure:
+Let us look to the input data structure:
 
 .. code:: python
 
-    X_train_sig.head()
+    data.head()
+    0    2.898565
+    1    2.462342
+    2    -0.513560
+    3    -5.263333
+    4    -8.934970
+    dtype: float64
 
-=====  ===========
-Id     total_acc_x
------  -----------
-0      1.012817
-1      1.022833
-2      1.022028
-3      1.017877
-4      1.023680
-=====  ===========
+Our input data is a ``Series`` named *LeadII*. Note that ``TSFEL`` can also handle multidimensional time series. In such cases, you will need to include the additional time series as a ``DataFrame`` or ``ndarray``.
 
-We have now a DataFrame composed by a unique column with associated column name. Note that TSFEL can also handle multidimensional datastreams. In that case, it will be necessary to pass the additional time series as additional columns in the dataframe.
+Now that we have the input data, we are ready for the feature extraction step. ``TSFEL`` relies on dictionaries to set up the configuration for extraction. We provide a set of template configuration dictionaries that can be used out of the box.
 
-Now that we have the input data we are ready for the feature extraction step. TSFEL relies on dictionaries to setup the configuration of the extractly. We provide a set of template configuration dictionaries that can be used out of the box. In this example we will use the example that extracts all the available features of TSFEL. We will configure TSFEL to divide our time series in windows of equal length of size 250 points (corresponding to 5 seconds).
+In this example, we will use the configuration that extracts all available features from the temporal, statistical, and spectral sets.
 
 .. code:: python
 
-    cfg_file = tsfel.get_features_by_domain()                                                        # If no argument is passed retrieves all the features available by default.
-    X_train = tsfel.time_series_features_extractor(cfg_file, X_train_sig, fs=50, window_size=250)    # Receives a time series sampled at 50 Hz, divides into windows of size 250 (i.e. 5 seconds) and extracts all features
+    cfg = tsfel.get_features_by_domain() # Extracts the temporal, statistical and spectral feature sets.
+    X = tsfel.time_series_feature_extractor(cfg, data, fs=100)
+    X.shape    # (1, 165)
 
-We finally have now ``X_train`` as the final feature vector composed of 205 features calculated for each of the 3764 extracted windows.
+We now have ``X`` as the extracted feature vector, composed of 165 features calculated for the entire length of the input data.
+
+Alternatively, if we are interested in performing window splitting before the feature extraction, we can divide the input data into shorter equal-length windows of size 100 (corresponding to 1 second).
+
+.. code:: python
+
+    cfg = tsfel.get_features_by_domain()    # Extracts the temporal, statistical and spectral feature sets.
+    X = tsfel.time_series_feature_extractor(cfg, data, fs=100, window_size=100)    # Performs window splitting before feature extraction
+    X.shape    # (10, 165)
+
 
 Extract from time series stored in datasets
 -------------------------------------------
@@ -118,8 +116,3 @@ Bellow, we list four examples to set up the configuration dictionary.
   cgf_file = tsfel.get_features_by_domain("fractal")      # All fractal domain features will be extracted
 
 In case you want a customised set of features or a combination of features from several domains, you can need to edit the configuration dictionary (JSON). You must edit the value of the key ``use`` to ``yes`` or ``no`` as appropriate. You can load any of the previous configuration dictionaries and set to ``"use": "no"`` the features you are not interested in or edit a dictionary manually or programmatically and set the ``use`` as ``yes`` or ``no`` as appropriate. An example file is available  `here <https://github.com/fraunhoferportugal/tsfel/blob/development/tsfel/feature_extraction/features.json/>`_.
-
-References
-----------
-
-.. [1] `https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones <https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones>`_.

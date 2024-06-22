@@ -4,11 +4,11 @@ Mainly for testing and supporting the documentation.
 """
 
 import os
-import shutil
 import zipfile
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import requests
 
 CACHE_ROOT_DIR = os.path.expanduser("~/.tsfel")
@@ -30,7 +30,7 @@ def _download_dataset(url, cache_dir, filename):
         print(f"An error occurred: {e}")
 
 
-def load_biopluxecg(use_cache=True) -> np.ndarray:
+def load_biopluxecg(use_cache=True) -> pd.Series:
     """Load an example single-lead ECG signal colected using BioSignalsPlux.
 
     Parameters
@@ -67,6 +67,7 @@ def load_biopluxecg(use_cache=True) -> np.ndarray:
         _download_dataset(REF_URL, cache_dir, "biopluxecg.txt")
 
     X = np.loadtxt(os.path.join(cache_dir, "biopluxecg.txt"))[1]
+    X = pd.Series(X, name="LeadII")
 
     return X
 
