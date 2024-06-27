@@ -6,16 +6,18 @@ Welcome to TSFEL documentation!
     :scale: 35 %
     :alt: TSFEL!
 
-Time Series Feature Extraction Library (TSFEL for short) is a Python package for feature extraction on time series data. It provides exploratory feature extraction tasks on time series without requiring significant programming effort. ``TSFEL`` automatically extracts over 60 different features on the statistical, temporal, spectral and fractal domains. ``TSFEL`` was built by data scientists for data scientists!
+**Time Series Feature Extraction Library (TSFEL)** is a Python package for efficient feature extraction from time series data. It offers a comprehensive set of feature extraction routines without requiring extensive programming effort. ``TSFEL`` automatically extracts over 65 features spanning statistical, temporal, spectral, and fractal domains.
+
+The ``TSFEL`` project began in 2019 intending to centralize development in feature extraction methods for time series data, applicable across various fields including healthcare and industry. ``TSFEL`` is currently being used in academic and industrial projects, demonstrating its wide-ranging applicability. Built by data scientists for data scientists, ``TSFEL`` aims to streamline and enhance feature extraction processes.
 
 Highlights
 ==========
 
-- **Intuitive, fast deployment and reproducible**: interactive UI for feature selection and customization
-- **Computational complexity evaluation**: estimate the computational effort before extracting features
-- **Comprehensive documentation**: each feature extraction method has a detailed explanation
-- **Unit tested**: we provide unit tests for each feature
-- **Easily extended**: adding new features is easy and we encourage you to contribute with your custom features
+- **Intuitive, fast deployment, and reproducible**: Easily configure your feature extraction pipeline and store the configuration file to ensure reproducibility.
+- **Computational complexity evaluation**: Estimate the computational time required for feature extraction in advance.
+- **Comprehensive documentation**: Each feature extraction method is accompanied by a detailed explanation.
+- **Unit tested**: We provide an extensive suite of unit tests for each feature to ensure accurate and reliable feature calculation.
+- **Easily extended**: Adding new features is straightforward, and we encourage contributions of custom features to the community.
 
 Installation
 ============
