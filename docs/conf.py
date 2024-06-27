@@ -56,6 +56,18 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
+# If true, figures, tables and code-blocks are automatically numbered
+# if they have a caption.
+numfig = True
+
+numfig_format = {
+    "figure": "Fig. %s",
+    "table": "Table %s",
+    "code-block": "Listing %s",
+}
+
+numfig_secnum_depth = 2
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

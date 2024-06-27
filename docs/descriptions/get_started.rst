@@ -2,17 +2,7 @@
 Get Started
 ===========
 
-Overview
---------
-
-Time series are passed as inputs for the main ``TSFEL`` extraction method, either as variables previously loaded in memory or stored in files within a dataset. Since ``TSFEL`` can handle multidimensional time series, a set of preprocessing methods is applied to ensure adequate signal quality and time series synchronization, enabling accurate window calculation.
-
-After feature extraction, the results are saved using a standard schema, making them compatible with most classification and data mining platforms. Each line corresponds to a window, with the results of the feature extraction methods stored in the corresponding columns.
-
-.. image:: ../imgs/tsfel_pipeline.png
-    :align: center
-    :scale: 25 %
-    :alt: TSFEL!
+``TSFEL`` is a simple yet powerful package for time series feature extraction. This page summarizes the key points to help you get started with using ``TSFEL`` for your feature extraction tasks. We begin by presenting the input data types, window splitting configurations, and the output data structure. Finally, we describe the available feature sets and important aspects of feature extraction configuration.
 
 Extract from time series stored in DataFrames, Series or ndarrays
 -----------------------------------------------------------------
@@ -38,9 +28,9 @@ Let us look to the input data structure:
     4    -8.934970
     dtype: float64
 
-Our input data is a ``Series`` named *LeadII*. Note that ``TSFEL`` can also handle multidimensional time series. In such cases, you will need to include the additional time series as a ``DataFrame`` or ``ndarray``.
+Our input data is a ``Series`` named *LeadII*. Note that ``TSFEL`` can also handle multivariate time series. In such cases, you will need to include the additional time series as a ``DataFrame`` or ``ndarray``.
 
-Now that we have the input data, we are ready for the feature extraction step. ``TSFEL`` relies on dictionaries to set up the configuration for extraction. We provide a set of template configuration dictionaries that can be used out of the box.
+Now that we have the input data, we are ready for the feature extraction step. ``TSFEL`` relies on JSON configuration files to set up the configuration for feature extraction. We provide a set of template JSON configurations that can be used out of the box to extract all or individual feature sets.
 
 In this example, we will use the configuration that extracts all available features from the temporal, statistical, and spectral sets.
 
@@ -52,7 +42,7 @@ In this example, we will use the configuration that extracts all available featu
 
 We now have ``X`` as the extracted feature vector, composed of 165 features calculated for the entire length of the input data.
 
-Alternatively, if we are interested in performing window splitting before the feature extraction, we can divide the input data into shorter equal-length windows of size 100 (corresponding to 1 second).
+Alternatively, if we are interested in performing window splitting before the feature extraction, we can divide the input data into shorter 10 equal-length windows of size 100 (corresponding to 1 second).
 
 .. code:: python
 
@@ -97,13 +87,95 @@ The following code block extracts features on data residing over ``main_director
                         output_directory=output_directory
          )
 
+
+Input data formats
+------------------
+
+``TSFEL`` offers flexibility concerning the datatypes and dimensions that specify the format of the time series data. It supports both univariate and multivariate series.
+
+A time series is a series of real valued observations taken at successive equally spaced points in time. We usually define the total number of observations as *length*. Univariate series consists of a single variable evolving over time (e.g., the daily closing stock prices for a given company). Multivariate series are composed of several variables concurrently evolving over time and we usually refer to each variable as a *dimension*. For instance, the input data from an accelerometer that measures the tridimensional acceleration (x, y, and z) has 3 dimensions. Note we assume that all dimensions share the same sampling frequency.
+
+``TSFEL`` supports time series stored in  ``ndarray``, ``Series`` and ``DataFrame`` . We provide below an intuitive visual guide that summarizes the supported input data types and dimensions.
+
+.. _visual_guide:
+
+.. figure:: ../imgs/tsfel_visual_guide.png
+    :align: center
+    :scale: 15 %
+    :alt: A visual guide do data representation in TSFEL.
+
+    A visual intro to data representation in TSFEL.
+
+Feature extraction relies on the ``time_series_feature_extractor`` method. Its base arguments are ``input_data``, which stores the time series data, and ``features_dict``, which contains the feature extraction configuration. Further explanation on feature extraction configuration is available :ref:`here <feature-config>`.
+
+A univariate time series must be stored in one column with several rows of observations. The ``time_series_feature_extractor`` extracts features from the whole length of a time series (:numref:`visual_guide` A) or from shorter fixed-size windows (:numref:`visual_guide` B).
+
+The several variables of multivariate time series must be stored in separate columns. Similarly, to the univariate case, ``time_series_feature_extractor`` extracts features from the whole length of a time series (:numref:`visual_guide` C) or from shorter fixed-size windows (:numref:`visual_guide` D).
+
+Output data format
+------------------
+
+The output is always provided as a ``DataFrame`` object, with the results from different features along the columns. If the input is multivariate, the features from the various dimensions are horizontally stacked together. The rows correspond to the values extracted from the entire time series (or from the windows, in the case of window division).
+
+.. list-table::
+   :widths: 15 15 15 15 15 15 10
+   :header-rows: 0
+
+   * -
+     - 0_feature_1
+     - 0_feature_2
+     - ...
+     - 1_feature_1
+     - 1_feature_2
+     - ...
+   * - Window / Time Series
+     -
+     -
+     - ...
+     -
+     -
+     - ...
+   * - ...
+     -
+     -
+     - ...
+     -
+     -
+     - ...
+
+Note: If the input is stored in a ``Series`` or ``DataFrame`` objects with column names, the prefixes 0_* and 1_* are replaced by the variable names (e.g., AccX_feature_1, AccY_feature_1).
+
+Feature sets
+------------
+
+Our feature sets are divided according to the *temporal*, *statistical, spectral*, and *fractal* domains.
+
+.. figure:: ../imgs/tsfel_feature_sets_squared.png
+    :align: center
+    :scale: 15 %
+    :alt: The available feature sets in TSFEL - temporal, statistical, spectral and fractal.
+
+    The available feature sets in TSFEL - temporal, statistical, spectral and fractal.
+
+**Temporal** features analyze the changes and patterns in data over time. They capture information such as trends, cycles, and temporal correlations, which are essential for understanding dynamic behaviors and predicting future values. Time-domain features sensitive to the ordering of observations are included in this set.
+
+**Statistical** features summarize data using descriptive statistics. They include measures such as mean, variance, skewness, and kurtosis, providing a comprehensive overview of the data distribution, central tendency, dispersion, and shape. Features insensitive to the ordering of observations are included in this set.
+
+**Spectral** features focus on the frequency domain of the data. By transforming data using techniques like Fourier or wavelet transforms, they reveal underlying periodicities, harmonics, and frequency components, which are crucial for identifying cyclical patterns and oscillations.
+
+**Fractal** features describe the complexity and self-similarity of data across different scales. They are derived from fractal theory and include measures like fractal dimension, capturing the intricate patterns and irregularities that are often present in natural and complex systems.
+
+The description of each feature is available :ref:`here <feature-list>`.
+
+.. _feature-config:
+
 Set up the feature extraction config file
 ------------------------------------------
-One of the main advantages of TSFEL is providing a large number of time series features out-of-the-box. Nevertheless, there are occasions where you might not be interested in extracting the complete set. Examples comprise scenarios where the models will be deployed in low-power embedded devices, or you simply want to be more specific in what features are extracted.
+``TSFEL`` provides a large number of time series features by default. However, there are occasions when you might not need to extract the complete feature set. Examples include scenarios where models will be deployed on low-power embedded devices or when you simply want to specify which features are extracted.
 
-TSFEL divides the available features into three domains: statistical, temporal and spectral. The two methods to extract features explained above expect a configuration file - ``feat_dict`` - a dictionary containing which features and hyperparameters will be used.
+The ``TSFEL`` complete feature set includes features from the statistical, temporal, spectral, and fractal domains. Some features also have their own hyperparameters, such as the number of bins for the histogram or the wavelet family. Information regarding which features to extract and their hyperparameters is stored in a JSON feature configuration file.
 
-Bellow, we list four examples to set up the configuration dictionary.
+We provide convenient methods to easily set up JSON configuration files to extract the complete feature set or feature sets related to individual domains. An example is provided below:
 
 .. code:: python
 
@@ -115,4 +187,9 @@ Bellow, we list four examples to set up the configuration dictionary.
   cgf_file = tsfel.get_features_by_domain("spectral")     # All spectral domain features will be extracted
   cgf_file = tsfel.get_features_by_domain("fractal")      # All fractal domain features will be extracted
 
-In case you want a customised set of features or a combination of features from several domains, you can need to edit the configuration dictionary (JSON). You must edit the value of the key ``use`` to ``yes`` or ``no`` as appropriate. You can load any of the previous configuration dictionaries and set to ``"use": "no"`` the features you are not interested in or edit a dictionary manually or programmatically and set the ``use`` as ``yes`` or ``no`` as appropriate. An example file is available  `here <https://github.com/fraunhoferportugal/tsfel/blob/development/tsfel/feature_extraction/features.json/>`_.
+To create a customized set of features, you need to edit the JSON feature configuration file accordingly by setting the value of the ``use`` key to ``yes`` or ``no`` as appropriate. Some feature extractors also have a ``parameter`` key to configure individual settings. An example file is available `here <https://github.com/fraunhoferportugal/tsfel/blob/development/tsfel/feature_extraction/features.json/>`_.
+
+Usage example
+-------------
+
+We provide an `example notebook <https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb>`_ that summarizes the complete development stack using ``TSFEL``, including feature extraction, modeling, and model evaluation applied to a Human Activity Recognition (HAR) dataset.
