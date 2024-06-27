@@ -540,7 +540,6 @@ def calc_window_features(
                         feature_results += [eval_result_ax]
                         feature_names += [str(header_names[ax]) + "_" + feat]
 
-
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)),
         columns=np.array(feature_names),

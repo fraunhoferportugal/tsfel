@@ -4,9 +4,6 @@ import time
 import numpy as np
 from scipy.optimize import curve_fit
 
-from tsfel.feature_extraction.calc_features import calc_window_features
-from tsfel.feature_extraction.features_settings import load_json
-
 
 # curves
 def n_squared(x, no):
@@ -109,6 +106,9 @@ def compute_complexity(feature, domain, json_path, **kwargs):
 
     Writes complexity in json file
     """
+
+    from tsfel.feature_extraction.calc_features import calc_window_features
+    from tsfel.feature_extraction.features_settings import load_json
 
     dictionary = load_json(json_path)
 

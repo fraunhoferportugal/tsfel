@@ -304,6 +304,7 @@
             "complexity": "linear",
             "description": "Computes CWT absolute mean value of each wavelet scale.",
             "function": "tsfel.wavelet_abs_mean",
+            "n_features": "max_width",
             "parameters": {
                 "fs": 100,
                 "max_width": 10,
@@ -313,58 +314,57 @@
                 "eeg",
                 "ecg"
             ],
-            "n_features": "max_width",
             "use": "yes"
         },
         "Wavelet energy": {
             "complexity": "linear",
             "description": "Computes CWT energy of each wavelet scale.",
             "function": "tsfel.wavelet_energy",
+            "n_features": "max_width",
             "parameters": {
                 "fs": 100,
                 "max_width": 10,
                 "wavelet": "mexh"
             },
             "tag": "eeg",
-            "n_features": "max_width",
             "use": "yes"
         },
         "Wavelet entropy": {
             "complexity": "linear",
             "description": "Computes CWT entropy of the signal.",
             "function": "tsfel.wavelet_entropy",
+            "n_features": "max_width",
             "parameters": {
                 "fs": 100,
                 "max_width": 10,
                 "wavelet": "mexh"
             },
             "tag": "eeg",
-            "n_features": "max_width",
             "use": "yes"
         },
         "Wavelet standard deviation": {
             "complexity": "linear",
             "description": "Computes CWT std value of each wavelet scale.",
             "function": "tsfel.wavelet_std",
+            "n_features": "max_width",
             "parameters": {
                 "fs": 100,
                 "max_width": 10,
                 "wavelet": "mexh"
             },
-            "n_features": "max_width",
             "use": "yes"
         },
         "Wavelet variance": {
             "complexity": "linear",
             "description": "Computes CWT variance value of each wavelet scale.",
             "function": "tsfel.wavelet_var",
+            "n_features": "max_width",
             "parameters": {
                 "fs": 100,
                 "max_width": 10,
                 "wavelet": "mexh"
             },
             "tag": "eeg",
-            "n_features": "max_width",
             "use": "yes"
         }
     },

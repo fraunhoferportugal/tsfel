@@ -15,6 +15,9 @@ numpy >= 1.18.5
 pandas >= 1.5.3
 
 # tsfel/feature_extraction/features_utils.py: 1
+PyWavelets >= 1.4.1
+
+# tsfel/feature_extraction/features_utils.py: 1
 scikit-learn >= 0.21.3
 
 # tsfel/feature_extraction/features.py: 1
@@ -29,6 +32,3 @@ setuptools >= 47.1.1
 
 # tsfel/feature_extraction/features.py: 39
 statsmodels >= 0.12.0
-
-# tsfel/feature_extraction/features_utils.py: 1
-PyWavelets >= 1.4.1
