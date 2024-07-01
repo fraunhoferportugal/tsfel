@@ -1,14 +1,14 @@
 import glob
 import json
 import os
+import unittest
 from pathlib import Path
 
-import unittest
 import numpy as np
 import pandas as pd
 
 from tsfel.feature_extraction.calc_features import dataset_features_extractor, time_series_features_extractor
-from tsfel.feature_extraction.features_settings import get_features_by_domain, get_features_by_tag
+from tsfel.feature_extraction.features_settings import get_features_by_domain, get_number_features, load_json
 from tsfel.utils.add_personal_features import add_feature_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
@@ -41,6 +41,7 @@ search_criteria = ["Accelerometer.txt", "Gyroscope.txt"]
 output_directory = str(Path.home()) + os.sep + "Documents" + os.sep + "tsfel_output" + os.sep
 sensor_data = {}
 key = "Accelerometer"
+domains = ["statistical", "temporal", "spectral", "fractal"]
 
 folders = list(glob.glob(main_directory + "**/", recursive=True))
 sensor_data[key] = pd.read_csv(folders[-1] + key + ".txt", header=None)
@@ -48,10 +49,10 @@ sensor_data[key] = pd.read_csv(folders[-1] + key + ".txt", header=None)
 
 # Features Dictionary
 # settings0 = json.load(open(tsfel_path_json))
-settings2 = get_features_by_domain("statistical")
-settings3 = get_features_by_domain("temporal")
-settings4 = get_features_by_domain("spectral")
-settings5 = get_features_by_domain("fractal")
+settings2 = get_features_by_domain(domains[0])  # statistical
+settings3 = get_features_by_domain(domains[1])  # temporal
+settings4 = get_features_by_domain(domains[2])  # spectral
+settings5 = get_features_by_domain(domains[3])  # fractal
 settings6 = get_features_by_domain()
 
 # Signal processing
@@ -124,7 +125,7 @@ class TestCalcFeatures(unittest.TestCase):
             features3.shape,
             (1, 42),
         )
-    
+
     def test_input_array_window_single_axis_multi(self):
         # input: np.array
         features4 = time_series_features_extractor(
@@ -138,7 +139,7 @@ class TestCalcFeatures(unittest.TestCase):
             features4.shape,
             (1, 333),
         )
-    
+
     def test_input_series_window_single_axis_single(self):
         # single window and single axis
         # input: pd.Series
@@ -153,7 +154,7 @@ class TestCalcFeatures(unittest.TestCase):
             features5.shape,
             (1, 40),
         )
-    
+
     def test_input_array_window_single_axis_single(self):
         # input: np.array
         features6 = time_series_features_extractor(
@@ -167,10 +168,10 @@ class TestCalcFeatures(unittest.TestCase):
             features6.shape,
             (1, 6),
         )
-    
+
     def test_personal_features(self):
         # personal features
-        settings1 = json.load(open(personal_path_json))
+        settings1 = load_json(personal_path_json)
         add_feature_json(personal_features_path, personal_path_json)
         features7 = time_series_features_extractor(
             settings1,
@@ -185,10 +186,17 @@ class TestCalcFeatures(unittest.TestCase):
             (1, 169),
         )
 
+    def test_get_number_features(self):
+        feature_sets_size = [get_number_features(get_features_by_domain(domain)) for domain in domains]
+        np.testing.assert_array_equal(
+            feature_sets_size,
+            [40, 14, 124, 6],  # 184 is the total
+        )
+
     def test_dataset_extractor(self):
 
         # Dataset features extractor
-        data = dataset_features_extractor(
+        dataset_features_extractor(
             main_directory,
             settings4,
             search_criteria=search_criteria,

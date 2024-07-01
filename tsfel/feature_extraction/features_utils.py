@@ -31,6 +31,27 @@ def compute_time(signal, fs):
     return np.arange(0, len(signal)) / fs
 
 
+def safe_eval_string(list_string):
+    """Safely evaluate a string containing a Python literal list of floats or
+    integers. This method is safer and faster on runtime than
+    `ast.eval_literal`.
+
+    Parameters
+    ----------
+    list_string : str
+        A string representation of a list literal.
+
+    Returns
+    ----------
+    parsed_list
+        A list containing integers or floats.
+    """
+    list_elements = list_string.strip("[] \n").split(",")
+    parsed_list = [float(x) if "." in x else int(x) for x in list_elements if x.strip()]
+
+    return parsed_list
+
+
 def calc_fft(signal, fs):
     """This functions computes the fft of a signal.
 
@@ -225,7 +246,7 @@ def lpc(signal, n_coeff=12):
     order = n_coeff - 1
 
     # Calculate LPC with Yule-Walker
-    acf = np.correlate(signal, signal, "full")
+    acf = scipy.signal.correlate(signal, signal, "full")
 
     r = np.zeros(order + 1, "float32")
     # Assuring that works for all type of input lengths
