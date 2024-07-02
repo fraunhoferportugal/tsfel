@@ -44,4 +44,4 @@ jobs:
           python tests/test_calc_features.py
       - name: Test the data loaders
         run: |
-          python tests/dataset_loaders.py
+          python tests/test_dataset_loaders.py
