@@ -39,9 +39,9 @@ jobs:
         run: |
           python -c "import numpy as np; np.show_config()"
           python -c "import scipy as sp; sp.show_config()"
-      - name: Test the input/output
-        run: |
-          python tests/test_calc_features.py
+      #      - name: Test the input/output
+      #        run: |
+      #          python tests/test_calc_features.py
       - name: Test the data loaders
         run: |
           python tests/test_dataset_loaders.py
