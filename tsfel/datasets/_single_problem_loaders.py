@@ -106,7 +106,7 @@ def get_uci_splits(cache_dir, data_modality):
 
 
 # TODO: Write a parser for this dataset.
-def load_ucihar(use_cache=True, data_modality=None) -> (list[pd.DataFrame], np.ndarray, list[pd.DataFrame], np.ndarray):
+def load_ucihar(use_cache=True, data_modality=None) -> (List[pd.DataFrame], np.ndarray, List[pd.DataFrame], np.ndarray):
     """Loads the Human Activity Recognition Using Smartphones dataset from the
     UC Irvine Machine Learning Repository [1]_. Retrieves the raw inertial data
     for both the training and test sets.
