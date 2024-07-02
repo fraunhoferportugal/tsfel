@@ -44,6 +44,10 @@ jobs:
       #          python tests/test_calc_features.py
       - name: Test the data loaders
         run: |
-          for i in {1..3}; do
-            python tests/test_dataset_loaders.py && break || sleep 5
+          retry_count=3
+          while [ $retry_count -gt 0 ]; do
+            python tests/test_dataset_loaders.py && break
+            retry_count=$((retry_count - 1))
+            sleep 5
           done
+
