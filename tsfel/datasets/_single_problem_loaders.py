@@ -7,6 +7,7 @@ import os
 import warnings
 import zipfile
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -74,7 +75,12 @@ def load_biopluxecg(use_cache=True) -> pd.Series:
     return X
 
 
-def _get_uci_train_test_splits(dataset_dir: str, data_modality: list, split: str) -> (list[pd.DataFrame], np.ndarray):
+def _get_uci_train_test_splits(
+    dataset_dir: str,
+    data_modality: List[pd.DataFrame],
+    split: str,
+) -> (List[pd.DataFrame], np.ndarray):
+
     raw_signals_split_dir = os.path.join(dataset_dir, "UCI HAR Dataset", split, "Inertial Signals")
     raw_signals_split_label_path = os.path.join(dataset_dir, "UCI HAR Dataset", split, f"y_{split}.txt")
     _, _, filenames = next(os.walk(raw_signals_split_dir), (None, None, []))
