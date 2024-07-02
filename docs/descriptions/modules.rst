@@ -10,3 +10,4 @@ Module Reference
 
     modules/tsfel.feature_extraction
     modules/tsfel.utils
+    modules/tsfel.datasets
