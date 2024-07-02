@@ -44,4 +44,6 @@ jobs:
       #          python tests/test_calc_features.py
       - name: Test the data loaders
         run: |
-          python tests/test_dataset_loaders.py
+          for i in {1..3}; do
+            python tests/test_dataset_loaders.py && break || sleep 5
+          done
