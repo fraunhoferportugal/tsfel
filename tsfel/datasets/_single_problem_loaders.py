@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-CACHE_ROOT_DIR = os.path.expanduser("~/.tsfel")
+CACHE_ROOT_DIR = os.path.join(os.path.expanduser("~"), ".tsfel")
 
 
 def _download_dataset(url, cache_dir, filename):
