@@ -53,5 +53,3 @@ jobs:
             $retry_count--
             Start-Sleep -Seconds 5
           }
-
-
