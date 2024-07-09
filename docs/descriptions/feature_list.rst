@@ -1,7 +1,9 @@
 List of available features
 ==========================
 
-The following table provides an overview of the available featurest in the current version of TSFEL.
+The table below provides an overview of the features available in ``TSFEL``.
+
+.. _feature-list:
 
 .. autosummary::
    :toctree: _generated
