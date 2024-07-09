@@ -27,9 +27,7 @@ It does not requires installation as it relies on Google Colabs and a user inter
 Advanced users can take full potential of TSFEL by installing as a python package
 
 ```python
-pip
-install
-tsfel
+pip install tsfel
 ```
 
 ## Includes a comprehensive number of features
