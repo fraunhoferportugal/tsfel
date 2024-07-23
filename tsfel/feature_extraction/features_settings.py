@@ -18,8 +18,9 @@ def load_json(json_path):
     Dict
         Dictionary
     """
-
-    return json.load(open(json_path))
+    
+    with open(json_path) as json_file:
+        return json.load(json_file)
 
 
 def get_features_by_domain(domain=None, json_path=None):
