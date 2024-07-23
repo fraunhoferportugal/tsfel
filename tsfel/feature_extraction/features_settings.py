@@ -18,7 +18,7 @@ def load_json(json_path):
     Dict
         Dictionary
     """
-    
+
     with open(json_path) as json_file:
         return json.load(json_file)
 
