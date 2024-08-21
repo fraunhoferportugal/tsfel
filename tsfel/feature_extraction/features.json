@@ -361,7 +361,7 @@
       "function": "tsfel.hist",
       "parameters": {
         "nbins": 10,
-        "r": null
+        "r": 1
       },
       "n_features": "nbins",
       "use": "yes"

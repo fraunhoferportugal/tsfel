@@ -469,7 +469,7 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10, r=None):
+def hist(signal, nbins=10, r=1):
     """Computes histogram of the signal.
 
     Feature computational cost: 1
@@ -488,10 +488,8 @@ def hist(signal, nbins=10, r=None):
     nd-array
         The values of the histogram
     """
-    if r is not None:
-        r = [-r, r]
-
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=r)
+    # TODO: r value must be revised!
+    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])
 
     names = [str(np.around(bin_edges[i], 2)) + ':' + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)]
 
