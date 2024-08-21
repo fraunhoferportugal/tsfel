@@ -262,8 +262,8 @@ def time_series_features_extractor(
     DataFrame
         Extracted features
     """
-    if verbose == 1:
-        print("*** Feature extraction started ***")
+    # if verbose == 1:
+        # print("*** Feature extraction started ***")
 
     window_size = kwargs.get("window_size", None)
     overlap = kwargs.get("overlap", 0)
@@ -385,8 +385,8 @@ def time_series_features_extractor(
             single_window=True,
         )
 
-    if verbose == 1:
-        print("\n" + "*** Feature extraction finished ***")
+    # if verbose == 1:
+        # print("\n" + "*** Feature extraction finished ***")
 
     # Assuring the same feature extraction order
     features_final = features_final.reindex(sorted(features_final.columns), axis=1)
@@ -535,7 +535,7 @@ def calc_window_features(
                         eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
                         for name, value in zip(names, values):
                             feature_results.append(value)
-                            feature_names.append(f"{header_names[ax]}_{feat}_{name}Hz")
+                            feature_names.append(f"{header_names[ax]}_{feat}_{name}")
                     else:
                         feature_results += [eval_result_ax]
                         feature_names += [str(header_names[ax]) + "_" + feat]

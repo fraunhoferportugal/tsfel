@@ -34,37 +34,37 @@ class TestFeatures(unittest.TestCase):
     # ############################################### STATISTICAL FEATURES ############################################### #
     def test_hist(self):
         np.testing.assert_almost_equal(
-            hist(const0, 10, 5),
+            hist(const0, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            hist(const1, 10, 5),
+            hist(const1, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            hist(constNeg, 10, 5),
+            hist(constNeg, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            hist(constF, 10, 5),
+            hist(constF, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0),
         )
         np.testing.assert_almost_equal(
-            hist(lin, 10, 5),
+            hist(lin, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 2),
         )
         np.testing.assert_almost_equal(
-            hist(wave, 10, 5),
+            hist(wave, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 499, 496, 5, 0.0, 0.0, 0.0),
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(offsetWave, 10, 5),
+            hist(offsetWave, 10, 5)["values"],
             (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 499, 496, 5, 0.0),
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(noiseWave, 10, 5),
+            hist(noiseWave, 10, 5)["values"],
             (0.0, 0.0, 0.0, 48, 446, 450, 56, 0.0, 0.0, 0.0),
             decimal=5,
         )

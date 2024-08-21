@@ -469,7 +469,7 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10, r=1):
+def hist(signal, nbins=10, r=None):
     """Computes histogram of the signal.
 
     Feature computational cost: 1
@@ -488,9 +488,14 @@ def hist(signal, nbins=10, r=1):
     nd-array
         The values of the histogram
     """
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])  # TODO:subsampling parameter
+    if r is not None:
+        r = [-r, r]
 
-    return tuple(histsig)
+    histsig, bin_edges = np.histogram(signal, bins=nbins, range=r)
+
+    names = [str(np.around(bin_edges[i], 2)) + ':' + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)]
+
+    return {"names": names, "values": histsig}
 
 
 @set_domain("domain", "statistical")
@@ -1546,8 +1551,8 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
     Sxx_mean = Sxx.mean(1)
     f_keys = np.round(frequencies, 2).astype(str)
-
-    return {"names": f_keys, "values": Sxx_mean}
+    
+    return {"names": [f + "Hz" for f in f_keys], "values": Sxx_mean}
 
 
 @set_domain("domain", "spectral")
@@ -1693,7 +1698,7 @@ def wavelet_abs_mean(signal, fs, wavelet="mexh", max_width=10):
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
     f_keys = np.round(frequencies, 2).astype(str)
 
-    return {"names": f_keys, "values": np.abs(np.mean(coeffs, axis=1))}
+    return {"names": [f + "Hz" for f in f_keys], "values": np.abs(np.mean(coeffs, axis=1))}
 
 
 @set_domain("domain", "spectral")
@@ -1723,7 +1728,7 @@ def wavelet_std(signal, fs, wavelet="mexh", max_width=10):
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
     f_keys = np.round(frequencies, 2).astype(str)
 
-    return {"names": f_keys, "values": np.std(coeffs, axis=1)}
+    return {"names": [f + "Hz" for f in f_keys], "values": np.std(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
@@ -1753,7 +1758,7 @@ def wavelet_var(signal, fs, wavelet="mexh", max_width=10):
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
     f_keys = np.round(frequencies, 2).astype(str)
 
-    return {"names": f_keys, "values": np.var(coeffs, axis=1)}
+    return {"names": [f + "Hz" for f in f_keys], "values": np.var(coeffs, axis=1)}
 
 
 @set_domain("domain", "spectral")
@@ -1786,7 +1791,7 @@ def wavelet_energy(signal, fs, wavelet="mexh", max_width=10):
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
     f_keys = np.round(frequencies, 2).astype(str)
 
-    return {"names": f_keys, "values": np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])}
+    return {"names": [f + "Hz" for f in f_keys], "values": np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])}
 
 
 # ############################################## FRACTAL DOMAIN ##################################################### #
