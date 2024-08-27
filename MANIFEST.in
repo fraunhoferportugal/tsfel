@@ -1,2 +1,14 @@
+recursive-include tsfel *.py
 include LICENSE.txt
-include requirements.txt
+include MANIFEST.in
+include pyproject.toml
+include README.md
+
+recursive-exclude .github *
+recursive-exclude docs *
+recursive-exclude notebooks *
+exclude .gitattributes
+exclude .gitignore
+exclude .pre-commit-config.yaml
+exclude .readthedocs.yml
+exclude CHANGELOG.rst
