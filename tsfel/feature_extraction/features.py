@@ -496,16 +496,20 @@ def hist(signal, nbins=10, r=1):
 
     if not future_warn_flag:
         warnings.warn(
-            ("The histogram feature was deprecated in version 0.1.8 and will be replaced by the mode of histogram in 0.1.9."
-            " From then on, only a single feature value will be returned."), 
-            FutureWarning
+            (
+                "The histogram feature was deprecated in version 0.1.8 and will be replaced by the mode of histogram in 0.1.9."
+                " From then on, only a single feature value will be returned."
+            ),
+            FutureWarning,
         )
         future_warn_flag = True
-    
+
     # TODO: r value must be revised!
     histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])
 
-    names = [str(np.around(bin_edges[i], 2)) + ':' + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)]
+    names = [
+        str(np.around(bin_edges[i], 2)) + ":" + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)
+    ]
 
     return {"names": names, "values": histsig}
 
@@ -1563,7 +1567,7 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
     Sxx_mean = Sxx.mean(1)
     f_keys = np.round(frequencies, 2).astype(str)
-    
+
     return {"names": [f + "Hz" for f in f_keys], "values": Sxx_mean}
 
 

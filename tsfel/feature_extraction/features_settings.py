@@ -42,7 +42,7 @@ def get_features_by_domain(domain=None, json_path=None):
     Dict
         Dictionary with the features settings
     """
-        
+
     valid_domains = ["statistical", "temporal", "spectral", "fractal", "all"]
 
     if json_path is None:
@@ -77,7 +77,7 @@ def get_features_by_domain(domain=None, json_path=None):
                 for k in dict_features[d]:
                     dict_features[d][k]["use"] = "yes"
             d_feat.update({d: dict_features[d]})
-        return d_feat           
+        return d_feat
 
 
 def get_features_by_tag(tag=None, json_path=None):

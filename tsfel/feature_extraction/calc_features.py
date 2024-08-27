@@ -262,8 +262,6 @@ def time_series_features_extractor(
     DataFrame
         Extracted features
     """
-    # if verbose == 1:
-        # print("*** Feature extraction started ***")
 
     window_size = kwargs.get("window_size", None)
     overlap = kwargs.get("overlap", 0)
@@ -384,9 +382,6 @@ def time_series_features_extractor(
             header_names=names,
             single_window=True,
         )
-
-    # if verbose == 1:
-        # print("\n" + "*** Feature extraction finished ***")
 
     # Assuring the same feature extraction order
     features_final = features_final.reindex(sorted(features_final.columns), axis=1)
