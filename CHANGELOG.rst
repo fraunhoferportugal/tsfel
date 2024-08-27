@@ -2,6 +2,24 @@
 Changelog
 =========
 
+Version 0.1.8
+=============
+- New Features
+    - Added a new Datasets module with convenient methods to load single-problem datasets (`#156 <https://github.com/fraunhoferportugal/tsfel/pull/156>`_)
+    - Improved the ``get_features_by_domain`` method, allowing easier selection of multiple feature domain combinations
+
+- Improvements
+    - Significantly reduced the computational time for the LPCC feature (`#156 <https://github.com/fraunhoferportugal/tsfel/pull/153>`_)
+    - Resolved deprecation issues with SciPy Wavelets by switching to PyWavelets for features that rely on wavelets (`#147 <https://github.com/fraunhoferportugal/tsfel/pull/147>`_)
+    - Renamed the ``fft_mean_coefficient`` feature to ``spectrogram_mean_coefficient`` for descriptive correctness (`#145 <https://github.com/fraunhoferportugal/tsfel/pull/145>`_)
+
+- Bugfixes
+    - Fixed a bug causing a circular import issue (`#154 <https://github.com/fraunhoferportugal/tsfel/pull/154>`_)
+    - Fixed a ResourceWarning when loading the feature configuration file (`#152 <https://github.com/fraunhoferportugal/tsfel/pull/152>`_)
+    - Removed the use of ``eval`` (`#150 <https://github.com/fraunhoferportugal/tsfel/pull/150>`_)
+
+- Documentation
+    - Major documentation updates, including detailed explanations of the expected input and output data formats
 
 Version 0.1.7
 =============
