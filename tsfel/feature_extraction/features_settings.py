@@ -42,23 +42,42 @@ def get_features_by_domain(domain=None, json_path=None):
     Dict
         Dictionary with the features settings
     """
+        
+    valid_domains = ["statistical", "temporal", "spectral", "fractal", "all"]
 
     if json_path is None:
         json_path = tsfel.__path__[0] + "/feature_extraction/features.json"
 
-        if domain not in ["statistical", "temporal", "spectral", "fractal", None]:
-            raise SystemExit(
-                "No valid domain. Choose: statistical, temporal, spectral, fractal or None (for all feature settings).",
+        if isinstance(domain, str) and domain not in valid_domains:
+            raise ValueError(
+                f"Domain {domain} is invalid. Please choose from `statistical`, `temporal`, `spectral`, `fractal` or `all`.",
+            )
+        elif isinstance(domain, list) and not np.all([d in valid_domains for d in domain]):
+            raise ValueError(
+                "At least one invalid domain was provided. Please choose from `statistical`, `temporal`, `spectral`, `fractal` or `all`.",
+            )
+        elif not isinstance(domain, (str, list)) and domain is not None:
+            raise TypeError(
+                "The 'domain' argument must be a string or a list of strings.",
             )
 
     dict_features = load_json(json_path)
     if domain is None:
         return dict_features
     else:
-        if domain == "fractal":
-            for k in dict_features[domain]:
-                dict_features[domain][k]["use"] = "yes"
-        return {domain: dict_features[domain]}
+        if domain == "all":
+            domain = ["statistical", "temporal", "spectral", "fractal"]
+
+        if isinstance(domain, str):
+            domain = [domain]
+
+        d_feat = {}
+        for d in domain:
+            if d == "fractal":
+                for k in dict_features[d]:
+                    dict_features[d][k]["use"] = "yes"
+            d_feat.update({d: dict_features[d]})
+        return d_feat           
 
 
 def get_features_by_tag(tag=None, json_path=None):

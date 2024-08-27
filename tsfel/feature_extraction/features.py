@@ -12,6 +12,10 @@ warning_msg = (
     + str(FEATURES_MIN_SIZE)
     + " data points."
 )
+
+future_warn_flag = False
+warnings.simplefilter("once", FutureWarning)
+
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -488,6 +492,16 @@ def hist(signal, nbins=10, r=1):
     nd-array
         The values of the histogram
     """
+    global future_warn_flag
+
+    if not future_warn_flag:
+        warnings.warn(
+            ("The histogram feature was deprecated in version 0.1.8 and will be replaced by the mode of histogram in 0.1.9."
+            " From then on, only a single feature value will be returned."), 
+            FutureWarning
+        )
+        future_warn_flag = True
+    
     # TODO: r value must be revised!
     histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])
 
