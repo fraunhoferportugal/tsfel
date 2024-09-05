@@ -178,35 +178,37 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         raise FileNotFoundError("There is no folder(s) in directory: " + main_directory)
 
 
-def calc_features(wind_sig, dict_features, fs, **kwargs):
-    r"""Extraction of time series features.
+def _calc_features(timeseries, config, fs, **kwargs):
+    """Extraction of time series features.
 
     Parameters
     ----------
-    wind_sig: list
-        Input from which features are computed, window
-    dict_features : dict
-        Dictionary with features
-    fs : float or None
-        Sampling frequency
+    timeseries: list
+        The input signal window from which features will be extracted.
+    config : dict
+        A dictionary containing the settings for feature extraction.
+    fs : float, default=None
+        Sampling frequency of the input signal.
     \**kwargs:
-        * *features_path* (``string``) --
-            Directory of script with personal features
+        Additional keyword arguments, see below:
 
-         * *header_names* (``list or array``) --
-            Names of each column window
+        * *features_path* (str) --
+            Path to a script with custom features.
+        
+        * *header_names* (list or array-like) --
+            Names of each column window.
 
     Returns
     -------
-    DataFrame
-        Extracted features
+    pd.DataFrame
+        A DataFrame containing the extracted features.
     """
 
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
     feat_val = calc_window_features(
-        dict_features,
-        wind_sig,
+        config,
+        timeseries,
         fs,
         features_path=features_path,
         header_names=names,
@@ -217,54 +219,53 @@ def calc_features(wind_sig, dict_features, fs, **kwargs):
 
 
 def time_series_features_extractor(
-    dict_features,
-    signal_windows,
+    config,
+    timeseries,
     fs=None,
+    window_size=None,
+    overlap=0,
     verbose=1,
     **kwargs,
 ):
-    r"""Extraction of time series features.
+    """Extract features from univariate or multivariate time series.
 
     Parameters
     ----------
-    dict_features : dict
-        Dictionary with features
-    signal_windows: list
-        Input from which features are computed, window
-    fs : int or None
-        Sampling frequency
-    verbose : int
-        Verbosity mode. 0 = silent, 1 = progress bar.
-        (0 or 1 (Default))
-    \**kwargs:
-    See below:
-        * *window_size* (``int``) --
-            Window size in number of samples
-            (default: ``100``)
+    config : dict
+        A dictionary containing the settings for feature extraction.
+    timeseries : list, np.ndarray, pd.DataFrame, pd.Series
+        The input signal from which features will be extracted.
+    fs : float, default=None
+        Sampling frequency of the input signal.
+    window_size : int or None, optional, default=None
+        The size of the windows used to split the input signal, measured in the number of samples.
+    overlap : float, optional, default=0
+        A value between 0 and 1 that defines the percentage of overlap between consecutive windows.
+    n_jobs : int, optional
+        The number of jobs to run in parallel. 
+            - ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+            - ``-1`` means using all available processors.
+            - default: ``None`` on Windows, ``-1`` for other systems
+    verbose : int, default=1
+        The verbosity mode. 0 means silent, and 1 means showing a progress bar.
 
-        * *overlap* (``float``) --
-            Overlap between 0 and 1
-            (default: ``0``)
+    **kwargs :
+        Additional keyword arguments, see below:
 
-        * *features_path* (``string``) --
-            Directory of script with personal features
-
-        * *header_names* (``list or array``) --
-            Names of each column window
-
-        * *n_jobs* (``int``) --
-            The number of jobs to run in parallel. ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
-            ``-1`` means using all processors.
-            (default: ``None`` in Windows and ``-1`` for other systems)
+        * *features_path* (str) --
+            Path to a script with custom features.
+        
+        * *header_names* (list or array-like) --
+            Names of each column window.
 
     Returns
     -------
-    DataFrame
-        Extracted features
+    pd.DataFrame
+        A DataFrame containing the extracted features, where:
+        - Columns represent the names of the features.
+        - Rows contain the feature values for each signal window.
     """
 
-    window_size = kwargs.get("window_size", None)
-    overlap = kwargs.get("overlap", 0)
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
 
@@ -290,34 +291,34 @@ def time_series_features_extractor(
         names = list(names)
     else:
         # Name of each column to be concatenated with feature name
-        if isinstance(signal_windows, pd.DataFrame):
-            names = signal_windows.columns.values
-        elif isinstance(signal_windows[0], pd.DataFrame):
-            names = signal_windows[0].columns.values
+        if isinstance(timeseries, pd.DataFrame):
+            names = timeseries.columns.values
+        elif isinstance(timeseries[0], pd.DataFrame):
+            names = timeseries[0].columns.values
 
     if window_size is not None:
-        signal_windows = signal_window_splitter(signal_windows, window_size, overlap)
+        timeseries = signal_window_splitter(timeseries, window_size, overlap)
 
-    if len(signal_windows) == 0:
+    if len(timeseries) == 0:
         raise SystemExit(
             "Empty signal windows. Please check window size input parameter.",
         )
 
     features_final = pd.DataFrame()
 
-    if isinstance(signal_windows, list) and isinstance(signal_windows[0], numbers.Real):
-        signal_windows = np.array(signal_windows)
+    if isinstance(timeseries, list) and isinstance(timeseries[0], numbers.Real):
+        timeseries = np.array(timeseries)
 
-    if not isinstance(signal_windows, list) and len(np.shape(signal_windows)) > 2:
-        signal_windows = list(signal_windows)
+    if not isinstance(timeseries, list) and len(np.shape(timeseries)) > 2:
+        timeseries = list(timeseries)
 
     # more than one window
-    if isinstance(signal_windows, list):
+    if isinstance(timeseries, list):
         # Starting the display of progress bar for notebooks interfaces
         if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
 
             out = display(
-                progress_bar_notebook(0, len(signal_windows)),
+                progress_bar_notebook(0, len(timeseries)),
                 display_id=True,
             )
         else:
@@ -333,30 +334,30 @@ def time_series_features_extractor(
             pool = mp.Pool(cpu_count)
             features = pool.imap(
                 partial(
-                    calc_features,
-                    dict_features=dict_features,
+                    _calc_features,
+                    config=config,
                     fs=fs,
                     features_path=features_path,
                     header_names=names,
                 ),
-                signal_windows,
+                timeseries,
             )
 
             for i, feat in enumerate(features):
                 if verbose == 1:
-                    display_progress_bar(i, len(signal_windows), out)
+                    display_progress_bar(i, len(timeseries), out)
                 features_final = pd.concat([features_final, feat], axis=0)
 
             pool.close()
             pool.join()
 
         elif n_jobs is None:
-            for i, feat in enumerate(signal_windows):
+            for i, feat in enumerate(timeseries):
                 features_final = pd.concat(
                     [
                         features_final,
                         calc_window_features(
-                            dict_features,
+                            config,
                             feat,
                             fs,
                             features_path=features_path,
@@ -366,7 +367,7 @@ def time_series_features_extractor(
                     axis=0,
                 )
                 if verbose == 1:
-                    display_progress_bar(i, len(signal_windows), out)
+                    display_progress_bar(i, len(timeseries), out)
         else:
             raise SystemExit(
                 "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing.",
@@ -374,8 +375,8 @@ def time_series_features_extractor(
     # single window
     else:
         features_final = calc_window_features(
-            dict_features,
-            signal_windows,
+            config,
+            timeseries,
             fs,
             verbose=verbose,
             features_path=features_path,
@@ -389,61 +390,62 @@ def time_series_features_extractor(
 
 
 def calc_window_features(
-    dict_features,
-    signal_window,
+    config,
+    window,
     fs,
     verbose=1,
     single_window=False,
     **kwargs,
 ):
-    r"""This function computes features matrix for one window.
+    """Extract features from a univariate or multivariate window.
 
     Parameters
     ----------
-    dict_features : dict
-        Dictionary with features
-    signal_window: pandas DataFrame
-        Input from which features are computed, window
-    fs : float
-        Sampling frequency
-    verbose : int
-        Level of function communication
-        (0 or 1 (Default))
-    single_window: Bool
-        Boolean value for printing the progress bar for only one window feature extraction
-    \**kwargs:
-    See below:
-        * *features_path* (``string``) --
-            Directory of script with personal features
-        * *header_names* (``list or array``) --
-            Names of each column window
+    config : dict
+        A dictionary containing the settings for feature extraction.
+    window : np.ndarray, pd.DataFrame, pd.Series
+        The input signal from which features will be extracted.
+    fs : float, default=None
+        Sampling frequency of the input signal.
+    verbose : int, default=1
+        The verbosity mode. 0 means silent, and 1 means showing a progress bar.
+    single_window : bool
+        If `True`, the progress bar will be shown only for the extraction of features from a single window.
+
+    **kwargs :
+        Additional keyword arguments, see below:
+
+        * *features_path* (str) --
+            Path to a script with custom features.
+        
+        * *header_names* (list or array-like) --
+            Names of each column window.
 
     Returns
     -------
-    pandas DataFrame
-        (columns) names of the features
-        (data) values of each features for signal
+    pd.DataFrame
+        A DataFrame containing the extracted features.
     """
-
+    
     features_path = kwargs.get("features_path", None)
     header_names = kwargs.get("header_names", None)
 
     # To handle object type signals
-    signal_window = np.array(signal_window).astype(float)
+    window = np.array(window).astype(float)
 
-    single_axis = True if len(signal_window.shape) == 1 else False
+    single_axis = True if len(window.shape) == 1 else False
 
     if header_names is None:
-        header_names = np.array([0]) if single_axis else np.arange(signal_window.shape[-1])
+        header_names = np.array([0]) if single_axis else np.arange(window.shape[-1])
     else:
-        if (len(header_names) != signal_window.shape[-1] and not single_axis) or (
+        if (len(header_names) != window.shape[-1] and not single_axis) or (
             len(header_names) != 1 and single_axis
         ):
             raise Exception("header_names dimension does not match input columns.")
 
     # Execute imports
     exec("from tsfel import *")
-    domain = dict_features.keys()
+    domain = config.keys()
 
     if features_path:
         sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
@@ -459,7 +461,7 @@ def calc_window_features(
     # Iterating over features of a single window
     if verbose == 1 and single_window:
 
-        feat_nb = np.hstack([list(dict_features[_type].keys()) for _type in domain])
+        feat_nb = np.hstack([list(config[_type].keys()) for _type in domain])
 
         if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
             out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
@@ -469,7 +471,7 @@ def calc_window_features(
         i_feat = -1
 
     for _type in domain:
-        domain_feats = dict_features[_type].keys()
+        domain_feats = config[_type].keys()
 
         for feat in domain_feats:
 
@@ -478,10 +480,10 @@ def calc_window_features(
                 display_progress_bar(i_feat, len(feat_nb), out)
 
             # Only returns used functions
-            if dict_features[_type][feat]["use"] == "yes":
+            if config[_type][feat]["use"] == "yes":
 
                 # Read Function (real name of function)
-                func_total = dict_features[_type][feat]["function"]
+                func_total = config[_type][feat]["function"]
 
                 if func_total.find("tsfel.") == 0:
                     func_total = func_total.replace("tsfel.", "")
@@ -489,8 +491,8 @@ def calc_window_features(
                 # Check for parameters
                 parameters_total = {}
 
-                if dict_features[_type][feat]["parameters"] != "":
-                    parameters_total = dict_features[_type][feat]["parameters"]
+                if config[_type][feat]["parameters"] != "":
+                    parameters_total = config[_type][feat]["parameters"]
 
                     # Check assert fs parameter:
                     if "fs" in parameters_total:
@@ -506,13 +508,13 @@ def calc_window_features(
                 # Eval feature results
                 if single_axis:
                     eval_result = locals()[func_total](
-                        signal_window,
+                        window,
                         **parameters_total,
                     )
                     eval_result = np.array([eval_result])
 
                 for ax in range(len(header_names)):
-                    sig_ax = signal_window if single_axis else signal_window[:, ax]
+                    sig_ax = window if single_axis else window[:, ax]
                     eval_result_ax = locals()[func_total](sig_ax, **parameters_total)
 
                     # Function returns more than one element

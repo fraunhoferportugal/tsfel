@@ -30,10 +30,13 @@ def get_features_by_domain(domain=None, json_path=None):
     """Creates a dictionary with the features settings by domain.
 
     Parameters
-    ----------
-    domain : string
-        Available domains: "statistical"; "spectral"; "temporal"; "fractal"
-        If domain equals None, then the features settings from all domains are returned.
+    ----------        
+    domain : str, list of str, or None, default=None
+        Specifies which feature domains to include in the dictionary.
+            - 'statistical', 'temporal', 'spectral', 'fractal': Includes the corresponding feature domain.
+            - 'all': Includes all available feature domains.
+            - list of str: A combination of the above strings, e.g., ['statistical', 'temporal'].
+            - None: By default, includes the 'statistical', 'temporal', and 'spectral' domains.
     json_path : string
         Directory of json file. Default: package features.json directory
 
