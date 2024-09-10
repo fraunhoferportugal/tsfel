@@ -1,9 +1,10 @@
 [![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
-[![license](https://img.shields.io/badge/License-BSD%203-brightgreen)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
+[![license](https://img.shields.io/badge/license-BSD%203--Clause-green?logo=style)](https://github.com/aeon-toolkit/aeon/blob/main/LICENSE)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
-![PyPI](https://img.shields.io/pypi/v/tsfel)
+[![!pypi](https://img.shields.io/pypi/v/tsfel?logo=pypi&color=blue)](https://pypi.org/project/tsfel/)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
+[![Slack](https://img.shields.io/badge/slack-join_here-lightgreen.svg?logo=slack)](https://join.slack.com/t/tsfel/shared_invite/zt-2pnrdi1s4-kCROK6R1mSP3D2MnSXUSZg)
 
 # Time Series Feature Extraction Library
 
