@@ -17,7 +17,7 @@
 `TSFEL` is an open-source Python library for time series analysis. It centralizes a large and powerful feature set of
 several feature extraction methods from statistical, temporal, spectral, and fractal domains.
 
-The documentation is available at https://tsfel.readthedocs.io/.
+The documentation is available [here](https://github.com/fraunhoferportugal/tsfel/issues).
 
 You can install `TSFEL` via pip using the following:
 
