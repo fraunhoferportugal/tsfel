@@ -8,7 +8,7 @@
 # Time Series Feature Extraction Library
 
 <p align="center">
-    <a href="https://readthedocs.org/projects/tsfel/badge/?version=latest"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/blob/master/docs/imgs/tsfel_feature_sets.png" width="100%" alt="tsfel logo" /></a>
+    <a href="https://readthedocs.org/projects/tsfel/badge/?version=latest"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/master/docs/imgs/tsfel_feature_sets.png" width="100%" alt="tsfel logo" /></a>
 </p>
 
 ## Intuitive time series feature extraction
