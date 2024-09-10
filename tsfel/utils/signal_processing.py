@@ -74,7 +74,7 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlated_features(features, threshold=0.95):
+def correlated_features(features, threshold=0.95, drop_correlated=True):
     """Compute pairwise correlation of features using pearson method.
 
     Parameters
@@ -94,4 +94,7 @@ def correlated_features(features, threshold=0.95):
     # Find index and column name of features with correlation greater than 0.95
     to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
 
-    return to_drop
+    if drop_correlated:
+        features.drop(to_drop, axis=1, inplace=True)
+
+    return to_drop, features
