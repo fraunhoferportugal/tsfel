@@ -13,55 +13,56 @@
 
 ## Intuitive time series feature extraction
 
-This repository hosts the **TSFEL - Time Series Feature Extraction Library** python package. TSFEL assists researchers
-on exploratory feature extraction tasks on time series without requiring significant programming effort.
+`TSFEL` is an open-source Python library for time series analysis. It centralizes a large and powerful feature set of
+several feature extraction methods from statistical, temporal, spectral, and fractal domains.
 
-Users can interact with TSFEL using two methods:
+The documentation is available at https://tsfel.readthedocs.io/.
 
-##### Online
-
-It does not requires installation as it relies on Google Colabs and a user interface provided by Google Sheets
-
-##### Offline
-
-Advanced users can take full potential of TSFEL by installing as a python package
+You can install `TSFEL` via pip using the following:
 
 ```python
-pip install tsfel
+pip
+install
+tsfel
 ```
 
-## Includes a comprehensive number of features
+A release on conda-forge is coming soon.
 
-TSFEL is optimized for time series and **automatically extracts over 65 different features on the statistical, temporal,
-spectral and fractal domains.**
+## Getting started
 
-## Functionalities
-
-- **Intuitive, fast deployment and reproducible**: interactive UI for feature selection and customization
-- **Computational complexity evaluation**: estimate the computational effort before extracting features
-- **Comprehensive documentation**: each feature extraction method has a detailed explanation
-- **Unit tested**: we provide unit tests for each feature
-- **Easily extended**: adding new features is easy and we encourage you to contribute with your custom features
-
-## Get started
-
-The code below extracts all the available features on an example dataset file.
+Below is a quick example of how to use `TSFEL` for time series feature extraction:
 
 ```python
 import tsfel
-import pandas as pd
 
-# load dataset
-df = pd.read_csv("Dataset.txt")
+# Loads a 10 s single lead ECG
+data = tsfel.datasets.load_biopluxecg()
 
-# Retrieves a pre-defined feature configuration file to extract all available features
+# Set up the default configuration using using the statistical, temporal and spectral feature sets. 
 cfg = tsfel.get_features_by_domain()
 
 # Extract features
-X = tsfel.time_series_features_extractor(cfg, df)
+X = tsfel.time_series_features_extractor(cfg, data)
 ```
 
+For a more detailed walk-through — including input/output data formats, extraction routine configuration, and how to
+implement your custom features — refer to the documentation here.
+
+## Highlights
+
+- **Intuitive, fast deployment, and reproducible**: Easily configure your feature extraction pipeline and store the
+  configuration file to ensure reproducibility.
+- **Computational complexity evaluation**: Estimate the computational time required for feature extraction in advance.
+- **Comprehensive documentation**: Each feature extraction method is accompanied by a detailed explanation.
+- **Unit tested**: We provide an extensive suite of unit tests for each feature to ensure accurate and reliable feature
+  calculation.
+- **Easily extended**: Adding new features is straightforward, and we encourage contributions of custom features to the
+  community.
+
 ## Available features
+
+`TSFEL` automatically extracts more than 65 distinct features across statistical, temporal, spectral, and fractal
+domains.
 
 #### Statistical domain
 
@@ -158,16 +159,20 @@ unnecessary to previously divide the signal into shorter windows. Therefore, thi
 feature
 configuration files._
 
+## Support & General discussion
+
+For bug reports, please use the [GitHub issue tracker](https://github.com/fraunhoferportugal/tsfel/issues). To make
+feature requests, share ideas, engage in general discussions, or receive announcements, you're welcome to join
+our [Slack community](https://join.slack.com/t/tsfel/shared_invite/zt-2pnrdi1s4-kCROK6R1mSP3D2MnSXUSZg).
+
 ## Citing
 
-When using TSFEL please cite the following publication:
+If you use `TSFEL` in your work, please cite the following publication:
 
 Barandas, Marília and Folgado, Duarte, et al. "*TSFEL: Time Series Feature Extraction Library.*" SoftwareX 11 (
 2020). [https://doi.org/10.1016/j.softx.2020.100456](https://doi.org/10.1016/j.softx.2020.100456)
 
 ## Acknowledgements
 
-We would like to acknowledge the financial support obtained from the project Total Integrated and Predictive
-Manufacturing System Platform for Industry 4.0, co-funded by Portugal 2020, framed under the COMPETE 2020 (Operational
-Programme Competitiveness and Internationalization) and European Regional Development Fund (ERDF) from European Union (
-EU), with operation code POCI-01-0247-FEDER-038436.
+We gratefully acknowledge the financial support received from the Center for Responsible AI and the Total Integrated and
+Predictive Manufacturing System Platform for Industry 4.0 projects.
