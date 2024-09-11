@@ -45,3 +45,6 @@ jobs:
         run: |
           python tests/test_dataset_loaders.py
         if: runner.os != 'Windows' # Skip Windows for now for this test only.
+      - name: Test the signal processing module
+        run: |
+          python tests/test_signal_processing.py
