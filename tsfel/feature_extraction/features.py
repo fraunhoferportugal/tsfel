@@ -470,31 +470,31 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10):
-    """Computes the mode of the signal's histogram.
+def hist_mode(signal, nbins=10):
+    """Compute the mode of a histogram using a given number of (linearly spaced)
+    bins.
 
     Feature computational cost: 1
 
     Parameters
     ----------
-    signal : nd-array
-        Input from histogram is computed
+    signal : np.ndarray
+        Input signal from which the histogram is computed.
     nbins : int
-        The number of equal-width bins in the given range
+        The number of equal-width bins in the given range, by default 10.
 
     Returns
     -------
     float
-        The mode of the histogram
+        The mode of the histogram (the midpoint of the bin with the highest
+        count).
     """
 
-    histsig, bin_edges = np.histogram(signal, bins=nbins)
+    hist_values, bin_edges = np.histogram(signal, bins=nbins)
+    max_bin_idx = np.argmax(hist_values)
+    mode_value = (bin_edges[max_bin_idx] + bin_edges[max_bin_idx + 1]) / 2.0
 
-    idx_max = np.argmax(histsig)
-
-    mode_hist = (bin_edges[idx_max] + bin_edges[idx_max + 1]) * 0.5
-
-    return mode_hist
+    return mode_value
 
 
 @set_domain("domain", "statistical")

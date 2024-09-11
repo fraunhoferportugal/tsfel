@@ -34,41 +34,41 @@ class TestFeatures(unittest.TestCase):
     # ############################################### STATISTICAL FEATURES ############################################### #
     def test_hist(self):
         np.testing.assert_almost_equal(
-            hist(const0, 10),
+            hist_mode(const0, 10),
             0.050000000000000044,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(const1, 10),
+            hist_mode(const1, 10),
             1.05,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(constNeg, 10),
+            hist_mode(constNeg, 10),
             -0.95,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(constF, 10),
+            hist_mode(constF, 10),
             2.55,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(lin, 10),
+            hist_mode(lin, 10),
             0.95,
         )
         np.testing.assert_almost_equal(
-            hist(wave, 10),
+            hist_mode(wave, 10),
             -0.9,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(offsetWave, 10),
+            hist_mode(offsetWave, 10),
             1.1,
             decimal=5,
         )
         np.testing.assert_almost_equal(
-            hist(noiseWave, 10),
+            hist_mode(noiseWave, 10),
             -0.8862517157830269,
             decimal=5,
         )

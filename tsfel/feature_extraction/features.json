@@ -358,7 +358,7 @@
     "Histogram mode": {
       "complexity": "log",
       "description": "Computes the mode of the signal's histogram.",
-      "function": "tsfel.hist",
+      "function": "tsfel.hist_mode",
       "parameters": {
         "nbins": 10
       },
