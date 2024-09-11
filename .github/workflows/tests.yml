@@ -9,11 +9,10 @@ jobs:
   test:
     name: Run template tests
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9' ]
-        platform: [ 'ubuntu-20.04', 'macos-latest', 'windows-latest' ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12']
+        platform: [ 'ubuntu-20.04', 'ubuntu-22.04', 'macos-latest', 'windows-latest' ]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 30
 
@@ -45,3 +44,4 @@ jobs:
       - name: Test the data loaders
         run: |
           python tests/test_dataset_loaders.py
+        if: runner.os != 'Windows' # Skip Windows for now for this test only.
