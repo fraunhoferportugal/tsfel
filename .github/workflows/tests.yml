@@ -44,12 +44,4 @@ jobs:
       #          python tests/test_calc_features.py
       - name: Test the data loaders
         run: |
-          $retry_count = 3
-          while ($retry_count -gt 0) {
-            python tests/test_dataset_loaders.py
-            if ($LASTEXITCODE -eq 0) {
-              break
-            }
-            $retry_count--
-            Start-Sleep -Seconds 5
-          }
+          python tests/test_dataset_loaders.py
