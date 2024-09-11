@@ -13,9 +13,6 @@ warning_msg = (
     + " data points."
 )
 
-future_warn_flag = False
-warnings.simplefilter("once", FutureWarning)
-
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -473,8 +470,8 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10, r=1):
-    """Computes histogram of the signal.
+def hist(signal, nbins=10):
+    """Computes the mode of the signal's histogram.
 
     Feature computational cost: 1
 
@@ -484,34 +481,20 @@ def hist(signal, nbins=10, r=1):
         Input from histogram is computed
     nbins : int
         The number of equal-width bins in the given range
-    r : float
-        The lower(-r) and upper(r) range of the bins
 
     Returns
     -------
-    nd-array
-        The values of the histogram
+    float
+        The mode of the histogram
     """
-    global future_warn_flag
 
-    if not future_warn_flag:
-        warnings.warn(
-            (
-                "The histogram feature was deprecated in version 0.1.8 and will be replaced by the mode of histogram in 0.1.9."
-                " From then on, only a single feature value will be returned."
-            ),
-            FutureWarning,
-        )
-        future_warn_flag = True
+    histsig, bin_edges = np.histogram(signal, bins=nbins)
 
-    # TODO: r value must be revised!
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])
+    idx_max = np.argmax(histsig)
 
-    names = [
-        str(np.around(bin_edges[i], 2)) + ":" + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)
-    ]
+    mode_hist = (bin_edges[idx_max] + bin_edges[idx_max + 1]) * 0.5
 
-    return {"names": names, "values": histsig}
+    return mode_hist
 
 
 @set_domain("domain", "statistical")
