@@ -1,3 +1,5 @@
+from typing import List, Tuple, Union
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -74,24 +76,55 @@ def merge_time_series(data, fs_resample, time_unit):
     return pd.DataFrame(data=data_new[:, 1:], columns=header_values[1:])
 
 
-def correlated_features(features, threshold=0.95):
-    """Compute pairwise correlation of features using pearson method.
+def correlated_features(
+    features: pd.DataFrame,
+    threshold: float = 0.95,
+    method: str = "pearson",
+    drop_correlated: bool = False,
+) -> Union[List[str], Tuple[List[str], pd.DataFrame]]:
+    """Identify and optionally remove highly correlated features from a
+    DataFrame.
+
+    This function computes the pairwise Pearson correlation of features using
+    pandas.corr() and identifies features that have an absolute value of the
+    correlation coefficient higher than the specified threshold. Different
+    correlation methods supported by such as 'pearson', 'spearman', or
+    'kendall'.
+
+    .. deprecated:: 0.1.11
+
+        tsfel.correlated_features will be deprecated in tsfel 0.1.11 and will be
+        removed in other upcoming releases. It will be replaced by a future
+        DropCorrelated feature class using fit and transform logic.
 
     Parameters
     ----------
-    features : DataFrame
-        features
-    threshold :
-        correlation value for removing highly correlated features
+    features : pd.DataFrame
+        A DataFrame containing the feature data.
+    threshold : float
+        The correlation value for removing highly correlated features.
+    method : str
+        Method to compute correlation. Must be one of {'pearson', 'kendall', 'spearman'}
+    drop_correlated : bool:
+        If True, drop the highly correlated features from the DataFrame.
+
     Returns
     -------
-    DataFrame
-        correlated features names
+    Union[List[str], Tuple[List[str], pd.DataFrame]]:
+        - A list of names of highly correlated features.
+        - If `drop_correlated` is True, a tuple containing the list of dropped feature names and the updated DataFrame with those features removed.
     """
-    corr_matrix = features.corr().abs()
+
+    corr_matrix = features.corr(method=method).abs()
     # Select upper triangle of correlation matrix
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     # Find index and column name of features with correlation greater than 0.95
     to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
 
-    return to_drop
+    if drop_correlated:
+        features.drop(to_drop, axis=1, inplace=True)
+
+        return to_drop, features
+
+    else:
+        return to_drop
