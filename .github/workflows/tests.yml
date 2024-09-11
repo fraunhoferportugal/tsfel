@@ -9,7 +9,7 @@ jobs:
   test:
     name: Run template tests
     strategy:
-      max-parallel: 4
+      max-parallel: 1
       fail-fast: false
       matrix:
         python-version: [ '3.8', '3.9' ]
