@@ -13,9 +13,6 @@ warning_msg = (
     + " data points."
 )
 
-future_warn_flag = False
-warnings.simplefilter("once", FutureWarning)
-
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -473,45 +470,31 @@ def entropy(signal, prob="standard"):
 
 
 @set_domain("domain", "statistical")
-def hist(signal, nbins=10, r=1):
-    """Computes histogram of the signal.
+def hist_mode(signal, nbins=10):
+    """Compute the mode of a histogram using a given number of (linearly spaced)
+    bins.
 
     Feature computational cost: 1
 
     Parameters
     ----------
-    signal : nd-array
-        Input from histogram is computed
+    signal : np.ndarray
+        Input signal from which the histogram is computed.
     nbins : int
-        The number of equal-width bins in the given range
-    r : float
-        The lower(-r) and upper(r) range of the bins
+        The number of equal-width bins in the given range, by default 10.
 
     Returns
     -------
-    nd-array
-        The values of the histogram
+    float
+        The mode of the histogram (the midpoint of the bin with the highest
+        count).
     """
-    global future_warn_flag
 
-    if not future_warn_flag:
-        warnings.warn(
-            (
-                "The histogram feature was deprecated in version 0.1.8 and will be replaced by the mode of histogram in 0.1.9."
-                " From then on, only a single feature value will be returned."
-            ),
-            FutureWarning,
-        )
-        future_warn_flag = True
+    hist_values, bin_edges = np.histogram(signal, bins=nbins)
+    max_bin_idx = np.argmax(hist_values)
+    mode_value = (bin_edges[max_bin_idx] + bin_edges[max_bin_idx + 1]) / 2.0
 
-    # TODO: r value must be revised!
-    histsig, bin_edges = np.histogram(signal, bins=nbins, range=[-r, r])
-
-    names = [
-        str(np.around(bin_edges[i], 2)) + ":" + str(np.around(bin_edges[i + 1], 2)) for i in range(len(bin_edges) - 1)
-    ]
-
-    return {"names": names, "values": histsig}
+    return mode_value
 
 
 @set_domain("domain", "statistical")

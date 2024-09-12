@@ -430,14 +430,13 @@
             "tag": "eeg",
             "use": "yes"
         },
-        "Histogram": {
+        "Histogram mode": {
             "complexity": "log",
-            "description": "Computes histogram of the signal.",
-            "function": "tsfel.hist",
-            "n_features": "nbins",
+            "description": "Computes the mode of the signal's histogram.",
+            "function": "tsfel.hist_mode",
+            "n_features": 1,
             "parameters": {
-                "nbins": 10,
-                "r": 1
+                "nbins": 10
             },
             "use": "yes"
         },

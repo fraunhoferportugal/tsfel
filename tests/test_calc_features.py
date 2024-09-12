@@ -75,7 +75,7 @@ class TestCalcFeatures(unittest.TestCase):
         )
         np.testing.assert_array_equal(
             features0.shape,
-            (16, 495),
+            (16, 468),
         )
 
     def test_input_array_window_tosplit_axis_single(self):
@@ -92,7 +92,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features1.shape,
-            (16, 165),
+            (16, 156),
         )
 
     def test_input_series_window_tosplit_axis_single(self):
@@ -108,7 +108,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features2.shape,
-            (16, 165),
+            (16, 156),
         )
 
     def test_input_dataframe_window_single_axis_multi(self):
@@ -152,7 +152,7 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features5.shape,
-            (1, 40),
+            (1, 31),
         )
 
     def test_input_array_window_single_axis_single(self):
@@ -183,14 +183,14 @@ class TestCalcFeatures(unittest.TestCase):
 
         np.testing.assert_array_equal(
             features7.shape,
-            (1, 169),
+            (1, 160),
         )
 
     def test_get_number_features(self):
         feature_sets_size = [get_number_features(get_features_by_domain(domain)) for domain in domains]
         np.testing.assert_array_equal(
             feature_sets_size,
-            [40, 14, 124, 6],  # 184 is the total
+            [31, 14, 124, 6],  # 184 is the total
         )
 
     def test_dataset_extractor(self):
