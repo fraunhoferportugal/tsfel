@@ -5,7 +5,7 @@ Changelog
 Version 0.1.9
 =============
 - Changes
-    - Replaced the ``Histogram`` feature with ``HistogramMode`` (`#167 <https://github.com/fraunhoferportugal/tsfel/pull/167>`_)
+    - Replaced the ``Histogram`` feature with ``Histogram mode`` (`#167 <https://github.com/fraunhoferportugal/tsfel/pull/167>`_)
 
 - Improvements
     - The ``correlated_features`` method now supports returning a filtered feature vector (`#163 <https://github.com/fraunhoferportugal/tsfel/pull/163>`_)
