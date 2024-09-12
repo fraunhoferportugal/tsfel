@@ -2,6 +2,19 @@
 Changelog
 =========
 
+Version 0.1.9
+=============
+- Changes
+    - Replaced the ``Histogram`` feature with ``HistogramMode`` (`#167 <https://github.com/fraunhoferportugal/tsfel/pull/167>`_)
+
+- Improvements
+    - The ``correlated_features`` method now supports returning a filtered feature vector (`#163 <https://github.com/fraunhoferportugal/tsfel/pull/163>`_)
+
+- Documentation
+    - Set up a Slack community invite (`#164 <https://github.com/fraunhoferportugal/tsfel/issues/164>`_)
+    - Enhanced documentation for ``the time_series_feature_extraction`` and ``get_features_by_domain functions``
+    - Updated the main example notebook on Human Activity Recognition (`#159 <https://github.com/fraunhoferportugal/tsfel/issues/159>`_)
+
 Version 0.1.8
 =============
 - New Features
