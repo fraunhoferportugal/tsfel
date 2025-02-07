@@ -18,7 +18,6 @@ from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
 import importlib
-features_mod = importlib.import_module('tsfel.feature_extraction.features')
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     r"""Extracts features from a dataset.
@@ -471,6 +470,8 @@ def calc_window_features(
             out = None
 
         i_feat = -1
+
+    features_mod = importlib.import_module('tsfel.feature_extraction.features')
 
     for _type in domain:
         domain_feats = config[_type].keys()
