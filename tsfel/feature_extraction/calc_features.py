@@ -17,6 +17,7 @@ from IPython.display import display
 from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
+import importlib
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     r"""Extracts features from a dataset.
@@ -470,6 +471,8 @@ def calc_window_features(
 
         i_feat = -1
 
+    features_mod = importlib.import_module('tsfel.feature_extraction.features')
+
     for _type in domain:
         domain_feats = config[_type].keys()
 
@@ -507,7 +510,7 @@ def calc_window_features(
 
                 # Eval feature results
                 if single_axis:
-                    eval_result = locals()[func_total](
+                    eval_result = getattr(features_mod, func_total)(
                         window,
                         **parameters_total,
                     )
@@ -515,7 +518,7 @@ def calc_window_features(
 
                 for ax in range(len(header_names)):
                     sig_ax = window if single_axis else window[:, ax]
-                    eval_result_ax = locals()[func_total](sig_ax, **parameters_total)
+                    eval_result_ax = getattr(features_mod, func_total)(sig_ax, **parameters_total)
 
                     # Function returns more than one element
                     if isinstance(eval_result_ax, tuple):
