@@ -328,13 +328,12 @@ def time_series_features_extractor(
             out = None
 
         if isinstance(n_jobs, int):
-            # Multiprocessing use
-            if n_jobs == -1:
-                cpu_count = mp.cpu_count()
-            else:
-                cpu_count = n_jobs
+            # Determine number of processes
+            cpu_count = mp.cpu_count() if n_jobs == -1 else n_jobs
 
-            pool = mp.Pool(cpu_count)
+            ctx = mp.get_context("spawn")
+            pool = ctx.Pool(cpu_count)
+
             features = pool.imap(
                 partial(
                     _calc_features,
