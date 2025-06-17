@@ -1,5 +1,6 @@
 import glob
 import importlib
+import importlib.util
 import multiprocessing as mp
 import numbers
 import os
@@ -16,8 +17,9 @@ from IPython.display import display
 
 from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
+from tsfel.feature_extraction import features as tsfel_features
 
-import importlib
+
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     r"""Extracts features from a dataset.
@@ -448,11 +450,8 @@ def calc_window_features(
     exec("from tsfel import *")
     domain = config.keys()
 
-    if features_path:
-        sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
-        exec("import " + features_path.split(os.sep)[-1][:-3])
-        importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
-        exec("from " + features_path.split(os.sep)[-1][:-3] + " import *")
+    # Load all available functions
+    feature_funcs = load_combined_feature_modules(features_path)
 
     # Create global arrays
     feature_results = []
@@ -470,8 +469,6 @@ def calc_window_features(
             out = None
 
         i_feat = -1
-
-    features_mod = importlib.import_module('tsfel.feature_extraction.features')
 
     for _type in domain:
         domain_feats = config[_type].keys()
@@ -510,7 +507,7 @@ def calc_window_features(
 
                 # Eval feature results
                 if single_axis:
-                    eval_result = getattr(features_mod, func_total)(
+                    eval_result = feature_funcs[func_total](
                         window,
                         **parameters_total,
                     )
@@ -518,8 +515,7 @@ def calc_window_features(
 
                 for ax in range(len(header_names)):
                     sig_ax = window if single_axis else window[:, ax]
-                    eval_result_ax = getattr(features_mod, func_total)(sig_ax, **parameters_total)
-
+                    eval_result_ax = feature_funcs[func_total](sig_ax, **parameters_total)
                     # Function returns more than one element
                     if isinstance(eval_result_ax, tuple):
                         eval_result_ax = (
@@ -546,3 +542,44 @@ def calc_window_features(
     )
 
     return features
+
+
+def load_combined_feature_modules(features_path=None):
+    """
+    Load feature functions from both the TSFEL features module and an optional user module.
+
+    Parameters
+    ----------
+    features_path : str or None
+        Path to user-defined Python feature module (.py).
+        If None, only the default TSFEL features module is used.
+
+    Returns
+    -------
+    dict
+        A dictionary mapping function names to function objects from both sources.
+        User-defined functions override TSFEL ones with the same name.
+    """
+
+    # Start with default TSFEL functions
+    feature_funcs = {
+        name: obj for name, obj in tsfel_features.__dict__.items() if callable(obj)
+    }
+
+    if features_path:
+        module_name = os.path.splitext(os.path.basename(features_path))[0]
+        spec = importlib.util.spec_from_file_location(module_name, features_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load module from {features_path}")
+
+        user_module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = user_module
+        spec.loader.exec_module(user_module)
+
+        # Add or override with user-defined functions
+        user_funcs = {
+            name: obj for name, obj in user_module.__dict__.items() if callable(obj)
+        }
+        feature_funcs.update(user_funcs)
+
+    return feature_funcs

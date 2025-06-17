@@ -23,21 +23,22 @@ def add_feature_json(features_path, json_path):
         New customised features will be added to file in this directory.
     """
 
-    sys.path.append(features_path[: -len(features_path.split(os.sep)[-1]) - 1])
-    exec("import " + features_path.split(os.sep)[-1][:-3])
-
-    # Reload module containing the new features
-    importlib.reload(sys.modules[features_path.split(os.sep)[-1][:-3]])
-    exec("import " + features_path.split(os.sep)[-1][:-3] + " as pymodule")
+    module_name = os.path.splitext(os.path.basename(features_path))[0]
+    
+    spec = importlib.util.spec_from_file_location(module_name, features_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load module from {features_path}")
+    pymodule = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = pymodule
+    spec.loader.exec_module(pymodule)
 
     # Functions from module containing the new features
-    functions_list = [o for o in getmembers(locals()["pymodule"]) if isfunction(o[1])]
-    function_names = [fname[0] for fname in functions_list]
-
+    functions_list = [o for o in getmembers(pymodule) if isfunction(o[1])]
+    
     # Check if @set_domain was declared on features module
     vset_domain = False
 
-    for fname, f in list(locals()["pymodule"].__dict__.items()):
+    for fname, f in pymodule.__dict__.items():
 
         if getattr(f, "domain", None) is not None:
 
