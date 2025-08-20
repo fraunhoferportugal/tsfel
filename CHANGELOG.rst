@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 0.2.0
+=============
+- New features
+    - Added support for Python 3.13 (`#176 <https://github.com/fraunhoferportugal/tsfel/pull/176>`_)
+
+- Changes
+    - Replaced ``numpy.trapz`` with ``scipy.integrate.trapezoid`` for consistent behavior and compatibility with NumPy < 2 (`#178 <https://github.com/fraunhoferportugal/tsfel/issues/178>`_)
+
 Version 0.1.9
 =============
 - Changes

@@ -1,5 +1,5 @@
-[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/latest/?badge=latest)
-[![license](https://img.shields.io/badge/license-BSD%203--Clause-green?logo=style)](https://github.com/aeon-toolkit/aeon/blob/main/LICENSE)
+[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/dev/descriptions/get_started.html)
+[![license](https://img.shields.io/badge/license-BSD%203--Clause-green?logo=style)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
 [![!pypi](https://img.shields.io/pypi/v/tsfel?logo=pypi&color=blue)](https://pypi.org/project/tsfel/)
 [![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
@@ -17,7 +17,7 @@
 `TSFEL` is an open-source Python library for time series analysis. It centralizes a large and powerful feature set of
 several feature extraction methods from statistical, temporal, spectral, and fractal domains.
 
-The documentation is available [here](https://github.com/fraunhoferportugal/tsfel/issues).
+The documentation is available [here](https://tsfel.readthedocs.io/en/latest/descriptions/get_started.html).
 
 You can install `TSFEL` via pip using the following:
 
