@@ -1,6 +1,6 @@
 import warnings
 
-import scipy.signal
+import scipy
 from statsmodels.tsa.stattools import acf
 
 from tsfel.constants import FEATURES_MIN_SIZE
@@ -471,8 +471,8 @@ def entropy(signal, prob="standard"):
 
 @set_domain("domain", "statistical")
 def hist_mode(signal, nbins=10):
-    """Compute the mode of a histogram using a given number of (linearly spaced)
-    bins.
+    """Compute the mode of a histogram using a given number of (linearly
+    spaced) bins.
 
     Feature computational cost: 1
 
@@ -2010,6 +2010,6 @@ def mse(signal, m=3, maxscale=None, tolerance=None):
 
     mse_values = np.array([sample_entropy(coarse_graining(signal, i + 1), m, tolerance) for i in np.arange(maxscale)])
     mse_values_finite = mse_values[np.isfinite(mse_values)]
-    mse_area = np.trapezoid(mse_values_finite) / len(mse_values_finite)
+    mse_area = scipy.integrate.trapezoid(mse_values_finite) / len(mse_values_finite)
 
     return mse_area
