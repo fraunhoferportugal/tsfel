@@ -300,25 +300,27 @@ def slope(signal):
 
 @set_domain("domain", "temporal")
 def auc(signal, fs):
-    """Computes the area under the curve of the signal computed with trapezoid
-    rule.
+    """Compute the unsigned area under the curve of a 1D signal using the
+    trapezoid rule.
 
     Feature computational cost: 1
 
     Parameters
     ----------
     signal : nd-array
-        Input from which the area under the curve is computed
+        Input signal.
     fs : float
-        Sampling Frequency
+        Sampling frequency in Hz (must be > 0).
+
     Returns
     -------
     float
-        The area under the curve value
+        Unsigned area under the curve.
     """
-    t = compute_time(signal, fs)
+    y = np.abs(signal)
+    dt = 1.0 / fs
 
-    return np.sum(0.5 * np.diff(t) * np.abs(np.array(signal[:-1]) + np.array(signal[1:])))
+    return float(scipy.integrate.trapezoid(y, dx=dt))
 
 
 @set_domain("domain", "temporal")

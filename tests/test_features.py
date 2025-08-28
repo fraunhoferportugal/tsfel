@@ -662,10 +662,10 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(auc(constNeg, Fs), 0.019)
         np.testing.assert_almost_equal(auc(constF, Fs), 0.0475)
         np.testing.assert_almost_equal(auc(lin, Fs), 0.18050000000000002)
-        np.testing.assert_almost_equal(auc(lin0, Fs), 0.09473684210526315)
+        np.testing.assert_almost_equal(auc(lin0, Fs), 0.09526315789473684)
         np.testing.assert_almost_equal(auc(wave, Fs), 0.6365517062491768)
         np.testing.assert_almost_equal(auc(offsetWave, Fs), 1.998015705379539)
-        np.testing.assert_almost_equal(auc(noiseWave, Fs), 0.6375702578824347)
+        np.testing.assert_almost_equal(auc(noiseWave, Fs), 0.6391744434087621)
 
     def test_abs_energy(self):
         np.testing.assert_almost_equal(abs_energy(const0), 0.0)
