@@ -46,14 +46,9 @@ if os.environ.get("READTHEDOCS", None) == "True":
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.todo",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.coverage",
-    "sphinx.ext.doctest",
-    "sphinx.ext.ifconfig",
-    "sphinx.ext.imgmath",
-    "sphinx.ext.napoleon",
+    "numpydoc",
+    "sphinx_design",
+    "sphinx_copybutton",
 ]
 
 # If true, figures, tables and code-blocks are automatically numbered
@@ -83,8 +78,8 @@ master_doc = "index"
 # General information about the project.
 now = datetime.datetime.today()
 project = "TSFEL"
-copyright = "2025, Fraunhofer AICOS"
-author = "Fraunhofer AICOS"
+copyright = f"{now.year}, Fraunhofer Portugal AICOS"
+author = "Fraunhofer Portugal AICOS"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -108,32 +103,66 @@ release = "0.2.0"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
-keep_warnings = True
+keep_warnings = False
 
 # Boolean indicating whether to scan all found documents for autosummary
 # directives, and to generate stub pages for each
+numpydoc_show_class_members = False
+numpydoc_class_members_toctree = False
 autosummary_generate = True
 
+
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "default"
+# pygments_style = "default"
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "logo": {
+        "image_light": "_static/tsfel_logo_light.png",
+        "image_dark": "_static/tsfel_logo_dark.png",
+        "alt_text": "TSFEL documentation - Home",
+    },
+    "github_url": "https://github.com/fraunhoferportugal/tsfel",
+    "icon_links": [
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/tsfel/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+    ],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "show_prev_next": False,
+    "use_edit_page_button": True,
+    "pygments_light_style": "tango",
+    "pygments_dark_style": "monokai",
+}
+
+html_context = {
+    "github_user": "fraunhoferportugal",
+    "github_repo": "tsfel",
+    "github_version": "master",
+    "doc_path": "docs",
+}
+
+html_title = "TSFEL"
+html_last_updated_fmt = "%b %d, %Y"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 # -- Options for HTMLHelp output ------------------------------------------
 
@@ -227,4 +256,10 @@ epub_exclude_files = ["search.html"]
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
+}
