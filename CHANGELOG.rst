@@ -30,7 +30,7 @@ Version 0.1.8
     - Improved the ``get_features_by_domain`` method, allowing easier selection of multiple feature domain combinations
 
 - Improvements
-    - Significantly reduced the computational time for the LPCC feature (`#156 <https://github.com/fraunhoferportugal/tsfel/pull/153>`_)
+    - Significantly reduced the computational time for the LPCC feature (`#153 <https://github.com/fraunhoferportugal/tsfel/pull/153>`_)
     - Resolved deprecation issues with SciPy Wavelets by switching to PyWavelets for features that rely on wavelets (`#147 <https://github.com/fraunhoferportugal/tsfel/pull/147>`_)
     - Renamed the ``fft_mean_coefficient`` feature to ``spectrogram_mean_coefficient`` for descriptive correctness (`#145 <https://github.com/fraunhoferportugal/tsfel/pull/145>`_)
 
