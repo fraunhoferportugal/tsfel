@@ -154,8 +154,8 @@ def load_ucihar(use_cache=True, data_modality=None) -> (List[pd.DataFrame], np.n
     References
     ----------
     .. [1] Anguita, D., et. al (2013). A Public Domain Dataset for Human
-    Activity Recognition using Smartphones. The European Symposium on Artificial
-    Neural Networks.
+       Activity Recognition using Smartphones. The European Symposium on
+       Artificial Neural Networks.
     """
 
     data_modality = [] if data_modality is None else data_modality

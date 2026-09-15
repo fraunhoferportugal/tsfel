@@ -279,13 +279,14 @@ repos:
               - mdformat-black
               - mdformat-beautysh
             exclude: CHANGELOG.md
-    - repo: https://github.com/myint/docformatter
-      rev: v1.7.5
+    - repo: https://github.com/PyCQA/docformatter
+      rev: v1.7.7
       hooks:
           - id: docformatter
             name: docformatter - formats docstrings to follow PEP 257
             description: Formats docstrings to follow PEP 257
             args: [--in-place]
+            additional_dependencies: [tomli]
     - repo: https://github.com/terrencepreilly/darglint
       rev: v1.8.1
       hooks:
