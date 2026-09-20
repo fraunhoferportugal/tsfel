@@ -505,13 +505,6 @@ def calc_window_features(
                             parameters_total["fs"] = fs
 
                 # Eval feature results
-                if single_axis:
-                    eval_result = feature_funcs[func_total](
-                        window,
-                        **parameters_total,
-                    )
-                    eval_result = np.array([eval_result])
-
                 for ax in range(len(header_names)):
                     sig_ax = window if single_axis else window[:, ax]
                     eval_result_ax = feature_funcs[func_total](sig_ax, **parameters_total)
