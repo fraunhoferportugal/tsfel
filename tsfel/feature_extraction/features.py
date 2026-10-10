@@ -397,6 +397,8 @@ def abs_energy(signal):
     float
         Absolute energy
     """
+    signal = np.asanyarray(signal)
+    signal = signal.astype(np.result_type(signal.dtype, np.float64), copy=False)
     return np.sum(np.abs(signal) ** 2)
 
 
@@ -419,6 +421,8 @@ def average_power(signal, fs):
     float
         Average power
     """
+    signal = np.asanyarray(signal)
+    signal = signal.astype(np.result_type(signal.dtype, np.float64), copy=False)
     time = compute_time(signal, fs)
 
     return np.sum(np.array(signal) ** 2) / (time[-1] - time[0])
@@ -690,6 +694,8 @@ def rms(signal):
     float
         Root mean square
     """
+    signal = np.asanyarray(signal)
+    signal = signal.astype(np.result_type(signal.dtype, np.float64), copy=False)
     return np.sqrt(np.sum(np.array(signal) ** 2) / len(signal))
 
 
