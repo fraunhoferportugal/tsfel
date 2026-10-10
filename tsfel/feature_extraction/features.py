@@ -70,6 +70,8 @@ def calc_centroid(signal, fs):
         Temporal centroid
     """
 
+    signal = np.asanyarray(signal)
+    signal = signal.astype(np.result_type(signal.dtype, np.float64), copy=False)
     time = compute_time(signal, fs)
 
     energy = np.array(signal) ** 2

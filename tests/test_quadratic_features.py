@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from tsfel.feature_extraction.features import abs_energy, average_power, rms
+from tsfel.feature_extraction.features import abs_energy, average_power, calc_centroid, rms
 
 
 class TestQuadraticFeatures(unittest.TestCase):
@@ -16,6 +16,11 @@ class TestQuadraticFeatures(unittest.TestCase):
                 ("abs_energy", abs_energy(signal), energy),
                 ("rms", rms(signal), np.sqrt(energy / len(signal))),
                 ("average_power", average_power(signal, 100), energy / 0.03),
+                (
+                    "calc_centroid",
+                    calc_centroid(signal, 100),
+                    sum(i * int(value) ** 2 for i, value in enumerate(signal)) / (100 * energy),
+                ),
             ]:
                 with self.subTest(dtype=dtype, feature=feature):
                     np.testing.assert_allclose(actual, expected, rtol=1e-14)
