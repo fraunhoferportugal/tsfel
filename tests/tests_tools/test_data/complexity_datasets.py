@@ -6,8 +6,7 @@ The implementation for generating colored noise is sourced from the
 'colorednoise' PyPI package, with credit to Felix Patzelt.
 """
 
-import os
-from typing import Iterable, Optional, Union
+from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -19,9 +18,9 @@ from numpy.random import Generator, RandomState, default_rng
 
 def powerlaw_psd_gaussian(
     exponent: float,
-    size: Union[int, Iterable[int]],
+    size: int | Iterable[int],
     fmin: float = 0.0,
-    random_state: Optional[Union[int, Generator, RandomState]] = None,
+    random_state: int | Generator | RandomState | None = None,
 ):
     """Gaussian (1/f)**beta noise.
 
@@ -92,9 +91,9 @@ def powerlaw_psd_gaussian(
     # The number of samples in each time series
     samples = size[-1]
 
-    # Calculate Frequencies (we asume a sample rate of one)
+    # Calculate Frequencies (we assume a sample rate of one)
     # Use fft functions for real output (-> hermitian spectrum)
-    f = rfftfreq(samples)  # type: ignore # mypy 1.5.1 has problems here
+    f = rfftfreq(samples)
 
     # Validate / normalise fmin
     if 0 <= fmin <= 0.5:
@@ -149,7 +148,7 @@ def powerlaw_psd_gaussian(
 
 
 def _get_normal_distribution(
-    random_state: Optional[Union[int, Generator, RandomState]],
+    random_state: int | Generator | RandomState | None,
 ):
     normal_dist = None
     if isinstance(random_state, (integer, int)) or random_state is None:
@@ -159,7 +158,7 @@ def _get_normal_distribution(
         normal_dist = random_state.normal
     else:
         raise ValueError(
-            "random_state must be one of integer, numpy.random.Generator, " "numpy.random.Randomstate",
+            "random_state must be one of integer, numpy.random.Generator, numpy.random.Randomstate",
         )
     return normal_dist
 

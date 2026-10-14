@@ -73,19 +73,19 @@ for i, (k, _v) in enumerate(dataset.items()):
     plot_acf(signal, ax[1, i], adjusted=True, fft=len(signal) > 1250, title="")
     ax[1, i].axhline(y=(1 / np.e), color="r", linestyle="--")
     ax[1, i].spines[["top", "right"]].set_visible(False)
-    ax[1, i].set_title("$\\tau = %d$" % get_first_acf_time_constant(signal))
+    ax[1, i].set_title(rf"$\tau = {get_first_acf_time_constant(signal):d}$")
 
     # Third row (dfa)
     # TODO: Change to our own implementation instead of relying on neurokit2
     _, info = nk.fractal_dfa(signal)
     plot_dfa(info, info["scale"], info["Fluctuations"], ax[2, i])
-    ax[2, i].set_title("$\\alpha = %0.2f$" % info["Alpha"])
+    ax[2, i].set_title(rf"$\alpha = {info['Alpha']:.2f}$")
     ax[2, i].set_axis_off()
 
     # Forth row (mse)
     mse, info = nk.entropy_multiscale(signal)
     plot_multiscale_entropy(info, ax[3, i])
-    ax[3, i].set_title("mse = %0.2f" % mse)
+    ax[3, i].set_title(f"mse = {mse:.2f}")
     ax[3, i].set_ylim([0, 2.5])
     ax[3, i].spines[["top", "right"]].set_visible(False)
 

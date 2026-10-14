@@ -59,23 +59,19 @@ def progress_bar_notebook(iteration, total=100):
     """
     result = int((iteration / total) * 100)
     return HTML(
-        """
+        f"""
               <p>
                   Progress: {result}% Complete
               <p/>
               <progress
-                  value='{value}'
-                  max='{max_value}',
+                  value='{iteration}'
+                  max='{total}',
                   style='width: 25%',
               >
-                  {value}
+                  {iteration}
               </progress>
 
-    """.format(
-            value=iteration,
-            max_value=total,
-            result=result,
-        ),
+    """,
     )
 
 

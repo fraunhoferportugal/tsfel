@@ -37,7 +37,7 @@ import tsfel
 # Loads a 10 s single lead ECG
 data = tsfel.datasets.load_biopluxecg()
 
-# Set up the default configuration using using the statistical, temporal and spectral feature sets. 
+# Set up the default configuration using using the statistical, temporal and spectral feature sets.
 cfg = tsfel.get_features_by_domain()
 
 # Extract features

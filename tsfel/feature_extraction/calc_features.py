@@ -316,7 +316,6 @@ def time_series_features_extractor(
     if isinstance(timeseries, list):
         # Starting the display of progress bar for notebooks interfaces
         if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
-
             out = display(
                 progress_bar_notebook(0, len(timeseries)),
                 display_id=True,
@@ -369,7 +368,7 @@ def time_series_features_extractor(
                     display_progress_bar(i, len(timeseries), out)
         else:
             raise SystemExit(
-                "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing.",
+                "n_jobs value is not valid. Choose an integer value or None for no multiprocessing.",
             )
     # single window
     else:
@@ -453,7 +452,6 @@ def calc_window_features(
     # Starting the display of progress bar for notebooks interfaces
     # Iterating over features of a single window
     if verbose == 1 and single_window:
-
         feat_nb = np.hstack([list(config[_type].keys()) for _type in domain])
 
         if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
@@ -467,14 +465,12 @@ def calc_window_features(
         domain_feats = config[_type].keys()
 
         for feat in domain_feats:
-
             if verbose == 1 and single_window:
                 i_feat = i_feat + 1
                 display_progress_bar(i_feat, len(feat_nb), out)
 
             # Only returns used functions
             if config[_type][feat]["use"] == "yes":
-
                 # Read Function (real name of function)
                 func_total = config[_type][feat]["function"]
 
@@ -489,7 +485,6 @@ def calc_window_features(
 
                     # Check assert fs parameter:
                     if "fs" in parameters_total:
-
                         # Select which fs to use
                         if fs is None:
                             # Check if features dict has default sampling frequency value
@@ -522,7 +517,7 @@ def calc_window_features(
                         names = eval_result_ax["names"]
                         values = eval_result_ax["values"]
                         eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
-                        for name, value in zip(names, values):
+                        for name, value in zip(names, values, strict=True):
                             feature_results.append(value)
                             feature_names.append(f"{header_names[ax]}_{feat}_{name}")
                     else:

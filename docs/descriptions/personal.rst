@@ -88,4 +88,4 @@ To add your feature to TSFEL complete the following steps:
 
 4. Develop unit tests for the new feature in `/tests/test_features.py <https://github.com/fraunhoferportugal/tsfel/blob/development/tests/test_features.py>`_
 
-5. Create a pull request in `GitHub <hhttps://github.com/fraunhoferportugal/tsfel>`_
+5. Create a pull request in `GitHub <https://github.com/fraunhoferportugal/tsfel>`_

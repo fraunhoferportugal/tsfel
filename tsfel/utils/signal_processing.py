@@ -1,5 +1,3 @@
-from typing import List, Tuple, Union
-
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -27,7 +25,7 @@ def signal_window_splitter(signal, window_size, overlap=0):
     step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
     if step == 0:
         raise SystemExit(
-            "Invalid overlap. " "Choose a lower overlap value.",
+            "Invalid overlap. Choose a lower overlap value.",
         )
     if len(signal) % window_size == 0 and overlap == 0:
         return [signal[i : i + window_size] for i in range(0, len(signal), step)]
@@ -81,7 +79,7 @@ def correlated_features(
     threshold: float = 0.95,
     method: str = "pearson",
     drop_correlated: bool = False,
-) -> Union[List[str], Tuple[List[str], pd.DataFrame]]:
+) -> list[str] | tuple[list[str], pd.DataFrame]:
     """Identify and optionally remove highly correlated features from a
     DataFrame.
 

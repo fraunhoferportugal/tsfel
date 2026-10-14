@@ -135,7 +135,6 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
     for m in np.arange(1, nfilt + 1):
-
         f_m_minus = int(filter_bin[m - 1])  # left
         f_m = int(filter_bin[m])  # center
         f_m_plus = int(filter_bin[m + 1])  # right
@@ -570,7 +569,7 @@ def calc_lempel_ziv_complexity(sequence):
     """Manual implementation of the Lempel-Ziv complexity.
 
     It is defined as the number of different substrings encountered as
-    the stream is viewed from begining to the end.
+    the stream is viewed from beginning to the end.
 
     Reference:
     https://github.com/Naereen/Lempel-Ziv_Complexity/blob/master/src/lempel_ziv_complexity.py
@@ -617,7 +616,7 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
 
     Returns
     -------
-        Index of the beggining of the plateau if it is found, length of y otherwise.
+        Index of the beginning of the plateau if it is found, length of y otherwise.
     """
 
     dy = np.diff(y)

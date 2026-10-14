@@ -105,7 +105,7 @@ grouped_stats = filtered_df.groupby(["Length", "Domain"])["Execution Time (s)"].
 
 
 fig, (ax0, ax1) = plt.subplots(ncols=2)
-for domain, marker in zip(DOMAINS, ["o", "v", "^"]):
+for domain, marker in zip(DOMAINS, ["o", "v", "^"], strict=True):
     _data_slice = grouped_stats[grouped_stats["Domain"] == domain]
     ax0.errorbar(
         _data_slice["Length"],

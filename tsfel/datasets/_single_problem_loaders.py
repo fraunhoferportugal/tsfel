@@ -7,7 +7,6 @@ import os
 import warnings
 import zipfile
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -39,7 +38,7 @@ def _download_dataset(url, cache_dir, filename):
 
 
 def load_biopluxecg(use_cache=True) -> pd.Series:
-    """Load an example single-lead ECG signal colected using BioSignalsPlux.
+    """Load an example single-lead ECG signal collected using BioSignalsPlux.
 
     Parameters
     ----------
@@ -77,9 +76,9 @@ def load_biopluxecg(use_cache=True) -> pd.Series:
 
 def _get_uci_train_test_splits(
     dataset_dir: str,
-    data_modality: List[pd.DataFrame],
+    data_modality: list[pd.DataFrame],
     split: str,
-) -> (List[pd.DataFrame], np.ndarray):
+) -> (list[pd.DataFrame], np.ndarray):
 
     raw_signals_split_dir = os.path.join(dataset_dir, "UCI HAR Dataset", split, "Inertial Signals")
     raw_signals_split_label_path = os.path.join(dataset_dir, "UCI HAR Dataset", split, f"y_{split}.txt")
@@ -106,7 +105,7 @@ def get_uci_splits(cache_dir, data_modality):
 
 
 # TODO: Write a parser for this dataset.
-def load_ucihar(use_cache=True, data_modality=None) -> (List[pd.DataFrame], np.ndarray, List[pd.DataFrame], np.ndarray):
+def load_ucihar(use_cache=True, data_modality=None) -> (list[pd.DataFrame], np.ndarray, list[pd.DataFrame], np.ndarray):
     """Loads the Human Activity Recognition Using Smartphones dataset from the
     UC Irvine Machine Learning Repository [1]_. Retrieves the raw inertial data
     for both the training and test sets.

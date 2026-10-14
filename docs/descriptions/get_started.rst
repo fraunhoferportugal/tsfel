@@ -67,9 +67,9 @@ TSFEL provides a method to increase flexibility when extracting features over mu
   * TSFEL expects that the first column must contain the timestamp and following columns contain the time series values.
 
 
-* **Files might not be syncronised in time**
+* **Files might not be synchronised in time**
 
-  * TSFEL handles this assumption by conducting a linear interpolation to ensure all the time series are syncronised in time before feature extraction. The resampling frequency is set by the user.
+  * TSFEL handles this assumption by conducting a linear interpolation to ensure all the time series are synchronised in time before feature extraction. The resampling frequency is set by the user.
 
 
 The following code block extracts features on data residing over ``main_directory``, from all files named ``Accelerometer.txt``. Timestamps were recorded in nanoseconds and the resampling frequency is set to 100 Hz.
