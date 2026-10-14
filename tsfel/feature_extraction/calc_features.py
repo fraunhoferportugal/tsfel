@@ -15,10 +15,9 @@ import pandas as pd
 from IPython import get_ipython
 from IPython.display import display
 
+from tsfel.feature_extraction import features as tsfel_features
 from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
-from tsfel.feature_extraction import features as tsfel_features
-
 
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
@@ -182,7 +181,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
 
 def _calc_features(timeseries, config, fs, **kwargs):
-    """Extraction of time series features.
+    r"""Extraction of time series features.
 
     Parameters
     ----------
@@ -197,7 +196,7 @@ def _calc_features(timeseries, config, fs, **kwargs):
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -206,7 +205,6 @@ def _calc_features(timeseries, config, fs, **kwargs):
     pd.DataFrame
         A DataFrame containing the extracted features.
     """
-
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
     feat_val = calc_window_features(
@@ -245,7 +243,7 @@ def time_series_features_extractor(
     overlap : float, optional, default=0
         A value between 0 and 1 that defines the percentage of overlap between consecutive windows.
     n_jobs : int, optional
-        The number of jobs to run in parallel. 
+        The number of jobs to run in parallel.
             - ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
             - ``-1`` means using all available processors.
             - default: ``None`` on Windows, ``-1`` for other systems
@@ -257,7 +255,7 @@ def time_series_features_extractor(
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -268,7 +266,6 @@ def time_series_features_extractor(
         - Columns represent the names of the features.
         - Rows contain the feature values for each signal window.
     """
-
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
 
@@ -419,7 +416,7 @@ def calc_window_features(
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -428,7 +425,6 @@ def calc_window_features(
     pd.DataFrame
         A DataFrame containing the extracted features.
     """
-    
     features_path = kwargs.get("features_path", None)
     header_names = kwargs.get("header_names", None)
 
@@ -440,9 +436,7 @@ def calc_window_features(
     if header_names is None:
         header_names = np.array([0]) if single_axis else np.arange(window.shape[-1])
     else:
-        if (len(header_names) != window.shape[-1] and not single_axis) or (
-            len(header_names) != 1 and single_axis
-        ):
+        if (len(header_names) != window.shape[-1] and not single_axis) or (len(header_names) != 1 and single_axis):
             raise Exception("header_names dimension does not match input columns.")
 
     # Execute imports
@@ -544,8 +538,8 @@ def calc_window_features(
 
 
 def load_combined_feature_modules(features_path=None):
-    """
-    Load feature functions from both the TSFEL features module and an optional user module.
+    """Load feature functions from both the TSFEL features module and an
+    optional user module.
 
     Parameters
     ----------
@@ -559,11 +553,8 @@ def load_combined_feature_modules(features_path=None):
         A dictionary mapping function names to function objects from both sources.
         User-defined functions override TSFEL ones with the same name.
     """
-
     # Start with default TSFEL functions
-    feature_funcs = {
-        name: obj for name, obj in tsfel_features.__dict__.items() if callable(obj)
-    }
+    feature_funcs = {name: obj for name, obj in tsfel_features.__dict__.items() if callable(obj)}
 
     if features_path:
         module_name = os.path.splitext(os.path.basename(features_path))[0]
@@ -576,9 +567,7 @@ def load_combined_feature_modules(features_path=None):
         spec.loader.exec_module(user_module)
 
         # Add or override with user-defined functions
-        user_funcs = {
-            name: obj for name, obj in user_module.__dict__.items() if callable(obj)
-        }
+        user_funcs = {name: obj for name, obj in user_module.__dict__.items() if callable(obj)}
         feature_funcs.update(user_funcs)
 
     return feature_funcs

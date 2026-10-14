@@ -20,11 +20,11 @@
 ##########################################################################################
 default_language_version:
     python: python3
-default_stages: [commit, push]
+default_stages: [pre-commit, pre-push]
 fail_fast: false
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v4.5.0
+      rev: v6.0.0
       hooks:
           - id: fix-byte-order-marker
             name: fix-byte-order-marker
@@ -116,13 +116,13 @@ repos:
     #         name: yesqa - remove unnecessary `# noqa` comments
     #         description: Automatically remove unnecessary `# noqa` comments
     - repo: https://github.com/asottile/add-trailing-comma
-      rev: v3.1.0
+      rev: v4.0.0
       hooks:
           - id: add-trailing-comma
             name: add-trailing-comma
             description: Automatically add trailing commas to calls and literals.
     - repo: https://github.com/PyCQA/flake8
-      rev: 7.0.0
+      rev: 7.4.1
       hooks:
           - id: flake8
             name: flake8 - check the style and quality of some python code
@@ -141,19 +141,19 @@ repos:
                 - flake8-typing-imports==1.12.0
                 #- flake8-match==1.0.0
     - repo: https://github.com/psf/black
-      rev: 24.1.1
+      rev: 26.10.1
       hooks:
           - id: black
             name: black - consistent Python code formatting
             description: The uncompromising Python code formatter
     - repo: https://github.com/PyCQA/isort
-      rev: 5.13.2
+      rev: 9.0.2
       hooks:
           - id: isort
             name: isort - sort Python imports
             description: Library to sort imports
     - repo: https://github.com/asottile/pyupgrade
-      rev: v3.15.0
+      rev: v3.22.0
       hooks:
           - id: pyupgrade
             name: pyupgrade - upgrade syntax for newer versions of the language
@@ -169,7 +169,7 @@ repos:
 # Notebooks
 ##########################################################################################
     - repo: https://github.com/nbQA-dev/nbQA
-      rev: 1.7.1
+      rev: 1.9.1
       hooks:
 #          - id: nbqa-flake8
 #            name: nbqa-flake8 - Python linting (notebooks)
@@ -191,7 +191,7 @@ repos:
 #          - id: nbqa-pydocstyle
 #            additional_dependencies: [pydocstyle, toml==0.10.2]
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.6.1
+      rev: 0.9.1
       hooks:
           - id: nbstripout
             name: nbstripout - strip outputs from notebooks
@@ -201,24 +201,6 @@ repos:
               - "metadata.colab metadata.kernelspec cell.metadata.colab cell.metadata.executionInfo cell.metadata.id cell.metadata.outputId"
             files: .ipynb
 ##########################################################################################
-# Shell Scripting
-##########################################################################################
-    - repo: local
-      hooks:
-          - id: shellcheck
-            name: shellcheck - static analysis tool for shell scripts
-            description: A static analysis tool for shell scripts
-            language: script
-            entry: scripts/shellcheck.sh
-            types: [shell]
-            args: [-e, SC1091]
-    - repo: https://github.com/lovesegfault/beautysh
-      rev: v6.2.1
-      hooks:
-          - id: beautysh
-            name: beautysh - Autoformat shell scripts
-            description: Autoformat shell scripts
-##########################################################################################
 # Tests
 ##########################################################################################
     - repo: local
@@ -226,11 +208,11 @@ repos:
           - id: pytest
             name: pytest
             description: Run pytest
-            entry: pytest -sv test
+            entry: pytest -sv tests
             language: system
             always_run: true
             types: [python]
-            stages: [push]
+            stages: [pre-push]
             pass_filenames: false
 ##########################################################################################
 # Security
@@ -244,7 +226,7 @@ repos:
 #            language: system
 #            files: requirements/*.txt
     - repo:  https://github.com/PyCQA/bandit
-      rev: 1.7.7
+      rev: 1.9.4
       hooks:
           - id: bandit
             args: ["-c", "pyproject.toml"]
@@ -270,7 +252,7 @@ repos:
 # Documentation
 ##########################################################################################
     - repo: https://github.com/executablebooks/mdformat
-      rev: 0.7.17
+      rev: 1.0.0
       hooks:
           - id: mdformat
             name: mdformat - Markdown formatter that can be used to enforce a consistent style in Markdown files
@@ -280,7 +262,7 @@ repos:
               - mdformat-beautysh
             exclude: CHANGELOG.md
     - repo: https://github.com/PyCQA/docformatter
-      rev: v1.7.7
+      rev: v1.7.8
       hooks:
           - id: docformatter
             name: docformatter - formats docstrings to follow PEP 257
@@ -326,14 +308,3 @@ repos:
 #           language_version: python3
 #           stages:
 #           - post-checkout
-##########################################################################################
-# Docker
-##########################################################################################
-    - repo: local
-      hooks:
-          - id: hadolint
-            name: hadolint - Lint Dockerfile for errors and enforce best practices
-            description: Lint Dockerfile for errors and enforce best practices
-            language: script
-            entry: scripts/hadolint.sh
-            files: Dockerfile

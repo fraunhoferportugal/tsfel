@@ -1,3 +1,9 @@
-ipython==8.27.0
-matplotlib==3.9.2
-pre-commit==3.8.0
+-e .
+-r requirements-test.txt  # pytest + colorednoise
+ipykernel >= 7.0          # run notebooks in VS Code, PyCharm or JupyterLab
+
+ipython >= 9.0
+matplotlib >= 3.10
+
+pre-commit >= 4.0
+seaborn >= 0.13           # used by the example notebooks
