@@ -443,6 +443,28 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(ecdf_percentile_count(offsetWave), (200, 800))
         np.testing.assert_almost_equal(ecdf_percentile_count(noiseWave), (200, 800))
 
+    def test_ecdf_percentile_nonconstant_repeated_endpoints(self):
+        signal = np.array([3, 1, 4, 2, 5, 3])
+        original = signal.copy()
+
+        np.testing.assert_array_equal(ecdf_percentile(signal), (1, 3))
+        np.testing.assert_array_equal(ecdf_percentile(signal), ecdf_percentile(np.sort(signal)))
+        np.testing.assert_array_equal(signal, original)
+
+    def test_ecdf_percentile_nonconstant_repeated_endpoints_scalar(self):
+        np.testing.assert_equal(ecdf_percentile([3, 1, 4, 2, 5, 3], percentile=0.4), 2)
+
+    def test_ecdf_percentile_count_nonconstant_repeated_endpoints(self):
+        signal = np.array([3, 1, 4, 2, 5, 3])
+        original = signal.copy()
+
+        np.testing.assert_array_equal(ecdf_percentile_count(signal), (1, 4))
+        np.testing.assert_array_equal(ecdf_percentile_count(signal), ecdf_percentile_count(np.sort(signal)))
+        np.testing.assert_array_equal(signal, original)
+
+    def test_ecdf_percentile_count_nonconstant_repeated_endpoints_scalar(self):
+        np.testing.assert_equal(ecdf_percentile_count([3, 1, 4, 2, 5, 3], percentile=0.4), 2)
+
     # ################################################ TEMPORAL FEATURES ################################################# #
     def test_distance(self):
         np.testing.assert_almost_equal(distance(const0), 19.0)
