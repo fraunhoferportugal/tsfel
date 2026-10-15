@@ -11,22 +11,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: [ '3.11', '3.12', '3.13', '3.14' ]
         platform: ['ubuntu-22.04', 'macos-latest', 'windows-latest' ]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 30
 
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.head_ref }}
-      - name: Extract branch name
-        run: echo running on branch ${GITHUB_REF##*/}
+          persist-credentials: false
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install dependencies
         run: |
           python -VV
