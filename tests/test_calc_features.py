@@ -42,7 +42,8 @@ sensor_data = {}
 key = "Accelerometer"
 domains = ["statistical", "temporal", "spectral", "fractal"]
 
-folders = list(glob.glob(main_directory + "**/", recursive=True))
+# Sorted, because glob returns folders in filesystem order, which differs between machines
+folders = sorted(glob.glob(main_directory + "**/", recursive=True))
 sensor_data[key] = pd.read_csv(folders[-1] + key + ".txt", header=None)
 
 
