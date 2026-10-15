@@ -1,0 +1,14 @@
+# Keeps the pinned GitHub Actions in .github/workflows up to date (one grouped PR per month)
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # Wait a week before proposing a new release, so a compromised version
+    # is likely to be caught and yanked before it reaches TSFEL's CI
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

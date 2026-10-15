@@ -1,49 +1,116 @@
-name: "Tests"
+name: Tests
 
 on:
   push:
+    branches: [master, dev]
   pull_request:
-    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel superseded runs when new commits are pushed to the same branch or PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    name: Run template tests
+  tests:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.11', '3.12', '3.13', '3.14' ]
-        platform: ['ubuntu-22.04', 'macos-latest', 'windows-latest' ]
-    runs-on: ${{ matrix.platform }}
-    timeout-minutes: 30
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install dependencies
+
+      - name: Install TSFEL and test dependencies
         run: |
-          python -VV
           python -m pip install --upgrade pip
           python -m pip install . --group test
-      - name: Check numpy and scipy flags
+          python -m pip list
+
+      - name: Run tests
+        run: python -m pytest -m "not network"
+
+  # The oldest dependency versions TSFEL claims to support, on the oldest Python.
+  # Keeps the floors in pyproject.toml honest.
+  lowest-dependencies:
+    name: Lowest dependencies (Python 3.11)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.11"
+          activate-environment: true
+
+      - name: Install TSFEL with the lowest allowed dependency versions
         run: |
-          python -c "import numpy as np; np.show_config()"
-          python -c "import scipy as sp; sp.show_config()"
-      #      - name: Test the input/output
-      #        run: |
-      #          python tests/test_calc_features.py
-      - name: Test the data loaders
+          uv pip install . --group test --resolution lowest-direct
+          uv pip list
+
+      - name: Run tests
+        run: python -m pytest -m "not network"
+
+  # Tests that download datasets run once, not on every matrix job,
+  # to keep CI fast and avoid hammering the dataset hosts.
+  network-tests:
+    name: Dataset loaders (network)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install TSFEL and test dependencies
         run: |
-          python tests/test_dataset_loaders.py
-        if: runner.os != 'Windows' # Skip Windows for now for this test only.
-      - name: Test the signal processing module
+          python -m pip install --upgrade pip
+          python -m pip install . --group test
+
+      - name: Run network tests
+        run: python -m pytest -m network
+
+  pre-commit:
+    name: Lint and format (pre-commit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Run pre-commit on all files
         run: |
-          python tests/test_signal_processing.py
+          python -m pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
