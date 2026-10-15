@@ -60,7 +60,7 @@ def add_feature_json(features_path, json_path):
             if args_name != "":
                 # Retrieve default values of arguments
                 spec = inspect.getfullargspec(f)
-                defaults = dict(zip(spec.args[::-1], (spec.defaults or ())[::-1], strict=True))
+                defaults = dict(zip(spec.args[::-1], (spec.defaults or ())[::-1], strict=False))
                 defaults.update(spec.kwonlydefaults or {})
 
                 for p in args_name[1:]:
