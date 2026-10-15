@@ -71,6 +71,12 @@ def calc_fft(signal, fs):
     """
 
     fmag = np.abs(np.fft.rfft(signal))
+    # FFT round-off grows with the signal length, up to about 0.3 * N * eps of
+    # the peak. Bins below N * eps of the peak are round-off, not signal content.
+    # Without this, features of clean signals (e.g. a pure tone) depend on
+    # round-off and change between FFT implementations.
+    round_off = len(signal) * np.finfo(fmag.dtype).eps * fmag.max(initial=0)
+    fmag[fmag < round_off] = 0
     f = np.fft.rfftfreq(len(signal), d=1 / fs)
 
     return f.copy(), fmag.copy()

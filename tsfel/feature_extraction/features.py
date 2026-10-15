@@ -1656,7 +1656,7 @@ def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     float
         wavelet entropy
     """
-    if np.sum(signal) == 0:
+    if np.all(signal == 0):
         return 0.0
 
     max_width = int(max_width)

@@ -29,6 +29,17 @@ whiteNoise = cn.powerlaw_psd_gaussian(0, samples, random_state=10)
 pinkNoise = cn.powerlaw_psd_gaussian(1, samples, random_state=10)
 brownNoise = cn.powerlaw_psd_gaussian(2, samples, random_state=10)
 
+# Signals and helper for the wavelet feature tests
+sine50 = np.sin(2 * np.pi * 50 * np.arange(10000) / Fs)
+whiteNoiseLong = np.random.default_rng(1).standard_normal(100000)
+
+
+def mexican_hat_amplitude(f, fs, widths=np.arange(1, 10)):
+    """Theoretical CWT amplitude of a unit sinusoid of frequency f, at each Mexican hat width."""
+    w = 2 * np.pi * f / fs * widths
+    psi_hat = 2 / (np.sqrt(3) * np.pi**0.25) * np.sqrt(2 * np.pi) * w**2 * np.exp(-(w**2) / 2)
+    return np.sqrt(widths) * psi_hat
+
 
 class TestFeatures(unittest.TestCase):
     # ############################################### STATISTICAL FEATURES ############################################### #
@@ -911,7 +922,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_spread(wave, Fs),
-            3.585399057660381e-05,
+            0,
             decimal=5,
         )
         np.testing.assert_almost_equal(
@@ -942,7 +953,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_skewness(wave, Fs),
-            10757350.436568316,
+            0,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -963,7 +974,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(spectral_kurtosis(constF, Fs), 0.0, decimal=5)
         np.testing.assert_almost_equal(
             spectral_kurtosis(lin, Fs),
-            4.209140226148914,
+            4.146584,
             decimal=0,
         )
         np.testing.assert_almost_equal(
@@ -973,7 +984,7 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_kurtosis(wave, Fs),
-            123562213974218.03,
+            0,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -1147,12 +1158,12 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_positive_turning(wave, Fs),
-            161,
+            1,
             decimal=0,
         )
         np.testing.assert_almost_equal(
             spectral_positive_turning(offsetWave, Fs),
-            161,
+            1,
             decimal=1,
         )
         np.testing.assert_almost_equal(
@@ -1590,7 +1601,7 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(spectral_entropy(constNeg, Fs), 0.0)
         np.testing.assert_almost_equal(spectral_entropy(constF, Fs), 0.0)
         np.testing.assert_almost_equal(spectral_entropy(lin, Fs), 0.5983234852309258)
-        np.testing.assert_almost_equal(spectral_entropy(lin0, Fs), 0.5745416630615365)
+        np.testing.assert_almost_equal(spectral_entropy(lin0, Fs), spectral_entropy(lin, Fs))
         np.testing.assert_almost_equal(
             spectral_entropy(wave, Fs),
             1.5228376718814352e-29,
@@ -1601,493 +1612,67 @@ class TestFeatures(unittest.TestCase):
         )
         np.testing.assert_almost_equal(
             spectral_entropy(noiseWave, Fs),
-            0.0301141821499739,
+            0.0301239,
         )
+
+    # --- Wavelet features ---------------------------------------------------------------------
+    # The expected values come from theory, not from previous outputs. TSFEL uses the Mexican hat
+    # wavelet with widths 1 to 9. For a sinusoid A*sin(w*n), the CWT at width a is a sinusoid of
+    # amplitude A * sqrt(a) * psi_hat(a*w), where psi_hat is the wavelet's Fourier transform. The
+    # wavelet has zero mean and zero first moment, so constants and straight lines have no CWT
+    # response away from the signal edges. Tolerances only absorb discretisation and edge effects.
+
+    def test_wavelet_cwt_of_constant_and_ramp_is_zero_inside(self):
+        for signal in (np.full(2000, 3.0), np.arange(2000.0)):
+            coeffs, _ = continuous_wavelet_transform(signal, Fs)
+            interior = coeffs[:, 60:-60]  # away from the edges, beyond the widest wavelet
+            self.assertLess(np.max(np.abs(interior)), 1e-5 * np.max(np.abs(coeffs)))
 
     def test_wavelet_entropy(self):
-        np.testing.assert_almost_equal(wavelet_entropy(const0, Fs), 0.0)
-        np.testing.assert_almost_equal(wavelet_entropy(const1, Fs), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(constNeg, Fs), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(constF, Fs), 1.944364115732569)
-        np.testing.assert_almost_equal(wavelet_entropy(lin, Fs), 1.9788857784433986)
-        np.testing.assert_almost_equal(wavelet_entropy(lin0, Fs), 2.034956946804592)
-        np.testing.assert_almost_equal(wavelet_entropy(wave, Fs), 1.7273424867024354)
-        np.testing.assert_almost_equal(wavelet_entropy(offsetWave, Fs), 1.7956330280777661)
-        np.testing.assert_almost_equal(wavelet_entropy(noiseWave, Fs), 2.040089456959981)
+        self.assertEqual(wavelet_entropy(np.zeros(100), Fs), 0.0)
+        # Sinusoid: the entropy of the analytic amplitude distribution across widths
+        amplitude = mexican_hat_amplitude(50, Fs)
+        p = amplitude / amplitude.sum()
+        np.testing.assert_allclose(wavelet_entropy(sine50, Fs), -np.sum(p * np.log(p)), atol=1e-3)
+        # White noise spreads evenly over the widths: maximum entropy, ln(9)
+        np.testing.assert_allclose(wavelet_entropy(whiteNoiseLong, Fs), np.log(9), atol=1e-3)
 
-    def test_wavelet_abs_mean(self):
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(const0, Fs)["values"],
-            (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(const1, Fs)["values"],
-            (
-                0.07899792805784951,
-                0.2398975173116698,
-                0.4459805679832682,
-                0.6895577839315219,
-                0.9667582971198649,
-                1.2663728921060002,
-                1.5758883935978716,
-                1.8718745148169993,
-                2.138907471539603,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(constNeg, Fs)["values"],
-            (
-                0.07899792805784951,
-                0.2398975173116698,
-                0.4459805679832682,
-                0.6895577839315219,
-                0.9667582971198649,
-                1.2663728921060002,
-                1.5758883935978716,
-                1.8718745148169993,
-                2.138907471539603,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(constF, Fs)["values"],
-            (
-                0.1974948201446238,
-                0.5997437932791744,
-                1.1149514199581705,
-                1.7238944598288044,
-                2.4168957427996625,
-                3.165932230265,
-                3.93972098399468,
-                4.6796862870424984,
-                5.347268678849009,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(lin, Fs)["values"],
-            (
-                0.7109813525202424,
-                2.159077655804685,
-                4.014235268835318,
-                6.206035838005904,
-                8.70210674449132,
-                11.409384741973945,
-                14.237634116552167,
-                16.98090677621436,
-                19.4954814746231,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(lin0, Fs)["values"],
-            (
-                0.041577856872977034,
-                0.12626185121702949,
-                0.23429487053234785,
-                0.36290853615111,
-                0.507470608576207,
-                0.6538502452979525,
-                0.7719006553974893,
-                0.8441064363654073,
-                0.8675152684243498,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(wave, Fs)["values"],
-            (
-                4.957379822130953e-05,
-                0.00015010126842380971,
-                0.0002786855391736307,
-                0.00042636513726987337,
-                0.0005926352256626579,
-                0.0007734352059476243,
-                0.0009591536187513033,
-                0.0011540567864786694,
-                0.0013593969802381594,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(offsetWave, Fs)["values"],
-            (
-                0.0031103433240926713,
-                0.00944579942404298,
-                0.01756053718576274,
-                0.02715605942394034,
-                0.03809118969797281,
-                0.05008376871179177,
-                0.06317116103191377,
-                0.0771689867880982,
-                0.09218045718872583,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_abs_mean(noiseWave, Fs)["values"],
-            (
-                4.49133263252551e-05,
-                8.13724192662979e-05,
-                0.00033346144050483596,
-                0.0005771394603385928,
-                0.0007655706842596226,
-                0.0009120859349630823,
-                0.0010376895846962721,
-                0.0011771589229261502,
-                0.0013362967355863126,
-            ),
-        )
+    def test_wavelet_entropy_zero_sum_signal(self):
+        # A signal that sums to zero but isn't silent must have a non-zero entropy
+        self.assertGreater(wavelet_entropy(np.tile([1.0, -1.0], 50), Fs), 0)
 
     def test_wavelet_std(self):
-        np.testing.assert_almost_equal(
-            wavelet_std(const0, Fs)["values"],
-            (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(const1, Fs)["values"],
-            (
-                0.1643028877893254,
-                0.2750570476702813,
-                0.3178759664917355,
-                0.2841791231505139,
-                0.3353924100329286,
-                0.5270543662913602,
-                0.7007594702761114,
-                0.7929067690446552,
-                0.8274973007800435,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(constNeg, Fs)["values"],
-            (
-                0.1643028877893254,
-                0.2750570476702813,
-                0.3178759664917355,
-                0.2841791231505139,
-                0.3353924100329286,
-                0.5270543662913602,
-                0.7007594702761114,
-                0.7929067690446552,
-                0.8274973007800435,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(constF, Fs)["values"],
-            (
-                0.4107572194733135,
-                0.6876426191757031,
-                0.7946899162293386,
-                0.7104478078762853,
-                0.8384810250823213,
-                1.317635915728401,
-                1.751898675690277,
-                1.9822669226116378,
-                2.068743251950108,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(lin, Fs)["values"],
-            (
-                2.5500773964136476,
-                5.241917897854233,
-                8.133127236621021,
-                11.234037041323939,
-                14.207777056524113,
-                16.41502796388351,
-                17.54556504615368,
-                17.64902126929419,
-                17.020996811047862,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(lin0, Fs)["values"],
-            (
-                2.107175440366379,
-                4.719615720034338,
-                7.816022665869094,
-                11.258654204336576,
-                14.234950245434051,
-                15.953858109016096,
-                16.412086975144252,
-                15.974770564870589,
-                14.96461788028099,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(wave, Fs)["values"],
-            (
-                0.0019110445651182074,
-                0.009682149832596305,
-                0.025576463560125905,
-                0.051114581095850424,
-                0.08778595797863342,
-                0.13620062896860544,
-                0.19765669978276515,
-                0.2715939983533627,
-                0.3603577777529345,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(offsetWave, Fs)["values"],
-            (
-                0.05109714551769268,
-                0.10242370885712056,
-                0.15471219203672268,
-                0.2092433508248967,
-                0.26782384213056326,
-                0.3319949781137163,
-                0.4042338620921491,
-                0.48467139632837664,
-                0.5770741023374354,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_std(noiseWave, Fs)["values"],
-            (
-                0.08113389135272678,
-                0.09399082458459491,
-                0.10337522853662447,
-                0.11334171048021162,
-                0.1319995404268057,
-                0.1663714431340742,
-                0.21875327203741599,
-                0.2871854951094453,
-                0.37232441001499883,
-            ),
-        )
+        np.testing.assert_array_equal(wavelet_std(np.zeros(100), Fs)["values"], 0)
+        expected = mexican_hat_amplitude(50, Fs) / np.sqrt(2)  # std of a sinusoid
+        result = wavelet_std(sine50, Fs)
+        np.testing.assert_allclose(result["values"], expected, atol=0.01 * expected.max())
+        # The strongest response is at the width labelled with the sinusoid's frequency
+        self.assertEqual(result["names"][np.argmax(result["values"])], "50.0Hz")
 
     def test_wavelet_var(self):
-        np.testing.assert_almost_equal(
-            wavelet_var(const0, Fs)["values"],
-            (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(const1, Fs)["values"],
-            (
-                0.026995438935911654,
-                0.07565637947309138,
-                0.10104513007305496,
-                0.08075777403459496,
-                0.11248806870769608,
-                0.27778630502678725,
-                0.4910638351816562,
-                0.6287011443968341,
-                0.6847517827982577,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(constNeg, Fs)["values"],
-            (
-                0.026995438935911654,
-                0.07565637947309138,
-                0.10104513007305496,
-                0.08075777403459496,
-                0.11248806870769608,
-                0.27778630502678725,
-                0.4910638351816562,
-                0.6287011443968341,
-                0.6847517827982577,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(constF, Fs)["values"],
-            (
-                0.16872149334944786,
-                0.47285237170682104,
-                0.6315320629565933,
-                0.5047360877162191,
-                0.7030504294231003,
-                1.7361644064174218,
-                3.0691489698853465,
-                3.9293821524802133,
-                4.279698642489108,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(lin, Fs)["values"],
-            (
-                6.502894727699807,
-                27.477703247844538,
-                66.14775864706668,
-                126.20358824583832,
-                201.86092888789298,
-                269.4531430550776,
-                307.8468527888098,
-                311.48795176399875,
-                289.71433244170146,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(lin0, Fs)["values"],
-            (
-                4.440188336483244,
-                22.274772544795244,
-                61.09021031337943,
-                126.75729449282566,
-                202.63380848998295,
-                254.52558856261862,
-                269.3565988796996,
-                255.1932946002558,
-                223.9397883028255,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(wave, Fs)["values"],
-            (
-                3.652091329867838e-06,
-                9.374402538084466e-05,
-                0.0006541554882424483,
-                0.0026127004006042697,
-                0.007706374418226394,
-                0.01855061133144372,
-                0.03906817096901415,
-                0.07376329994156637,
-                0.12985772798703332,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(offsetWave, Fs)["values"],
-            (
-                0.0026109182800562606,
-                0.010490616136048195,
-                0.023935862364807756,
-                0.0437827798644308,
-                0.07172961041357687,
-                0.11022066549272698,
-                0.16340501526193463,
-                0.23490636241889837,
-                0.3330145195885568,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_var(noiseWave, Fs)["values"],
-            (
-                0.006582708326036073,
-                0.008834275106092093,
-                0.010686437874999339,
-                0.012846343334580112,
-                0.01742387867288791,
-                0.02767945709051449,
-                0.047852994027075726,
-                0.08247550860125724,
-                0.13862546629301695,
-            ),
-        )
+        expected = mexican_hat_amplitude(50, Fs) ** 2 / 2
+        np.testing.assert_allclose(wavelet_var(sine50, Fs)["values"], expected, atol=0.02 * expected.max())
+        # By definition, the variance is the squared standard deviation
+        for signal in (sine50, whiteNoiseLong, offsetWave):
+            np.testing.assert_allclose(wavelet_var(signal, Fs)["values"], np.square(wavelet_std(signal, Fs)["values"]))
 
     def test_wavelet_energy(self):
-        np.testing.assert_almost_equal(
-            wavelet_energy(const0, Fs)["values"],
-            (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(const1, Fs)["values"],
-            (
-                0.182307738654575,
-                0.36497561327490674,
-                0.547671249100894,
-                0.745820160236465,
-                1.0232837699083268,
-                1.3716729227070505,
-                1.7246704219236024,
-                2.0328835046844693,
-                2.2933985599119477,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(constNeg, Fs)["values"],
-            (
-                0.182307738654575,
-                0.36497561327490674,
-                0.547671249100894,
-                0.745820160236465,
-                1.0232837699083268,
-                1.3716729227070505,
-                1.7246704219236024,
-                2.0328835046844693,
-                2.2933985599119477,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(constF, Fs)["values"],
-            (
-                0.4557693466364376,
-                0.9124390331872667,
-                1.369178122752235,
-                1.8645504005911626,
-                2.558209424770817,
-                3.4291823067676264,
-                4.311676054809006,
-                5.082208761711174,
-                5.733496399779869,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(lin, Fs)["values"],
-            (
-                2.6473362482562206,
-                5.669155102097631,
-                9.069831500123255,
-                12.83426932351242,
-                16.660960076790722,
-                19.990677908601935,
-                22.59551012979393,
-                24.49161380363657,
-                25.880265268522148,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(lin0, Fs)["values"],
-            (
-                2.1075855984195266,
-                4.721304332477201,
-                7.819533515481419,
-                11.264501635600086,
-                14.243992941185827,
-                15.967251131797697,
-                16.43022913721847,
-                15.997056300337551,
-                14.989742194039724,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(wave, Fs)["values"],
-            (
-                0.0019116874460376426,
-                0.00968331326414813,
-                0.02557798181780949,
-                0.05111635929753359,
-                0.08778795836979632,
-                0.13620282498341038,
-                0.1976590269749361,
-                0.2715964502504272,
-                0.3603603418068964,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(offsetWave, Fs)["values"],
-            (
-                0.05119172311663272,
-                0.10285834561574206,
-                0.15570560308177836,
-                0.210998178731162,
-                0.27051903656893317,
-                0.33575146966335573,
-                0.4091400870704979,
-                0.4907763390189059,
-                0.5843900720204608,
-            ),
-        )
-        np.testing.assert_almost_equal(
-            wavelet_energy(noiseWave, Fs)["values"],
-            (
-                0.0811339037840714,
-                0.09399085980861496,
-                0.10337576636490604,
-                0.11334317987658893,
-                0.13200176048583787,
-                0.16637394324613228,
-                0.2187557332431539,
-                0.28718790765696783,
-                0.3723268080356053,
-            ),
-        )
+        expected = mexican_hat_amplitude(50, Fs) / np.sqrt(2)  # RMS of a sinusoid
+        np.testing.assert_allclose(wavelet_energy(sine50, Fs)["values"], expected, atol=0.01 * expected.max())
+        # The energy (RMS) squared is the variance plus the squared mean, for any signal
+        for signal in (sine50, whiteNoiseLong, offsetWave):
+            energy = np.asarray(wavelet_energy(signal, Fs)["values"])
+            var = np.asarray(wavelet_var(signal, Fs)["values"])
+            abs_mean = np.asarray(wavelet_abs_mean(signal, Fs)["values"])
+            np.testing.assert_allclose(energy**2, var + abs_mean**2)
 
-    # ################################################ FRACTAL FEATURES ################################################# #
+    def test_wavelet_abs_mean(self):
+        np.testing.assert_array_equal(wavelet_abs_mean(np.zeros(100), Fs)["values"], 0)
+        # The wavelet has zero mean, so the CWT averages to ~0 over time for any long signal
+        for signal in (sine50, whiteNoiseLong):
+            abs_mean = np.asarray(wavelet_abs_mean(signal, Fs)["values"])
+            std = np.asarray(wavelet_std(signal, Fs)["values"])
+            self.assertTrue(np.all(abs_mean < 1e-3 * std))
 
     def test_dfa(self):
         np.testing.assert_almost_equal(dfa(const0), np.nan)
