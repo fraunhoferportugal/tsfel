@@ -4,17 +4,47 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tsfel"
-version = "0.2.0"
-description = "Library for time series feature extraction"
+version = "0.3.0"
+description = "Time Series Feature Extraction Library (TSFEL): 60+ statistical, temporal, spectral and fractal features for time series classification, regression and signal processing in Python"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "BSD-3-Clause"
 license-files = ["LICENSE.txt"]
 authors = [{ name = "Fraunhofer Portugal" }]
-keywords = ["time series", "feature extraction", "signal processing", "machine learning"]
+keywords = [
+    "time series",
+    "time-series",
+    "feature extraction",
+    "feature engineering",
+    "time series classification",
+    "time-series-analysis",
+    "time-series-classification",
+    "time-series-regression",
+    "data-science",
+    "scikit-learn",
+    "signal processing",
+    "biosignals",
+    "physiological signals",
+    "wearables",
+    "sensors",
+    "human activity recognition",
+    "ECG",
+    "EEG",
+    "EMG",
+    "audio",
+    "accelerometer",
+    "spectral features",
+    "wavelets",
+    "fractal",
+    "machine learning",
+    "explainable AI",
+]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Healthcare Industry",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -23,6 +53,11 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 # Floors: oldest releases with wheels for the oldest supported Python, tested in CI.
 # No upper bounds, so TSFEL can be installed alongside other scientific stacks.
@@ -53,6 +88,7 @@ Documentation = "https://tsfel.readthedocs.io"
 Source = "https://github.com/fraunhoferportugal/tsfel"
 Issues = "https://github.com/fraunhoferportugal/tsfel/issues"
 Changelog = "https://github.com/fraunhoferportugal/tsfel/blob/master/CHANGELOG.rst"
+Paper = "https://doi.org/10.1016/j.softx.2020.100456"
 
 # Development-only dependencies: not published to PyPI.
 #   pip install -e . --group dev     (pip >= 25.1)
