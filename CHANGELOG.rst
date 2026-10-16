@@ -2,6 +2,34 @@
 Changelog
 =========
 
+Version 0.3.0
+=============
+- New features
+    - Added support for Python 3.14
+    - Added ``tsfel.__version__``
+
+- Changes
+    - TSFEL now requires Python 3.11 or newer. On Python 3.8–3.10, ``pip`` keeps installing TSFEL 0.2.0
+    - Raised the minimum dependency versions: NumPy 1.26, SciPy 1.11.2, pandas 2.1.1, scikit-learn 1.3.1, PyWavelets 1.9, statsmodels 0.14 and requests 2.32.4. PyWavelets 1.9 gives identical wavelet features on NumPy 1.x and 2.x
+    - ``setuptools`` is no longer installed as a runtime dependency
+    - Some feature values differ from 0.2.0 because of the bugfixes below: ``auc``, ``entropy``, ``wavelet_entropy`` and, for synthetic signals, the spectral features based on the FFT
+
+- Bugfixes
+    - ``auc`` underestimated the area of signals that cross zero
+    - ``entropy`` depended on floating-point round-off: computed signals with repeated values, such as sine waves, gave different results on Linux, macOS and Windows. Values that differ only by round-off are now counted as the same value
+    - ``wavelet_entropy`` returned 0 for any signal whose values sum to zero, such as ``[1, -1, 2, -2]``. It now returns 0 only for an all-zero signal
+    - Spectral features ignore FFT round-off. A pure tone had a spectral skewness of about 10\ :sup:`7` and 161 spectral peaks, values that also changed between NumPy 1.x and 2.x; it now has zero spread, skewness and kurtosis, and one peak. On real signals, only ``spectral_entropy`` changes, by about 0.03%
+
+- Documentation
+    - Migrated the documentation to the PyData Sphinx theme, with light and dark modes (`#186 <https://github.com/fraunhoferportugal/tsfel/pull/186>`_)
+    - Rewrote the personalised features guide as three steps (write, register and extract), with a working example
+
+- Development
+    - ``pyproject.toml`` is now the only source of packaging metadata; ``setup.py`` and ``requirements/*.txt`` were removed. Set up a development environment with ``pip install -e . --group dev`` (pip 25.1 or newer)
+    - CI tests Python 3.11–3.14 on Linux, macOS and Windows, the lowest supported dependency versions, the dataset loaders (in a separate job) and the pre-commit hooks
+    - GitHub Actions are pinned to commit SHAs and kept up to date by Dependabot
+    - The wavelet and spectral tests now check values derived from theory instead of values recorded from earlier runs
+
 Version 0.2.0
 =============
 - New features
