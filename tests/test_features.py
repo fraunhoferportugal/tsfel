@@ -718,8 +718,8 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(entropy(constF), 0.0)
         np.testing.assert_almost_equal(entropy(lin), 1.0)
         np.testing.assert_almost_equal(entropy(lin0), 1.0)
-        np.testing.assert_almost_equal(entropy(wave), 0.9620267810255854)
-        np.testing.assert_almost_equal(entropy(offsetWave), 0.8891261649211666)
+        np.testing.assert_almost_equal(entropy(wave), 0.6676700999855466)
+        np.testing.assert_almost_equal(entropy(offsetWave), 0.6676700999855466)
         np.testing.assert_almost_equal(entropy(noiseWave), 1.0)
 
     def test_neighbourhood_peaks(self):

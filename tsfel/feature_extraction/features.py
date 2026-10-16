@@ -449,6 +449,11 @@ def entropy(signal, prob="standard"):
     """
 
     if prob == "standard":
+        # Values that differ only by floating-point round-off are the same value. Without this,
+        # e.g. the repeated values of a sine wave count as distinct depending on the CPU.
+        resolution = 1e-10 * np.max(np.abs(signal), initial=0)
+        if resolution > 0:
+            signal = np.round(signal / resolution)
         value, counts = np.unique(signal, return_counts=True)
         p = counts / counts.sum()
     elif prob == "kde":
