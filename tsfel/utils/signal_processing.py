@@ -45,7 +45,8 @@ def merge_time_series(data, fs_resample, time_unit):
     fs_resample :
         resample sampling frequency
     time_unit :
-        time unit in seconds
+        Number of timestamp units per second: 1 for seconds, 1e3 for
+        milliseconds, or 1e9 for nanoseconds.
 
     Returns
     -------

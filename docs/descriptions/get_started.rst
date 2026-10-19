@@ -74,6 +74,10 @@ TSFEL provides a method to increase flexibility when extracting features over mu
 
 The following code block extracts features on data residing over ``main_directory``, from all files named ``Accelerometer.txt``. Timestamps were recorded in nanoseconds and the resampling frequency is set to 100 Hz.
 
+``time_unit`` is the number of timestamp units per second, not the duration of
+one timestamp unit in seconds. Use ``1`` for seconds, ``1e3`` for milliseconds,
+and ``1e9`` for nanoseconds.
+
 .. code:: python
 
   import tsfel
@@ -83,7 +87,7 @@ The following code block extracts features on data residing over ``main_director
 
   data = tsfel.dataset_features_extractor(
                         main_directory, tsfel.get_features_by_domain(), search_criteria="Accelerometer.txt",
-                        time_unit=1e-9, resample_rate=100, window_size=250,
+                        time_unit=1e9, resample_rate=100, window_size=250,
                         output_directory=output_directory
          )
 
