@@ -40,7 +40,8 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
             (default: ``None``)
 
         * *time_unit* (``float``) --
-            Time unit
+            Number of timestamp units per second: 1 for seconds, 1e3 for
+            milliseconds, or 1e9 for nanoseconds.
             (default: ``1e9``)
 
         * *resampling_rate* (``int``) --
