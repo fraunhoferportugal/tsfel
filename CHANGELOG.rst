@@ -13,6 +13,11 @@ Version 0.3.0
     - Raised the minimum dependency versions: NumPy 1.26, SciPy 1.11.2, pandas 2.1.1, scikit-learn 1.3.1, PyWavelets 1.9, statsmodels 0.14 and requests 2.32.4. PyWavelets 1.9 gives identical wavelet features on NumPy 1.x and 2.x
     - ``setuptools`` is no longer installed as a runtime dependency
     - Some feature values differ from 0.2.0 because of the bugfixes below: ``auc``, ``entropy``, ``wavelet_entropy`` and, for synthetic signals, the spectral features based on the FFT
+    - Progress bars use tqdm and show what is being counted (windows or features), and elapsed and remaining time. They are written to stderr. In Jupyter, install ``ipywidgets`` for a widget bar
+    - IPython is no longer a dependency
+
+- Removed
+    - The undocumented ``progress_bar_terminal``, ``progress_bar_notebook`` and ``display_progress_bar``, and ``tsfel.get_ipython``, ``tsfel.HTML`` and ``tsfel.display``, which were exposed by accident
 
 - Bugfixes
     - ``auc`` underestimated the area of signals that cross zero

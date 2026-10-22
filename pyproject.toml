@@ -69,7 +69,7 @@ dependencies = [
     "PyWavelets>=1.9",  # 1.9+ gives identical wavelet features on NumPy 1.x and 2.x
     "statsmodels>=0.14",
     "requests>=2.32.4",  # dataset loaders; floor kept for security fixes
-    "ipython>=8.0",  # remove once the IPython import is made lazy
+    "tqdm>=4.66.3",  # progress bars; floor kept for a security fix
 ]
 
 [project.optional-dependencies]

@@ -1,12 +1,21 @@
+import contextlib
 import glob
+import io
 import os
+import sys
+import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pandas as pd
 
-from tsfel.feature_extraction.calc_features import dataset_features_extractor, time_series_features_extractor
+from tsfel.feature_extraction.calc_features import (
+    _in_notebook,
+    dataset_features_extractor,
+    time_series_features_extractor,
+)
 from tsfel.feature_extraction.features_settings import get_features_by_domain, get_number_features, load_json
 from tsfel.utils.add_personal_features import add_feature_json
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
@@ -207,6 +216,32 @@ class TestCalcFeatures(unittest.TestCase):
             pre_process=pre_process,
             output_directory=output_directory,
         )
+
+    def test_in_notebook(self):
+        self.assertFalse(_in_notebook())
+
+        # get_ipython() returns the running shell; only kernel shells count as notebooks
+        for shell, expected in [("ZMQInteractiveShell", True), ("Shell", True), ("TerminalInteractiveShell", False)]:
+            with self.subTest(shell=shell):
+                fake_ipython = types.SimpleNamespace(get_ipython=type(shell, (), {}))
+                with mock.patch.dict(sys.modules, {"IPython": fake_ipython}):
+                    self.assertEqual(_in_notebook(), expected)
+
+    def test_progress_bar(self):
+        # tqdm writes the bar to stderr and verbose=0 silences it. One window shows a bar over the
+        # features; several windows show a bar over the windows.
+        x = data_new.values[:, 0]
+        for unit, kwargs in [("feature", {}), ("window", {"window_size": window_size, "n_jobs": None})]:
+            for verbose in (1, 0):
+                with self.subTest(unit=unit, verbose=verbose):
+                    stderr = io.StringIO()
+                    with contextlib.redirect_stderr(stderr):
+                        time_series_features_extractor(settings2, x, fs=resample_rate, verbose=verbose, **kwargs)
+                    if verbose:
+                        self.assertIn("Extracting features: 100%", stderr.getvalue())
+                        self.assertIn(f"{unit}/s", stderr.getvalue())
+                    else:
+                        self.assertNotIn("Extracting features", stderr.getvalue())
 
 
 if __name__ == "__main__":

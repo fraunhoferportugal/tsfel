@@ -12,12 +12,27 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from IPython import get_ipython
-from IPython.display import display
+from tqdm.auto import tqdm
 
 from tsfel.feature_extraction import features as tsfel_features
-from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
 from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
+
+
+def _in_notebook():
+    """Whether TSFEL runs in a Jupyter notebook or Google Colab.
+
+    Notebooks always import IPython, so if it isn't imported we can't be in one. Checking
+    ``sys.modules`` avoids depending on IPython.
+
+    Returns
+    -------
+    bool
+        True in a Jupyter (``ZMQInteractiveShell``) or Colab (``Shell``) kernel
+    """
+    ipython = sys.modules.get("IPython")
+    if ipython is None:
+        return False
+    return type(ipython.get_ipython()).__name__ in ("ZMQInteractiveShell", "Shell")
 
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
@@ -99,7 +114,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
+    if _in_notebook():
         n_jobs_default = -1
 
     n_jobs = kwargs.get("n_jobs", n_jobs_default)
@@ -276,7 +291,7 @@ def time_series_features_extractor(
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
+    if _in_notebook():
         n_jobs_default = -1
 
     n_jobs = kwargs.get("n_jobs", n_jobs_default)
@@ -314,15 +329,6 @@ def time_series_features_extractor(
 
     # more than one window
     if isinstance(timeseries, list):
-        # Starting the display of progress bar for notebooks interfaces
-        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
-            out = display(
-                progress_bar_notebook(0, len(timeseries)),
-                display_id=True,
-            )
-        else:
-            out = None
-
         if isinstance(n_jobs, int):
             # Determine number of processes
             cpu_count = mp.cpu_count() if n_jobs == -1 else n_jobs
@@ -341,16 +347,16 @@ def time_series_features_extractor(
                 timeseries,
             )
 
-            for i, feat in enumerate(features):
-                if verbose == 1:
-                    display_progress_bar(i, len(timeseries), out)
+            for feat in tqdm(
+                features, total=len(timeseries), desc="Extracting features", unit="window", disable=verbose != 1
+            ):
                 features_final = pd.concat([features_final, feat], axis=0)
 
             pool.close()
             pool.join()
 
         elif n_jobs is None:
-            for i, feat in enumerate(timeseries):
+            for feat in tqdm(timeseries, desc="Extracting features", unit="window", disable=verbose != 1):
                 features_final = pd.concat(
                     [
                         features_final,
@@ -364,8 +370,6 @@ def time_series_features_extractor(
                     ],
                     axis=0,
                 )
-                if verbose == 1:
-                    display_progress_bar(i, len(timeseries), out)
         else:
             raise SystemExit(
                 "n_jobs value is not valid. Choose an integer value or None for no multiprocessing.",
@@ -449,26 +453,18 @@ def calc_window_features(
     feature_results = []
     feature_names = []
 
-    # Starting the display of progress bar for notebooks interfaces
-    # Iterating over features of a single window
-    if verbose == 1 and single_window:
-        feat_nb = np.hstack([list(config[_type].keys()) for _type in domain])
-
-        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
-            out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
-        else:
-            out = None
-
-        i_feat = -1
+    # Progress over the features, shown only when extracting a single window
+    progress = tqdm(
+        total=sum(feat["use"] == "yes" for _type in domain for feat in config[_type].values()),
+        desc="Extracting features",
+        unit="feature",
+        disable=not (verbose == 1 and single_window),
+    )
 
     for _type in domain:
         domain_feats = config[_type].keys()
 
         for feat in domain_feats:
-            if verbose == 1 and single_window:
-                i_feat = i_feat + 1
-                display_progress_bar(i_feat, len(feat_nb), out)
-
             # Only returns used functions
             if config[_type][feat]["use"] == "yes":
                 # Read Function (real name of function)
@@ -523,6 +519,9 @@ def calc_window_features(
                     else:
                         feature_results += [eval_result_ax]
                         feature_names += [str(header_names[ax]) + "_" + feat]
+                progress.update()
+
+    progress.close()
 
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)),
