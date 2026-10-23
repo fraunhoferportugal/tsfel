@@ -296,7 +296,7 @@ def time_series_features_extractor(
         # Name of each column to be concatenated with feature name
         if isinstance(timeseries, pd.DataFrame):
             names = timeseries.columns.values
-        elif isinstance(timeseries[0], pd.DataFrame):
+        elif not isinstance(timeseries, pd.Series) and isinstance(timeseries[0], pd.DataFrame):
             names = timeseries[0].columns.values
 
     if window_size is not None:
