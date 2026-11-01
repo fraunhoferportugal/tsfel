@@ -72,6 +72,39 @@ class SignalProcessingTestCase(unittest.TestCase):
 
         return X_df
 
+    def test_step_splits_full_windows(self):
+        signal = np.arange(1, 6)
+        windows = tsfel.signal_window_splitter(signal, window_size=3, step=2)
+        self.assertEqual([window.tolist() for window in windows], [[1, 2, 3], [3, 4, 5]])
+
+    def test_step_matches_equivalent_overlap(self):
+        signal = np.arange(5.0)
+        by_step = tsfel.signal_window_splitter(signal, window_size=3, step=2)
+        by_overlap = tsfel.signal_window_splitter(signal, window_size=3, overlap=1 / 3)
+        self.assertEqual(len(by_step), len(by_overlap))
+        for left, right in zip(by_step, by_overlap):
+            np.testing.assert_array_equal(left, right)
+
+    def test_step_rejects_overlap_and_non_positive_values(self):
+        signal = np.arange(5.0)
+        with self.assertRaises(SystemExit):
+            tsfel.signal_window_splitter(signal, window_size=3, overlap=0.5, step=2)
+        with self.assertRaises(SystemExit):
+            tsfel.signal_window_splitter(signal, window_size=3, step=0)
+
+    def test_extractor_uses_step(self):
+        cfg = {"statistical": {"Mean": {"function": "tsfel.calc_mean", "parameters": "", "use": "yes"}}}
+        features = tsfel.time_series_features_extractor(
+            cfg,
+            np.arange(5.0),
+            fs=1,
+            window_size=3,
+            step=2,
+            verbose=0,
+        )
+        self.assertEqual(len(features), 2)
+        self.assertIn("0_Mean", features.columns)
+
 
 if __name__ == "__main__":
     unittest.main()

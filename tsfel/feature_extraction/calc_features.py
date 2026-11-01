@@ -55,6 +55,11 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
             Overlap between 0 and 1
             (default: ``0``)
 
+        * *step* (``int``) --
+            Distance in samples between consecutive window starts.
+            Cannot be combined with a non-zero overlap.
+            (default: ``None``)
+
         * *pre_process* (``function``) --
             Function with pre processing code
 
@@ -85,6 +90,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
     resample_rate = kwargs.get("resample_rate", 30)
     window_size = kwargs.get("window_size", 100)
     overlap = kwargs.get("overlap", 0)
+    step = kwargs.get("step", None)
     pre_process = kwargs.get("pre_process", None)
     output_directory = kwargs.get(
         "output_directory",
@@ -141,7 +147,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
             data_new = merge_time_series(pp_sensor_data, resample_rate, time_unit)
 
-            windows = signal_window_splitter(data_new, window_size, overlap)
+            windows = signal_window_splitter(data_new, window_size, overlap, step=step)
 
             if features_path:
                 features = time_series_features_extractor(
@@ -228,6 +234,7 @@ def time_series_features_extractor(
     window_size=None,
     overlap=0,
     verbose=1,
+    step=None,
     **kwargs,
 ):
     """Extract features from univariate or multivariate time series.
@@ -244,6 +251,9 @@ def time_series_features_extractor(
         The size of the windows used to split the input signal, measured in the number of samples.
     overlap : float, optional, default=0
         A value between 0 and 1 that defines the percentage of overlap between consecutive windows.
+    step : int, optional, default=None
+        Distance in samples between consecutive window starts. Requires
+        ``window_size``. Cannot be combined with a non-zero ``overlap``.
     n_jobs : int, optional
         The number of jobs to run in parallel. 
             - ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
@@ -299,8 +309,11 @@ def time_series_features_extractor(
         elif isinstance(timeseries[0], pd.DataFrame):
             names = timeseries[0].columns.values
 
+    if step is not None and window_size is None:
+        raise SystemExit("step requires window_size.")
+
     if window_size is not None:
-        timeseries = signal_window_splitter(timeseries, window_size, overlap)
+        timeseries = signal_window_splitter(timeseries, window_size, overlap, step=step)
 
     if len(timeseries) == 0:
         raise SystemExit(
