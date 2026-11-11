@@ -1,10 +1,15 @@
-[![Documentation Status](https://readthedocs.org/projects/tsfel/badge/?version=dev)](https://tsfel.readthedocs.io/en/dev/descriptions/get_started.html)
-[![license](https://img.shields.io/badge/license-BSD%203--Clause-green?logo=style)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tsfel)
-[![!pypi](https://img.shields.io/pypi/v/tsfel?logo=pypi&color=blue)](https://pypi.org/project/tsfel/)
-[![Downloads](https://pepy.tech/badge/tsfel)](https://pepy.tech/project/tsfel)
+# Time Series Feature Extraction Library
+
+[![Tests](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml)
+[![Documentation](https://readthedocs.org/projects/tsfel/badge/?version=stable)](https://tsfel.readthedocs.io/en/stable/)
+[![PyPI](https://img.shields.io/pypi/v/tsfel?logo=pypi&logoColor=white)](https://pypi.org/project/tsfel/)
+[![Python versions](https://img.shields.io/pypi/pyversions/tsfel?logo=python&logoColor=white)](https://pypi.org/project/tsfel/)
+[![Downloads](https://static.pepy.tech/badge/tsfel)](https://pepy.tech/projects/tsfel)
+[![License](https://img.shields.io/github/license/fraunhoferportugal/tsfel)](https://github.com/fraunhoferportugal/tsfel/blob/master/LICENSE.txt)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Paper](https://img.shields.io/badge/SoftwareX-10.1016%2Fj.softx.2020.100456-blue)](https://doi.org/10.1016/j.softx.2020.100456)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fraunhoferportugal/tsfel/blob/master/notebooks/TSFEL_HAR_Example.ipynb)
-[![Slack](https://img.shields.io/badge/slack-join_here-lightgreen.svg?logo=slack)](https://join.slack.com/t/tsfel/shared_invite/zt-2pnrdi1s4-kCROK6R1mSP3D2MnSXUSZg)
+[![Slack](https://img.shields.io/badge/Slack-join-4A154B?logo=slack)](https://join.slack.com/t/tsfel/shared_invite/zt-3ozqu1dhd-gYMNzeLpDV1qSVYsgZHMaA)
 
 # Time Series Feature Extraction Library
 
