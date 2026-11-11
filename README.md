@@ -168,7 +168,7 @@ configuration files._
 
 For bug reports, please use the [GitHub issue tracker](https://github.com/fraunhoferportugal/tsfel/issues). To make
 feature requests, share ideas, engage in general discussions, or receive announcements, you're welcome to join
-our [Slack community](https://join.slack.com/t/tsfel/shared_invite/zt-2pnrdi1s4-kCROK6R1mSP3D2MnSXUSZg).
+our [Slack community](https://join.slack.com/t/tsfel/shared_invite/zt-3ozqu1dhd-gYMNzeLpDV1qSVYsgZHMaA).
 
 ## Citing
 
