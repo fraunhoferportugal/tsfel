@@ -106,11 +106,11 @@ A time series is a series of real valued observations taken at successive equall
 
     A visual intro to data representation in TSFEL.
 
-Feature extraction relies on the ``time_series_features_extractorr`` method. Its base arguments are ``input_data``, which stores the time series data, and ``features_dict``, which contains the feature extraction configuration. Further explanation on feature extraction configuration is available :ref:`here <feature-config>`.
+Feature extraction relies on the ``time_series_features_extractor`` method. Its base arguments are ``input_data``, which stores the time series data, and ``features_dict``, which contains the feature extraction configuration. Further explanation on feature extraction configuration is available :ref:`here <feature-config>`.
 
-A univariate time series must be stored in one column with several rows of observations. The ``time_series_features_extractorr`` extracts features from the whole length of a time series (:numref:`visual_guide` A) or from shorter fixed-size windows (:numref:`visual_guide` B).
+A univariate time series must be stored in one column with several rows of observations. The ``time_series_features_extractor`` extracts features from the whole length of a time series (:numref:`visual_guide` A) or from shorter fixed-size windows (:numref:`visual_guide` B).
 
-The several variables of multivariate time series must be stored in separate columns. Similarly, to the univariate case, ``time_series_features_extractorr`` extracts features from the whole length of a time series (:numref:`visual_guide` C) or from shorter fixed-size windows (:numref:`visual_guide` D).
+The several variables of multivariate time series must be stored in separate columns. Similarly, to the univariate case, ``time_series_features_extractor`` extracts features from the whole length of a time series (:numref:`visual_guide` C) or from shorter fixed-size windows (:numref:`visual_guide` D).
 
 Output data format
 ------------------

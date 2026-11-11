@@ -1,7 +1,5 @@
-# Time Series Feature Extraction Library
-
 [![Tests](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml)
-[![Documentation](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/)
+[![Documentation](https://img.shields.io/readthedocs/tsfel/latest?logo=readthedocs&logoColor=white)](https://tsfel.readthedocs.io/en/latest/)
 [![PyPI](https://img.shields.io/pypi/v/tsfel?logo=pypi&logoColor=white)](https://pypi.org/project/tsfel/)
 [![Python versions](https://img.shields.io/pypi/pyversions/tsfel?logo=python&logoColor=white)](https://pypi.org/project/tsfel/)
 [![Downloads](https://static.pepy.tech/badge/tsfel)](https://pepy.tech/projects/tsfel)
@@ -14,7 +12,7 @@
 # Time Series Feature Extraction Library
 
 <p align="center">
-    <a href="https://readthedocs.org/projects/tsfel/badge/?version=latest"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/master/docs/imgs/tsfel_feature_sets.png" width="100%" alt="tsfel logo" /></a>
+  <a href="https://tsfel.readthedocs.io/en/latest/"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/master/docs/imgs/tsfel_feature_sets.png" width="100%" alt="TSFEL feature domains: statistical, temporal, spectral and fractal" /></a>
 </p>
 
 ## Intuitive time series feature extraction
@@ -26,9 +24,12 @@ The documentation is available [here](https://tsfel.readthedocs.io/en/latest/des
 
 You can install `TSFEL` via pip using the following:
 
-```python
+```bash
 pip install tsfel
 ```
+
+TSFEL requires Python 3.11 or newer. On older Python versions, `pip` installs TSFEL 0.2.0, the last release that
+supports them.
 
 A release on conda-forge is coming soon.
 
@@ -42,7 +43,7 @@ import tsfel
 # Loads a 10 s single lead ECG
 data = tsfel.datasets.load_biopluxecg()
 
-# Set up the default configuration using using the statistical, temporal and spectral feature sets.
+# Set up the default configuration using the statistical, temporal and spectral feature sets.
 cfg = tsfel.get_features_by_domain()
 
 # Extract features
