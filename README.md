@@ -1,7 +1,7 @@
 # Time Series Feature Extraction Library
 
 [![Tests](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/fraunhoferportugal/tsfel/actions/workflows/tests.yml)
-[![Documentation](https://readthedocs.org/projects/tsfel/badge/?version=stable)](https://tsfel.readthedocs.io/en/stable/)
+[![Documentation](https://readthedocs.org/projects/tsfel/badge/?version=latest)](https://tsfel.readthedocs.io/en/latest/)
 [![PyPI](https://img.shields.io/pypi/v/tsfel?logo=pypi&logoColor=white)](https://pypi.org/project/tsfel/)
 [![Python versions](https://img.shields.io/pypi/pyversions/tsfel?logo=python&logoColor=white)](https://pypi.org/project/tsfel/)
 [![Downloads](https://static.pepy.tech/badge/tsfel)](https://pepy.tech/projects/tsfel)
