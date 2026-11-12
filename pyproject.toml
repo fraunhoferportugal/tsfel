@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tsfel"
-version = "0.3.0"
+version = "0.3.1.dev0"
 description = "Time Series Feature Extraction Library (TSFEL): 60+ statistical, temporal, spectral and fractal features for time series classification, regression and signal processing in Python"
 readme = "README.md"
 requires-python = ">=3.11"

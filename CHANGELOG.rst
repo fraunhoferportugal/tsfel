@@ -2,6 +2,9 @@
 Changelog
 =========
 
+Version 0.3.1 (unreleased)
+==========================
+
 Version 0.3.0
 =============
 - New features
