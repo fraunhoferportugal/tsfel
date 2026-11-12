@@ -13,6 +13,7 @@
 #   - A hook that misfires on specific files gets an `exclude:` pattern, not removal.
 
 ci:
+  skip: [no-commit-to-branch]
   autoupdate_schedule: monthly
   autofix_commit_msg: "style: apply pre-commit fixes"
   autoupdate_commit_msg: "build: update pre-commit hooks"
