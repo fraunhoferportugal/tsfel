@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 
-def signal_window_splitter(signal, window_size, overlap=0):
+def signal_window_splitter(signal, window_size, overlap=0, step=None):
     """Splits the signal into windows.
 
     Parameters
@@ -15,22 +15,35 @@ def signal_window_splitter(signal, window_size, overlap=0):
     overlap : float
         percentage of overlap, value between 0 and 1 (exclusive)
         Default: 0
+    step : int, optional
+        Distance in samples between consecutive window starts. For
+        ``window_size=3`` and ``step=2``, ``[1, 2, 3, 4, 5]`` yields
+        ``[1, 2, 3]`` and ``[3, 4, 5]``. Cannot be combined with a
+        non-zero ``overlap``. Default: None, which keeps the overlap
+        behaviour.
     Returns
     -------
     list
         list of signal windows
     """
-    if not isinstance(window_size, int):
+    if not isinstance(window_size, int) or isinstance(window_size, bool):
         raise SystemExit("window_size must be an integer.")
-    step = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
-    if step == 0:
+    if step is not None:
+        if overlap != 0:
+            raise SystemExit("Pass either step or overlap, not both.")
+        if not isinstance(step, int) or isinstance(step, bool) or step <= 0:
+            raise SystemExit("step must be a positive integer.")
+        hop = step
+        return [signal[i : i + window_size] for i in range(0, len(signal) - window_size + 1, hop)]
+    hop = int(round(window_size)) if overlap == 0 else int(round(window_size * (1 - overlap)))
+    if hop == 0:
         raise SystemExit(
             "Invalid overlap. Choose a lower overlap value.",
         )
     if len(signal) % window_size == 0 and overlap == 0:
-        return [signal[i : i + window_size] for i in range(0, len(signal), step)]
+        return [signal[i : i + window_size] for i in range(0, len(signal), hop)]
     else:
-        return [signal[i : i + window_size] for i in range(0, len(signal) - window_size + 1, step)]
+        return [signal[i : i + window_size] for i in range(0, len(signal) - window_size + 1, hop)]
 
 
 def merge_time_series(data, fs_resample, time_unit):
