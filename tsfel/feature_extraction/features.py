@@ -13,6 +13,17 @@ warning_msg = (
     + " data points."
 )
 
+
+def _signal_differences(signal):
+    """Compute integer differences without overflow or precision loss."""
+    signal = np.asanyarray(signal)
+    if np.issubdtype(signal.dtype, np.integer):
+        # Narrow integers fit in int64; full-width differences need Python integers.
+        dtype = np.int64 if signal.dtype.itemsize < 8 else object
+        signal = signal.astype(dtype)
+    return np.diff(signal)
+
+
 # ############################################# TEMPORAL DOMAIN ##################################################### #
 
 
@@ -101,7 +112,7 @@ def negative_turning(signal):
     float
         Number of negative turning points
     """
-    diff_sig = np.diff(signal)
+    diff_sig = _signal_differences(signal)
     array_signal = np.arange(len(diff_sig[:-1]))
     negative_turning_pts = np.where((diff_sig[array_signal] < 0) & (diff_sig[array_signal + 1] > 0))[0]
 
@@ -125,7 +136,7 @@ def positive_turning(signal):
     float
         Number of positive turning points
     """
-    diff_sig = np.diff(signal)
+    diff_sig = _signal_differences(signal)
 
     array_signal = np.arange(len(diff_sig[:-1]))
 
@@ -150,7 +161,7 @@ def mean_abs_diff(signal):
     float
         Mean absolute difference result
     """
-    return np.mean(np.abs(np.diff(signal)))
+    return np.mean(np.abs(_signal_differences(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -169,7 +180,7 @@ def mean_diff(signal):
     float
         Mean difference result
     """
-    return np.mean(np.diff(signal))
+    return np.mean(_signal_differences(signal))
 
 
 @set_domain("domain", "temporal")
@@ -188,7 +199,7 @@ def median_abs_diff(signal):
     float
         Median absolute difference result
     """
-    return np.median(np.abs(np.diff(signal)))
+    return np.median(np.abs(_signal_differences(signal)))
 
 
 @set_domain("domain", "temporal")
@@ -207,7 +218,7 @@ def median_diff(signal):
     float
         Median difference result
     """
-    return np.median(np.diff(signal))
+    return np.median(_signal_differences(signal))
 
 
 @set_domain("domain", "temporal")
@@ -229,7 +240,7 @@ def distance(signal):
     float
         Signal distance
     """
-    diff_sig = np.diff(signal).astype(float)
+    diff_sig = _signal_differences(signal).astype(float)
     return np.sum([np.sqrt(1 + diff_sig**2)])
 
 
@@ -249,7 +260,7 @@ def sum_abs_diff(signal):
     float
         Sum absolute difference result
     """
-    return np.sum(np.abs(np.diff(signal)))
+    return np.sum(np.abs(_signal_differences(signal)))
 
 
 @set_domain("domain", "temporal")
