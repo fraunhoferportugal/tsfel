@@ -1352,11 +1352,28 @@ class TestFeatures(unittest.TestCase):
         np.testing.assert_almost_equal(power_bandwidth(const1, Fs), 0.0)
         np.testing.assert_almost_equal(power_bandwidth(constNeg, Fs), 0.0)
         np.testing.assert_almost_equal(power_bandwidth(constF, Fs), 0.0)
-        np.testing.assert_almost_equal(power_bandwidth(lin, Fs), 0.0)
-        np.testing.assert_almost_equal(power_bandwidth(lin0, Fs), 0.0)
+        np.testing.assert_almost_equal(power_bandwidth(lin, Fs), 50.0)
+        np.testing.assert_almost_equal(power_bandwidth(lin0, Fs), 50.0)
         np.testing.assert_almost_equal(power_bandwidth(wave, Fs), 2.0)
         np.testing.assert_almost_equal(power_bandwidth(offsetWave, Fs), 2.0)
         np.testing.assert_almost_equal(power_bandwidth(noiseWave, Fs), 2.0)
+
+    def test_power_bandwidth_contains_95_percent_power(self):
+        # A dominant tone with two distant, smaller tones. Discarding 5% from
+        # each tail leaves only 94% or 92% of the power in the returned band.
+        for fs in (512, 1024, 2048):
+            for tail_power, expected_bins in ((0.03, 198), (0.04, 200)):
+                with self.subTest(fs=fs, tail_power=tail_power):
+                    time = np.arange(1024) / fs
+                    signal = sum(
+                        np.sqrt(power) * np.sin(2 * np.pi * frequency * fs / 1024 * time)
+                        for power, frequency in (
+                            (tail_power, 100),
+                            (1 - 2 * tail_power, 200),
+                            (tail_power, 300),
+                        )
+                    )
+                    np.testing.assert_allclose(power_bandwidth(signal, fs), expected_bins * fs / 1024)
 
     def test_fft_mean_coeff(self):
         np.testing.assert_almost_equal(
