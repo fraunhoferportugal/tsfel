@@ -1674,6 +1674,33 @@ class TestFeatures(unittest.TestCase):
             std = np.asarray(wavelet_std(signal, Fs)["values"])
             self.assertTrue(np.all(abs_mean < 1e-3 * std))
 
+    def test_frequency_feature_names(self):
+        # Names of the frequency-based features, as in TSFEL 0.3.0, must not change: users select
+        # features and train models by these names. The spectrogram has bins at k * fs / nperseg,
+        # with nperseg = 2 * bins - 2 = 62; the Mexican hat wavelet of width w is centred at
+        # 0.25 * fs / w. Both are named with two decimals.
+        spectrogram_names = [
+            "0.0Hz", "1.61Hz", "3.23Hz", "4.84Hz", "6.45Hz", "8.06Hz", "9.68Hz", "11.29Hz",
+            "12.9Hz", "14.52Hz", "16.13Hz", "17.74Hz", "19.35Hz", "20.97Hz", "22.58Hz", "24.19Hz",
+            "25.81Hz", "27.42Hz", "29.03Hz", "30.65Hz", "32.26Hz", "33.87Hz", "35.48Hz", "37.1Hz",
+            "38.71Hz", "40.32Hz", "41.94Hz", "43.55Hz", "45.16Hz", "46.77Hz", "48.39Hz", "50.0Hz",
+        ]  # fmt: skip
+        wavelet_names = ["25.0Hz", "12.5Hz", "8.33Hz", "6.25Hz", "5.0Hz", "4.17Hz", "3.57Hz", "3.12Hz", "2.78Hz"]
+        wavelet_features = (wavelet_abs_mean, wavelet_std, wavelet_var, wavelet_energy)
+
+        self.assertEqual(spectrogram_mean_coeff(wave, fs=100)["names"], spectrogram_names)
+        for feature in wavelet_features:
+            self.assertEqual(feature(wave, fs=100)["names"], wavelet_names)
+
+        # The same rule at other common sampling rates
+        for fs in (10, 25, 50, 128, 200, 256, 500, 1000):
+            with self.subTest(fs=fs):
+                expected = [f"{f}Hz" for f in np.round(np.arange(32) * fs / 62, 2)]
+                self.assertEqual(spectrogram_mean_coeff(wave, fs=fs)["names"], expected)
+                expected = [f"{f}Hz" for f in np.round(0.25 * fs / np.arange(1, 10), 2)]
+                for feature in wavelet_features:
+                    self.assertEqual(feature(wave, fs=fs)["names"], expected)
+
     def test_dfa(self):
         np.testing.assert_almost_equal(dfa(const0), np.nan)
         np.testing.assert_almost_equal(dfa(const1), np.nan)

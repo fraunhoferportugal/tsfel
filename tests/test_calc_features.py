@@ -178,6 +178,11 @@ class TestCalcFeatures(unittest.TestCase):
             (1, 6),
         )
 
+    def test_low_sampling_frequency(self):
+        # At low sampling frequency, rounding to 2 decimals gave duplicate frequency names and pandas raised
+        features = time_series_features_extractor(settings4, data_new.values[:, 0], fs=1, n_jobs=n_jobs)
+        self.assertTrue(features.columns.is_unique)
+
     def test_personal_features(self):
         # personal features
         settings1 = load_json(personal_path_json)

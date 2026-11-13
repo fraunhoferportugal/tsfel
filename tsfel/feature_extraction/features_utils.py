@@ -635,3 +635,27 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
 
     # No plateau found
     return len(y)
+
+
+def frequency_labels(frequencies, decimals=2):
+    """Labels frequencies with the fewest decimals (at least ``decimals``) that keep them distinct.
+
+    Parameters
+    ----------
+    frequencies : array_like
+        Frequencies in Hz.
+    decimals : int
+        Minimum number of decimals (default is 2).
+
+    Returns
+    -------
+    np.ndarray
+        Frequencies as strings, one per frequency.
+    """
+
+    frequencies = np.asarray(frequencies, dtype=float)
+    for d in range(decimals, 16):  # np.finfo(float).precision + 1 = 16
+        rounded = np.round(frequencies, d)
+        if len(set(rounded.tolist())) == rounded.size:
+            return rounded.astype(str)
+    return frequencies.astype(str)  # only reached if a frequency repeats
