@@ -1,15 +1,18 @@
+import contextlib
 import glob
-import json
+import io
 import os
+import sys
+import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pandas as pd
 
-from tsfel.feature_extraction import features as tsfel_features
 from tsfel.feature_extraction.calc_features import (
-    calc_window_features,
+    _in_notebook,
     dataset_features_extractor,
     time_series_features_extractor,
 )
@@ -48,7 +51,8 @@ sensor_data = {}
 key = "Accelerometer"
 domains = ["statistical", "temporal", "spectral", "fractal"]
 
-folders = list(glob.glob(main_directory + "**/", recursive=True))
+# Sorted, because glob returns folders in filesystem order, which differs between machines
+folders = sorted(glob.glob(main_directory + "**/", recursive=True))
 sensor_data[key] = pd.read_csv(folders[-1] + key + ".txt", header=None)
 
 
@@ -174,6 +178,11 @@ class TestCalcFeatures(unittest.TestCase):
             (1, 6),
         )
 
+    def test_low_sampling_frequency(self):
+        # At low sampling frequency, rounding to 2 decimals gave duplicate frequency names and pandas raised
+        features = time_series_features_extractor(settings4, data_new.values[:, 0], fs=1, n_jobs=n_jobs)
+        self.assertTrue(features.columns.is_unique)
+
     def test_personal_features(self):
         # personal features
         settings1 = load_json(personal_path_json)
@@ -230,6 +239,32 @@ class TestCalcFeatures(unittest.TestCase):
             pre_process=pre_process,
             output_directory=output_directory,
         )
+
+    def test_in_notebook(self):
+        self.assertFalse(_in_notebook())
+
+        # get_ipython() returns the running shell; only kernel shells count as notebooks
+        for shell, expected in [("ZMQInteractiveShell", True), ("Shell", True), ("TerminalInteractiveShell", False)]:
+            with self.subTest(shell=shell):
+                fake_ipython = types.SimpleNamespace(get_ipython=type(shell, (), {}))
+                with mock.patch.dict(sys.modules, {"IPython": fake_ipython}):
+                    self.assertEqual(_in_notebook(), expected)
+
+    def test_progress_bar(self):
+        # tqdm writes the bar to stderr and verbose=0 silences it. One window shows a bar over the
+        # features; several windows show a bar over the windows.
+        x = data_new.values[:, 0]
+        for unit, kwargs in [("feature", {}), ("window", {"window_size": window_size, "n_jobs": None})]:
+            for verbose in (1, 0):
+                with self.subTest(unit=unit, verbose=verbose):
+                    stderr = io.StringIO()
+                    with contextlib.redirect_stderr(stderr):
+                        time_series_features_extractor(settings2, x, fs=resample_rate, verbose=verbose, **kwargs)
+                    if verbose:
+                        self.assertIn("Extracting features: 100%", stderr.getvalue())
+                        self.assertIn(f"{unit}/s", stderr.getvalue())
+                    else:
+                        self.assertNotIn("Extracting features", stderr.getvalue())
 
 
 if __name__ == "__main__":

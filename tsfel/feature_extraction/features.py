@@ -449,6 +449,11 @@ def entropy(signal, prob="standard"):
     """
 
     if prob == "standard":
+        # Values that differ only by floating-point round-off are the same value. Without this,
+        # e.g. the repeated values of a sine wave count as distinct depending on the CPU.
+        resolution = 1e-10 * np.max(np.abs(signal), initial=0)
+        if resolution > 0:
+            signal = np.round(signal / resolution)
         value, counts = np.unique(signal, return_counts=True)
         p = counts / counts.sum()
     elif prob == "kde":
@@ -1551,7 +1556,7 @@ def spectrogram_mean_coeff(signal, fs, bins=32):
 
     frequencies, _, Sxx = scipy.signal.spectrogram(signal, fs, nperseg=bins * 2 - 2)
     Sxx_mean = Sxx.mean(1)
-    f_keys = np.round(frequencies, 2).astype(str)
+    f_keys = frequency_labels(frequencies, 2)
 
     return {"names": [f + "Hz" for f in f_keys], "values": Sxx_mean}
 
@@ -1656,7 +1661,7 @@ def wavelet_entropy(signal, fs, wavelet="mexh", max_width=10):
     float
         wavelet entropy
     """
-    if np.sum(signal) == 0:
+    if np.all(signal == 0):
         return 0.0
 
     max_width = int(max_width)
@@ -1697,7 +1702,7 @@ def wavelet_abs_mean(signal, fs, wavelet="mexh", max_width=10):
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
-    f_keys = np.round(frequencies, 2).astype(str)
+    f_keys = frequency_labels(frequencies, 2)
 
     return {"names": [f + "Hz" for f in f_keys], "values": np.abs(np.mean(coeffs, axis=1))}
 
@@ -1727,7 +1732,7 @@ def wavelet_std(signal, fs, wavelet="mexh", max_width=10):
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
-    f_keys = np.round(frequencies, 2).astype(str)
+    f_keys = frequency_labels(frequencies, 2)
 
     return {"names": [f + "Hz" for f in f_keys], "values": np.std(coeffs, axis=1)}
 
@@ -1757,7 +1762,7 @@ def wavelet_var(signal, fs, wavelet="mexh", max_width=10):
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
-    f_keys = np.round(frequencies, 2).astype(str)
+    f_keys = frequency_labels(frequencies, 2)
 
     return {"names": [f + "Hz" for f in f_keys], "values": np.var(coeffs, axis=1)}
 
@@ -1790,7 +1795,7 @@ def wavelet_energy(signal, fs, wavelet="mexh", max_width=10):
     widths = np.arange(1, max_width)
 
     coeffs, frequencies = continuous_wavelet_transform(signal=signal, fs=fs, wavelet=wavelet, widths=widths)
-    f_keys = np.round(frequencies, 2).astype(str)
+    f_keys = frequency_labels(frequencies, 2)
 
     return {"names": [f + "Hz" for f in f_keys], "values": np.sqrt(np.sum(coeffs**2, axis=1) / np.shape(coeffs)[1])}
 

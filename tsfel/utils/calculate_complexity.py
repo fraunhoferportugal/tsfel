@@ -126,7 +126,6 @@ def compute_complexity(feature, domain, json_path, **kwargs):
 
     for ti in t:
         for _ in range(20):
-
             start = time.time()
             calc_window_features(
                 one_feat_dict,

@@ -1,0 +1,71 @@
+cff-version: 1.2.0
+message: "If you use TSFEL in your work, please cite the publication below."
+title: "TSFEL: Time Series Feature Extraction Library"
+type: software
+abstract: >-
+  TSFEL is a Python library for time series feature extraction. It computes
+  over 60 statistical, temporal, spectral and fractal features, and is used for
+  time series classification, regression and signal processing.
+authors:
+  - family-names: Folgado
+    given-names: Duarte
+    affiliation: Fraunhofer Portugal AICOS
+  - family-names: Gamboa
+    given-names: Hugo
+    affiliation: Fraunhofer Portugal AICOS
+  - family-names: Barandas
+    given-names: Marília
+    affiliation: Fraunhofer Portugal AICOS
+  - family-names: Liu
+    given-names: Hui
+  - family-names: Curioso
+    given-names: Isabel
+  - family-names: Fernandes
+    given-names: Letícia
+  - family-names: Abreu
+    given-names: Mariana
+  - family-names: Bota
+    given-names: Patrícia
+  - family-names: Santos
+    given-names: Sara
+  - family-names: Schultz
+    given-names: Tanja
+repository-code: "https://github.com/fraunhoferportugal/tsfel"
+url: "https://tsfel.readthedocs.io"
+license: BSD-3-Clause
+keywords:
+  - time series
+  - feature extraction
+  - signal processing
+  - machine learning
+  - biosignals
+  - wearables
+preferred-citation:
+  type: article
+  title: "TSFEL: Time Series Feature Extraction Library"
+  authors:
+    - family-names: Barandas
+      given-names: Marília
+    - family-names: Folgado
+      given-names: Duarte
+    - family-names: Fernandes
+      given-names: Letícia
+    - family-names: Santos
+      given-names: Sara
+    - family-names: Abreu
+      given-names: Mariana
+    - family-names: Bota
+      given-names: Patrícia
+    - family-names: Liu
+      given-names: Hui
+    - family-names: Schultz
+      given-names: Tanja
+    - family-names: Gamboa
+      given-names: Hugo
+  journal: SoftwareX
+  volume: 11
+  start: 100456
+  year: 2020
+  publisher:
+    name: Elsevier
+  doi: 10.1016/j.softx.2020.100456

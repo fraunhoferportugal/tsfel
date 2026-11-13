@@ -12,13 +12,27 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from IPython import get_ipython
-from IPython.display import display
+from tqdm.auto import tqdm
 
-from tsfel.utils.progress_bar import display_progress_bar, progress_bar_notebook
-from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 from tsfel.feature_extraction import features as tsfel_features
+from tsfel.utils.signal_processing import merge_time_series, signal_window_splitter
 
+
+def _in_notebook():
+    """Whether TSFEL runs in a Jupyter notebook or Google Colab.
+
+    Notebooks always import IPython, so if it isn't imported we can't be in one. Checking
+    ``sys.modules`` avoids depending on IPython.
+
+    Returns
+    -------
+    bool
+        True in a Jupyter (``ZMQInteractiveShell``) or Colab (``Shell``) kernel
+    """
+    ipython = sys.modules.get("IPython")
+    if ipython is None:
+        return False
+    return type(ipython.get_ipython()).__name__ in ("ZMQInteractiveShell", "Shell")
 
 
 def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
@@ -100,7 +114,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
+    if _in_notebook():
         n_jobs_default = -1
 
     n_jobs = kwargs.get("n_jobs", n_jobs_default)
@@ -182,7 +196,7 @@ def dataset_features_extractor(main_directory, feat_dict, verbose=1, **kwargs):
 
 
 def _calc_features(timeseries, config, fs, **kwargs):
-    """Extraction of time series features.
+    r"""Extraction of time series features.
 
     Parameters
     ----------
@@ -197,7 +211,7 @@ def _calc_features(timeseries, config, fs, **kwargs):
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -206,7 +220,6 @@ def _calc_features(timeseries, config, fs, **kwargs):
     pd.DataFrame
         A DataFrame containing the extracted features.
     """
-
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
     feat_val = calc_window_features(
@@ -245,7 +258,7 @@ def time_series_features_extractor(
     overlap : float, optional, default=0
         A value between 0 and 1 that defines the percentage of overlap between consecutive windows.
     n_jobs : int, optional
-        The number of jobs to run in parallel. 
+        The number of jobs to run in parallel.
             - ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
             - ``-1`` means using all available processors.
             - default: ``None`` on Windows, ``-1`` for other systems
@@ -257,7 +270,7 @@ def time_series_features_extractor(
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -268,7 +281,6 @@ def time_series_features_extractor(
         - Columns represent the names of the features.
         - Rows contain the feature values for each signal window.
     """
-
     features_path = kwargs.get("features_path", None)
     names = kwargs.get("header_names", None)
 
@@ -279,7 +291,7 @@ def time_series_features_extractor(
         n_jobs_default = -1
 
     # Choosing default of n_jobs by python interface
-    if get_ipython().__class__.__name__ == "ZMQInteractiveShell" or get_ipython().__class__.__name__ == "Shell":
+    if _in_notebook():
         n_jobs_default = -1
 
     n_jobs = kwargs.get("n_jobs", n_jobs_default)
@@ -317,16 +329,6 @@ def time_series_features_extractor(
 
     # more than one window
     if isinstance(timeseries, list):
-        # Starting the display of progress bar for notebooks interfaces
-        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
-
-            out = display(
-                progress_bar_notebook(0, len(timeseries)),
-                display_id=True,
-            )
-        else:
-            out = None
-
         if isinstance(n_jobs, int):
             # Determine number of processes
             cpu_count = mp.cpu_count() if n_jobs == -1 else n_jobs
@@ -345,16 +347,16 @@ def time_series_features_extractor(
                 timeseries,
             )
 
-            for i, feat in enumerate(features):
-                if verbose == 1:
-                    display_progress_bar(i, len(timeseries), out)
+            for feat in tqdm(
+                features, total=len(timeseries), desc="Extracting features", unit="window", disable=verbose != 1
+            ):
                 features_final = pd.concat([features_final, feat], axis=0)
 
             pool.close()
             pool.join()
 
         elif n_jobs is None:
-            for i, feat in enumerate(timeseries):
+            for feat in tqdm(timeseries, desc="Extracting features", unit="window", disable=verbose != 1):
                 features_final = pd.concat(
                     [
                         features_final,
@@ -368,11 +370,9 @@ def time_series_features_extractor(
                     ],
                     axis=0,
                 )
-                if verbose == 1:
-                    display_progress_bar(i, len(timeseries), out)
         else:
             raise SystemExit(
-                "n_jobs value is not valid. " "Choose an integer value or None for no multiprocessing.",
+                "n_jobs value is not valid. Choose an integer value or None for no multiprocessing.",
             )
     # single window
     else:
@@ -419,7 +419,7 @@ def calc_window_features(
 
         * *features_path* (str) --
             Path to a script with custom features.
-        
+
         * *header_names* (list or array-like) --
             Names of each column window.
 
@@ -428,7 +428,6 @@ def calc_window_features(
     pd.DataFrame
         A DataFrame containing the extracted features.
     """
-    
     features_path = kwargs.get("features_path", None)
     header_names = kwargs.get("header_names", None)
 
@@ -440,9 +439,7 @@ def calc_window_features(
     if header_names is None:
         header_names = np.array([0]) if single_axis else np.arange(window.shape[-1])
     else:
-        if (len(header_names) != window.shape[-1] and not single_axis) or (
-            len(header_names) != 1 and single_axis
-        ):
+        if (len(header_names) != window.shape[-1] and not single_axis) or (len(header_names) != 1 and single_axis):
             raise Exception("header_names dimension does not match input columns.")
 
     # Execute imports
@@ -456,31 +453,20 @@ def calc_window_features(
     feature_results = []
     feature_names = []
 
-    # Starting the display of progress bar for notebooks interfaces
-    # Iterating over features of a single window
-    if verbose == 1 and single_window:
-
-        feat_nb = np.hstack([list(config[_type].keys()) for _type in domain])
-
-        if (get_ipython().__class__.__name__ == "ZMQInteractiveShell") or (get_ipython().__class__.__name__ == "Shell"):
-            out = display(progress_bar_notebook(0, len(feat_nb)), display_id=True)
-        else:
-            out = None
-
-        i_feat = -1
+    # Progress over the features, shown only when extracting a single window
+    progress = tqdm(
+        total=sum(feat["use"] == "yes" for _type in domain for feat in config[_type].values()),
+        desc="Extracting features",
+        unit="feature",
+        disable=not (verbose == 1 and single_window),
+    )
 
     for _type in domain:
         domain_feats = config[_type].keys()
 
         for feat in domain_feats:
-
-            if verbose == 1 and single_window:
-                i_feat = i_feat + 1
-                display_progress_bar(i_feat, len(feat_nb), out)
-
             # Only returns used functions
             if config[_type][feat]["use"] == "yes":
-
                 # Read Function (real name of function)
                 func_total = config[_type][feat]["function"]
 
@@ -495,7 +481,6 @@ def calc_window_features(
 
                     # Check assert fs parameter:
                     if "fs" in parameters_total:
-
                         # Select which fs to use
                         if fs is None:
                             # Check if features dict has default sampling frequency value
@@ -521,12 +506,15 @@ def calc_window_features(
                         names = eval_result_ax["names"]
                         values = eval_result_ax["values"]
                         eval_result_ax = np.zeros(len(values)) if np.isnan(values[0]) else eval_result_ax
-                        for name, value in zip(names, values):
+                        for name, value in zip(names, values, strict=True):
                             feature_results.append(value)
                             feature_names.append(f"{header_names[ax]}_{feat}_{name}")
                     else:
                         feature_results += [eval_result_ax]
                         feature_names += [str(header_names[ax]) + "_" + feat]
+                progress.update()
+
+    progress.close()
 
     features = pd.DataFrame(
         data=np.array(feature_results).reshape(1, len(feature_results)),
@@ -537,8 +525,8 @@ def calc_window_features(
 
 
 def load_combined_feature_modules(features_path=None):
-    """
-    Load feature functions from both the TSFEL features module and an optional user module.
+    """Load feature functions from both the TSFEL features module and an
+    optional user module.
 
     Parameters
     ----------
@@ -552,11 +540,8 @@ def load_combined_feature_modules(features_path=None):
         A dictionary mapping function names to function objects from both sources.
         User-defined functions override TSFEL ones with the same name.
     """
-
     # Start with default TSFEL functions
-    feature_funcs = {
-        name: obj for name, obj in tsfel_features.__dict__.items() if callable(obj)
-    }
+    feature_funcs = {name: obj for name, obj in tsfel_features.__dict__.items() if callable(obj)}
 
     if features_path:
         module_name = os.path.splitext(os.path.basename(features_path))[0]
@@ -569,9 +554,7 @@ def load_combined_feature_modules(features_path=None):
         spec.loader.exec_module(user_module)
 
         # Add or override with user-defined functions
-        user_funcs = {
-            name: obj for name, obj in user_module.__dict__.items() if callable(obj)
-        }
+        user_funcs = {name: obj for name, obj in user_module.__dict__.items() if callable(obj)}
         feature_funcs.update(user_funcs)
 
     return feature_funcs

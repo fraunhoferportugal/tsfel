@@ -71,6 +71,12 @@ def calc_fft(signal, fs):
     """
 
     fmag = np.abs(np.fft.rfft(signal))
+    # FFT round-off grows with the signal length, up to about 0.3 * N * eps of
+    # the peak. Bins below N * eps of the peak are round-off, not signal content.
+    # Without this, features of clean signals (e.g. a pure tone) depend on
+    # round-off and change between FFT implementations.
+    round_off = len(signal) * np.finfo(fmag.dtype).eps * fmag.max(initial=0)
+    fmag[fmag < round_off] = 0
     f = np.fft.rfftfreq(len(signal), d=1 / fs)
 
     return f.copy(), fmag.copy()
@@ -135,7 +141,6 @@ def filterbank(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40):
 
     fbank = np.zeros((nfilt, int(np.floor(nfft / 2 + 1))))
     for m in np.arange(1, nfilt + 1):
-
         f_m_minus = int(filter_bin[m - 1])  # left
         f_m = int(filter_bin[m])  # center
         f_m_plus = int(filter_bin[m + 1])  # right
@@ -570,7 +575,7 @@ def calc_lempel_ziv_complexity(sequence):
     """Manual implementation of the Lempel-Ziv complexity.
 
     It is defined as the number of different substrings encountered as
-    the stream is viewed from begining to the end.
+    the stream is viewed from beginning to the end.
 
     Reference:
     https://github.com/Naereen/Lempel-Ziv_Complexity/blob/master/src/lempel_ziv_complexity.py
@@ -617,7 +622,7 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
 
     Returns
     -------
-        Index of the beggining of the plateau if it is found, length of y otherwise.
+        Index of the beginning of the plateau if it is found, length of y otherwise.
     """
 
     dy = np.diff(y)
@@ -630,3 +635,27 @@ def find_plateau(y, threshold=0.1, consecutive_points=5):
 
     # No plateau found
     return len(y)
+
+
+def frequency_labels(frequencies, decimals=2):
+    """Labels frequencies with the fewest decimals (at least ``decimals``) that keep them distinct.
+
+    Parameters
+    ----------
+    frequencies : array_like
+        Frequencies in Hz.
+    decimals : int
+        Minimum number of decimals (default is 2).
+
+    Returns
+    -------
+    np.ndarray
+        Frequencies as strings, one per frequency.
+    """
+
+    frequencies = np.asarray(frequencies, dtype=float)
+    for d in range(decimals, 16):  # np.finfo(float).precision + 1 = 16
+        rounded = np.round(frequencies, d)
+        if len(set(rounded.tolist())) == rounded.size:
+            return rounded.astype(str)
+    return frequencies.astype(str)  # only reached if a frequency repeats

@@ -38,7 +38,7 @@ class SignalProcessingTestCase(unittest.TestCase):
         thresholds = [0.05, 0.5, 0.95]
         expected_features_to_remove = [5, 5, 3]
 
-        for threshold, expected_n_features in zip(thresholds, expected_features_to_remove):
+        for threshold, expected_n_features in zip(thresholds, expected_features_to_remove, strict=True):
             features_name_to_drop = tsfel.correlated_features(X, threshold=threshold, drop_correlated=False)
             self.assertIsInstance(features_name_to_drop, list)
             self.assertEqual(len(features_name_to_drop), expected_n_features)

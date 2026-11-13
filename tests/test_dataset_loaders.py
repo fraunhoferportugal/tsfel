@@ -4,8 +4,11 @@ import hashlib
 import unittest
 
 import numpy as np
+import pytest
 
 import tsfel
+
+pytestmark = pytest.mark.network
 
 
 class TestDataLoaders(unittest.TestCase):

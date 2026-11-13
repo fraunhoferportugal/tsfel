@@ -1,50 +1,118 @@
-name: "Tests"
+name: Tests
 
 on:
   push:
+    branches: [master, dev]
   pull_request:
-    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel superseded runs when new commits are pushed to the same branch or PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    name: Run template tests
+  tests:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        platform: ['ubuntu-22.04', 'macos-latest', 'windows-latest' ]
-    runs-on: ${{ matrix.platform }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install TSFEL and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install . --group test
+          python -m pip list
+
+      - name: Run tests
+        run: python -m pytest -m "not network"
+
+  # The oldest dependency versions TSFEL claims to support, on the oldest Python.
+  # Keeps the floors in pyproject.toml honest.
+  lowest-dependencies:
+    name: Lowest dependencies (Python 3.11)
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.head_ref }}
-      - name: Extract branch name
-        run: echo running on branch ${GITHUB_REF##*/}
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          python-version: "3.11"
+          activate-environment: true
+
+      - name: Install TSFEL with the lowest allowed dependency versions
         run: |
-          python -VV
-          python -m pip install --upgrade pip setuptools
-          pip install -r requirements/requirements.txt
-          pip install -r requirements/requirements-test.txt
-          python -m pip install .
-      - name: Check numpy and scipy flags
+          uv pip install . --group test --resolution lowest-direct
+          uv pip list
+
+      - name: Run tests
+        run: python -m pytest -m "not network"
+
+  # Tests that download datasets run once, not on every matrix job,
+  # to keep CI fast and avoid hammering the dataset hosts.
+  network-tests:
+    name: Dataset loaders (network)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install TSFEL and test dependencies
         run: |
-          python -c "import numpy as np; np.show_config()"
-          python -c "import scipy as sp; sp.show_config()"
-      #      - name: Test the input/output
-      #        run: |
-      #          python tests/test_calc_features.py
-      - name: Test the data loaders
+          python -m pip install --upgrade pip
+          python -m pip install . --group test
+
+      - name: Run network tests
+        run: python -m pytest -m network
+
+  pre-commit:
+    name: Lint and format (pre-commit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Run pre-commit on all files
+        env:
+          SKIP: no-commit-to-branch # guards local commits; CI also runs on master
         run: |
-          python tests/test_dataset_loaders.py
-        if: runner.os != 'Windows' # Skip Windows for now for this test only.
-      - name: Test the signal processing module
-        run: |
-          python tests/test_signal_processing.py
+          python -m pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
