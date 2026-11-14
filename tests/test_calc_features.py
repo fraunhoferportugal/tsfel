@@ -11,8 +11,10 @@ from unittest import mock
 import numpy as np
 import pandas as pd
 
+from tsfel.feature_extraction import features as tsfel_features
 from tsfel.feature_extraction.calc_features import (
     _in_notebook,
+    calc_window_features,
     dataset_features_extractor,
     time_series_features_extractor,
 )
