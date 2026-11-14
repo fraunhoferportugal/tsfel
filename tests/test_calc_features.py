@@ -11,8 +11,10 @@ from unittest import mock
 import numpy as np
 import pandas as pd
 
+from tsfel.feature_extraction import features as tsfel_features
 from tsfel.feature_extraction.calc_features import (
     _in_notebook,
+    calc_window_features,
     dataset_features_extractor,
     time_series_features_extractor,
 )
@@ -199,6 +201,24 @@ class TestCalcFeatures(unittest.TestCase):
             features7.shape,
             (1, 160),
         )
+
+    def test_features_are_evaluated_once_per_axis(self):
+        # Univariate input used to evaluate every feature twice.
+        calls = []
+
+        def counting_feature(signal):
+            calls.append(1)
+            return 0
+
+        config = {"statistical": {"Counting": {"function": "counting_feature", "parameters": "", "use": "yes"}}}
+        tsfel_features.counting_feature = counting_feature
+        try:
+            calc_window_features(config, data_new.values[:, 0], resample_rate, verbose=0)
+            calc_window_features(config, data_new.values[:, :2], resample_rate, verbose=0)
+        finally:
+            del tsfel_features.counting_feature
+
+        np.testing.assert_array_equal(len(calls), 3)
 
     def test_get_number_features(self):
         feature_sets_size = [get_number_features(get_features_by_domain(domain)) for domain in domains]
