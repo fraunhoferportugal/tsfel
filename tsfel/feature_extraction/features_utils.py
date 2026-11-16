@@ -558,14 +558,38 @@ def calc_lengths_higuchi(signal):
     n = len(signal)
     k_values = np.arange(1, n // 10)
     lk = []
+    n_minus_one = n - 1
+    indices = np.arange(n)
+    vectorize = type(signal) is np.ndarray and signal.ndim == 1 and signal.dtype.kind in "iuf"
+
+    difference_buffer = np.empty_like(signal) if vectorize else None
+
+    def normalize(sum_length, m):
+        return (sum_length * n_minus_one) / (((n - m) // k) * k_squared)
 
     for k in k_values:
         lmk = 0
-        for m in np.arange(1, k + 1):
+        k_squared = k**2
+        if vectorize:
+            differences = difference_buffer[: n - k]
+            np.subtract(signal[k:], signal[:-k], out=differences)
+            np.abs(differences, out=differences)
+            rows, remainder = divmod(len(differences), k)
+            dtype = type(0 + differences[0])
+            differences = differences.astype(dtype, copy=False)
+            columns = differences[: rows * k].reshape(rows, k)
+            np.add.accumulate(columns, axis=0, dtype=dtype, out=columns)
+            sums = columns[-1]
+            sums[:remainder] += differences[rows * k :]
+        if vectorize:
+            lengths = normalize(sums, indices[1 : k + 1])
+            lmk = np.add.accumulate(lengths, dtype=type(0 + lengths[0]), out=lengths)[-1]
+        for m in () if vectorize else indices[1 : k + 1]:
             sum_length = 0
-            for i in np.arange(1, (n - m) // k + 1):
-                sum_length += abs(signal[m + i * k - 1] - signal[m + (i - 1) * k - 1])
-            lmk += (sum_length * (n - 1)) / (((n - m) // k) * k**2)
+            lengths = (abs(signal[index] - signal[index - k]) for index in indices[m + k - 1 :: k])
+            for length in lengths:
+                sum_length += length
+            lmk += normalize(sum_length, m)
         lk.append(lmk / k)
 
     return k_values, lk
