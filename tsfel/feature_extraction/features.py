@@ -804,7 +804,7 @@ def ecdf_slope(signal, p_init=0.5, p_end=0.75):
     """
     signal = np.array(signal)
     # check if signal is constant
-    if np.sum(np.diff(signal)) == 0:
+    if np.all(signal == signal[0]):
         return np.inf
     else:
         x_init, x_end = ecdf_percentile(signal, percentile=[p_init, p_end])
@@ -842,13 +842,13 @@ def ecdf_percentile(signal, percentile=None):
 
     if len(percentile) > 1:
         # check if signal is constant
-        if np.sum(np.diff(signal)) == 0:
+        if np.all(signal == signal[0]):
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
             return tuple([x[y <= p].max() for p in percentile])
     else:
         # check if signal is constant
-        if np.sum(np.diff(signal)) == 0:
+        if np.all(signal == signal[0]):
             return signal[0]
         else:
             return x[y <= percentile].max()
@@ -887,13 +887,13 @@ def ecdf_percentile_count(signal, percentile=None):
 
     if len(percentile) > 1:
         # check if signal is constant
-        if np.sum(np.diff(signal)) == 0:
+        if np.all(signal == signal[0]):
             return tuple(np.repeat(signal[0], len(percentile)))
         else:
             return tuple([x[y <= p].shape[0] for p in percentile])
     else:
         # check if signal is constant
-        if np.sum(np.diff(signal)) == 0:
+        if np.all(signal == signal[0]):
             return signal[0]
         else:
             return x[y <= percentile].shape[0]
