@@ -53,6 +53,15 @@ X = tsfel.time_series_features_extractor(cfg, data)
 For a more detailed walk-through — including input/output data formats, extraction routine configuration, and how to
 implement your custom features — refer to the documentation here.
 
+## Cheat sheet
+
+The main calls, input formats and all 67 features on one double-sided A4 page.
+[Download the PDF](https://github.com/fraunhoferportugal/tsfel/blob/master/docs/cheatsheet/TSFEL_cheatsheet.pdf).
+
+<p align="center">
+  <a href="https://github.com/fraunhoferportugal/tsfel/blob/master/docs/cheatsheet/TSFEL_cheatsheet.pdf"><img src="https://raw.githubusercontent.com/fraunhoferportugal/tsfel/master/docs/cheatsheet/TSFEL_cheatsheet_thumbnail.png" width="630" alt="The two pages of the TSFEL cheat sheet" /></a>
+</p>
+
 ## Highlights
 
 - **Intuitive, fast deployment, and reproducible**: Easily configure your feature extraction pipeline and store the
