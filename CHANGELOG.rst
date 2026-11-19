@@ -4,6 +4,11 @@ Changelog
 
 Version 0.3.1 (unreleased)
 ==========================
+- Bugfixes
+    - Spectral feature extraction no longer fails at low sampling frequencies (such as ``fs=1``) because of duplicate frequency names. Thanks to Micha Claydon (`#184 <https://github.com/fraunhoferportugal/tsfel/pull/184>`_)
+
+- Documentation
+    - Added a two-page cheat sheet (``docs/cheatsheet``), linked from the README and the Get Started page
 
 Version 0.3.0
 =============
