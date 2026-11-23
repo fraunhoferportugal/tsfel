@@ -120,7 +120,7 @@ def correlated_features(
     to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
 
     if drop_correlated:
-        features.drop(to_drop, axis=1, inplace=True)
+        features = features.drop(columns=to_drop)
 
         return to_drop, features
 
