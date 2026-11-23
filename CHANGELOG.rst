@@ -4,6 +4,14 @@ Changelog
 
 Version 0.3.1 (unreleased)
 ==========================
+- Changes
+    - Feature extraction is about twice as fast for single-axis input, which computed every feature twice. Thanks to Madson Dias (`#189 <https://github.com/fraunhoferportugal/tsfel/pull/189>`_)
+
+- Bugfixes
+    - ``correlated_features`` no longer modifies the input DataFrame, and no longer raises a ``Pandas4Warning`` on pandas 3.1 or newer (`#208 <https://github.com/fraunhoferportugal/tsfel/pull/208>`_, by `Daniel Carradinha <https://github.com/Carradinha>`_)
+
+- Documentation
+    - Added a two-page cheat sheet (``docs/cheatsheet``), linked from the README and the Get Started page
 
 Version 0.3.0
 =============
