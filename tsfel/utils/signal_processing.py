@@ -85,9 +85,8 @@ def correlated_features(
 
     This function computes the pairwise Pearson correlation of features using
     pandas.corr() and identifies features that have an absolute value of the
-    correlation coefficient higher than the specified threshold. Different
-    correlation methods supported by such as 'pearson', 'spearman', or
-    'kendall'.
+    correlation coefficient higher than the specified threshold. Supported
+    methods are 'pearson', 'spearman', or 'kendall'.
 
     .. deprecated:: 0.1.11
 
@@ -110,13 +109,14 @@ def correlated_features(
     -------
     Union[List[str], Tuple[List[str], pd.DataFrame]]:
         - A list of names of highly correlated features.
-        - If `drop_correlated` is True, a tuple containing the list of dropped feature names and the updated DataFrame with those features removed.
+        - If `drop_correlated` is True, a tuple containing the list of dropped feature names and a new DataFrame without
+         those features. The input DataFrame is not modified.
     """
 
     corr_matrix = features.corr(method=method).abs()
     # Select upper triangle of correlation matrix
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    # Find index and column name of features with correlation greater than 0.95
+    # Find index and column name of features with correlation greater than the threshold
     to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
 
     if drop_correlated:
