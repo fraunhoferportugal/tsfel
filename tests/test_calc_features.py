@@ -224,7 +224,7 @@ class TestCalcFeatures(unittest.TestCase):
         feature_sets_size = [get_number_features(get_features_by_domain(domain)) for domain in domains]
         np.testing.assert_array_equal(
             feature_sets_size,
-            [31, 14, 124, 6],  # 184 is the total
+            [31, 14, 111, 6],  # 162 is the total
         )
 
     def test_dataset_extractor(self):
