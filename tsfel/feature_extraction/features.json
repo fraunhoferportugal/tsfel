@@ -264,7 +264,7 @@
             "wavelet": "mexh"
         },
         "tag": "eeg",
-        "n_features": "max_width",
+        "n_features": 1,
         "use": "yes"
     },
     "Wavelet standard deviation": {

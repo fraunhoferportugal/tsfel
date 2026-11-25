@@ -155,6 +155,9 @@ def get_number_features(dict_features):
 
             if isinstance(n_feat, int):
                 number_features += n_feat
+            # Wavelet features use np.arange(1, max_width), generating 9 features not the 10 indicated by features.json
+            elif n_feat == "max_width":
+                number_features += dict_features[domain][feat]["parameters"][n_feat] - 1
             else:
                 n_feat_param = dict_features[domain][feat]["parameters"][n_feat]
                 if isinstance(n_feat_param, int):
