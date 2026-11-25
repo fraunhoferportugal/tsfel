@@ -1474,7 +1474,8 @@ def mfcc(signal, fs, pre_emphasis=0.97, nfft=512, nfilt=40, num_ceps=12, cep_lif
 def power_bandwidth(signal, fs):
     """Computes power spectrum density bandwidth of the signal.
 
-    It corresponds to the width of the frequency band in which 95% of its power is located.
+    It corresponds to the width of the frequency band in which 95% of its power is located,
+    excluding 2.5% of the power from each tail.
 
     Description in article:
     Power Spectrum and Bandwidth Ulf Henriksson, 2003 Translated by Mikael Olofsson, 2005
@@ -1504,10 +1505,10 @@ def power_bandwidth(signal, fs):
 
     # Computing the lower and upper limits of power bandwidth
     cum_power = np.cumsum(power)
-    f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.95)[0][0]]
+    f_lower = freq[np.where(cum_power >= cum_power[-1] * 0.975)[0][0]]
 
     cum_power_inv = np.cumsum(power[::-1])
-    f_upper = freq[np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.95)[0][0] - len(power) + 1)]
+    f_upper = freq[np.abs(np.where(cum_power_inv >= cum_power[-1] * 0.975)[0][0] - len(power) + 1)]
 
     # Returning the bandwidth in terms of frequency
 
